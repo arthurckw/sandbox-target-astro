@@ -1,0 +1,61 @@
+---
+// FeatureGrid component - Display features in a grid layout
+interface Feature {
+  icon?: string;
+  title: string;
+  description: string;
+}
+
+interface Props {
+  title?: string;
+  description?: string;
+  features: Feature[];
+  columns?: 2 | 3 | 4;
+}
+
+const { title, description, features, columns = 3 } = Astro.props;
+
+const gridClasses = {
+  2: 'md:grid-cols-2',
+  3: 'md:grid-cols-3',
+  4: 'md:grid-cols-4'
+};
+---
+
+<section class="py-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    {(title || description) && (
+      <div class="text-center mb-16">
+        {title && (
+          <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-6">
+            {title}
+          </h2>
+        )}
+        {description && (
+          <p class="text-xl text-secondary max-w-3xl mx-auto">
+            {description}
+          </p>
+        )}
+      </div>
+    )}
+
+    <div class={`grid grid-cols-1 ${gridClasses[columns]} gap-8`}>
+      {features.map((feature) => (
+        <div class="bg-surface-elevated border border-border-subtle rounded-lg p-6 hover:border-accent/30 transition-micro ease-smooth">
+          {feature.icon && (
+            <div class="text-4xl mb-4">{feature.icon}</div>
+          )}
+          <h3 class="text-xl font-semibold text-primary mb-3">
+            {feature.title}
+          </h3>
+          <p class="text-secondary">
+            {feature.description}
+          </p>
+        </div>
+      ))}
+    </div>
+
+    <!-- Slot for additional content below grid -->
+    <slot />
+  </div>
+</section>

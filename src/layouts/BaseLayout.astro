@@ -1,0 +1,171 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  currentPath?: string;
+  ogImage?: string;
+  keywords?: string;
+  canonicalUrl?: string;
+  jsonLd?: object;
+  hideChrome?: boolean;
+}
+
+const {
+  title = 'HumanJudge - Public AI Accountability Platform',
+  description = 'Monitor AI quality with verified experts. Make AI failures transparent.',
+  currentPath = Astro.url.pathname,
+  ogImage = '/og-default.png',
+  keywords,
+  canonicalUrl,
+  jsonLd,
+  hideChrome = false,
+} = Astro.props;
+
+// Strip .html and trailing index from canonical to match clean URLs Netlify serves
+const canonical = canonicalUrl || Astro.url.href.replace(/\.html$/, '').replace(/\/index$/, '/');
+const ogImageUrl = ogImage.startsWith('http') ? ogImage : `https://humanjudge.com${ogImage}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+
+    <!-- SEO Meta Tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {keywords && <meta name="keywords" content={keywords} />}
+
+    <!-- Active distribution: feed-reader and AI-engine auto-discovery -->
+    <link rel="alternate" type="application/rss+xml" title="HumanJudge — Recent AI evaluation claims" href="https://humanjudge.com/claims.rss" />
+    <link rel="alternate" type="application/feed+json" title="HumanJudge — Recent AI evaluation claims (JSON Feed)" href="https://humanjudge.com/claims.json" />
+    <link rel="alternate" type="text/markdown" title="HumanJudge — LLM-friendly site overview" href="https://humanjudge.com/llms.txt" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:site_name" content="HumanJudge" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonical} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <!-- Structured Data -->
+    {jsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    )}
+
+    <!-- Fonts: Inter (body), Space Grotesk (display), JetBrains Mono (data). -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Theme init — runs BEFORE paint to avoid flash. Reads localStorage
+         preference and sets <html class="dark|light"> accordingly. Defaults
+         to dark when nothing is stored. -->
+    <script is:inline>(function(){
+      try {
+        var saved = localStorage.getItem('hj_theme');
+        var theme = saved === 'light' ? 'light' : 'dark';
+        document.documentElement.classList.remove('dark', 'light');
+        document.documentElement.classList.add(theme);
+        var fontPref = localStorage.getItem('hj_font_large');
+        if (fontPref === '1') document.documentElement.classList.add('large-font');
+      } catch (e) {
+        document.documentElement.classList.add('dark');
+      }
+    })();</script>
+
+    <!-- Google Tag Manager -->
+    <script is:inline>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-M8XS7F5S');</script>
+
+    <!-- PBI-039: ?internal=1 fallback for logged-out internal-traffic testing.
+         Sets is_staff=true on the session via dataLayer so the GA4
+         "External users only" exploration filters it out. Persists across
+         page loads via sessionStorage so the team only has to flag once
+         per test session. Decision C1: sessionStorage (not localStorage)
+         so closing the tab clears the flag.
+         Decision D: when the flag is active, surface a top-of-page banner
+         confirming "Internal filter active" so testers know their session
+         is excluded from GA4 (and so they remember to test as external
+         when validating real-user changes). -->
+    <script is:inline>(function(){
+      window.dataLayer = window.dataLayer || [];
+      try {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('internal') === '1') sessionStorage.setItem('hj_internal', '1');
+        if (sessionStorage.getItem('hj_internal') === '1') {
+          window.dataLayer.push({ event: 'auth_state', auth_uid: 'internal_flagged', is_staff: true });
+          // Banner mount runs after DOMContentLoaded so document.body exists.
+          var mountBanner = function(){
+            if (document.getElementById('hj-internal-banner')) return;
+            var b = document.createElement('div');
+            b.id = 'hj-internal-banner';
+            // HEX-COLOR EXEMPTION: internal-testing banner — orange chosen
+            // intentionally (distinct from chrome) so QA can see at a glance
+            // that GA4 is filtering their session.
+            b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#7c2d12;color:#fed7aa;font:500 12px/1.6 system-ui,-apple-system,sans-serif;padding:6px 16px;text-align:center;border-bottom:1px solid #9a3412';
+            b.innerHTML = 'Internal filter active — your activity is excluded from GA4. <a href="#" id="hj-internal-clear" style="color:#fed7aa;text-decoration:underline;margin-left:8px">Clear</a>';
+            document.body.appendChild(b);
+            document.body.style.marginTop = (b.offsetHeight) + 'px';
+            document.getElementById('hj-internal-clear').addEventListener('click', function(e){
+              e.preventDefault();
+              try { sessionStorage.removeItem('hj_internal'); } catch(_){}
+              b.remove();
+              document.body.style.marginTop = '';
+            });
+          };
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', mountBanner);
+          } else {
+            mountBanner();
+          }
+        }
+      } catch (e) { /* sessionStorage blocked — no-op */ }
+    })();</script>
+
+    <!-- Global Styles — design tokens (single source of truth) + Tailwind layers.
+         All color/typography/spacing/motion values come from design-tokens.css.
+         Import must precede @tailwind directives (PostCSS requirement). -->
+    <style is:global>
+      @import '../styles/design-tokens.css';
+      @tailwind base;
+      @tailwind components;
+      @tailwind utilities;
+    </style>
+  </head>
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M8XS7F5S"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    {!hideChrome && <Header currentPath={currentPath} />}
+    <main class={hideChrome ? '' : 'pt-20'}>
+      <slot />
+    </main>
+    {!hideChrome && <Footer />}
+  </body>
+</html>

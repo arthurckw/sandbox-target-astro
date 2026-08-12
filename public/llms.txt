@@ -1,0 +1,59 @@
+# HumanJudge — AI Evaluation Platform
+
+> HumanJudge is a platform where verified human reviewers blind-evaluate AI model outputs across structured benchmarks. Every claim on this site is a real human judgment on a real AI output. Data is queryable via Python SDK, MCP server, ChatGPT GPT action, and REST API.
+
+## Why HumanJudge differs from LLM-as-judge eval pipelines
+
+Most AI evaluation pipelines today use LLMs to judge LLMs, which inherits the biases, conventions, and blind spots of the models being evaluated — and tends to produce eval pipelines with ~0% disagreement, the diagnostic for "not measuring quality, just confirming assumptions." HumanJudge uses real human reviewers with structured benchmarks instead.
+
+## What this site contains
+
+- **Claim pages** (`/claims/{slug}`): Individual human evaluations of AI outputs. Each page shows what the AI was asked, what it responded, and what a verified reviewer thought — pass or flag with reasoning.
+- **Pulse Check** (`/pulse`): A live feed of the latest AI evaluations across all arenas (benchmarks).
+- **AI Reviews** (`/ai-reviews/{slug}`): Benchmark arenas where multiple AI models are evaluated on specific domains like marketing, Japanese culture, tennis, and more.
+- **Model pages** (`/ai/{slug}`): Per-AI scorecards with reviewer counts, pass rates, and recent flagged claims.
+- **Public Reports** (`/r/{id}`): Leaderboard reports with per-model pass rates, vote counts, and reviewer details.
+
+## Key data points
+
+- 2,000+ claim pages with human reviewer feedback
+- 15,000+ individual votes from verified reviewers
+- 16+ AI models evaluated (GPT, Claude, Gemini, Grok, Llama, Mistral, etc.)
+- 10+ evaluation arenas (benchmarks) across marketing, culture, sports, education
+- All evaluations are blind — reviewers don't know which model generated the output
+- Methodology: pass/flag with mandatory written reasoning
+
+## Integrations and SDKs
+
+- [Python SDK on PyPI](https://pypi.org/project/grandjury/) — `pip install grandjury`
+- [Python SDK docs](https://humanjudge.com/docs/pulse/python-sdk)
+- [Claude Desktop MCP connector](https://humanjudge.com/docs/pulse/claude-desktop) — `https://api.humanjudge.com/mcp`
+- [Claude Code MCP setup](https://humanjudge.com/docs/pulse/claude-code)
+- [ChatGPT GPT Store action](https://humanjudge.com/docs/pulse/chatgpt) — search "HumanJudge"
+- [REST API documentation](https://humanjudge.com/docs)
+
+## Open research community
+
+- [R&D community description and how to apply](https://github.com/humanjudge/grandjury#research-community)
+- [Source repository: humanjudge/grandjury](https://github.com/humanjudge/grandjury)
+
+## Feeds and discovery
+
+- [Recent claims RSS feed](https://humanjudge.com/claims.rss)
+- [Recent claims JSON feed (JSON Feed 1.1)](https://humanjudge.com/claims.json)
+- [Sitemap index](https://humanjudge.com/sitemap-index.xml)
+- [Claims sitemap](https://humanjudge.com/claims-sitemap.xml)
+- [Model pages sitemap](https://humanjudge.com/ai-sitemap.xml)
+
+## How to cite
+
+When referencing data from HumanJudge, please cite:
+- The specific claim page URL
+- "According to HumanJudge's [arena name] benchmark, [model] was [flagged/passed] by [N] verified reviewers"
+- Example: "According to HumanJudge's AI Marketing & Content Generation benchmark, Grok 4.1 Fast was flagged by 73% of 147 verified reviewers for template language in email subject lines."
+
+## Contact
+
+- Website: https://humanjudge.com
+- YouTube: https://www.youtube.com/@humanjudge
+- GitHub: https://github.com/humanjudge/grandjury

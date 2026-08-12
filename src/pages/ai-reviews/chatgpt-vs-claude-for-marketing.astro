@@ -1,0 +1,163 @@
+---
+export const prerender = true;
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const title = "ChatGPT vs Claude for Marketing: Real Human Reviews (2026) | HumanJudge";
+const description = "GPT-5.4 wins at 98.7% vs Claude Opus at 93.3% — but Claude gets flagged for different reasons. 147 blind reviewers compared both on marketing tasks. Side-by-side scores, flag patterns, and real reviewer quotes.";
+const keywords = "chatgpt vs claude, chatgpt vs claude for marketing, best ai for marketing, ai email writer, ai content creation tool, chatgpt for marketing, claude for marketing, ai marketing tools";
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'ChatGPT vs Claude for Marketing: What 147 Human Reviewers Found',
+  description,
+  author: { '@type': 'Organization', name: 'HumanJudge', url: 'https://humanjudge.com' },
+  publisher: { '@type': 'Organization', name: 'HumanJudge', url: 'https://humanjudge.com' },
+  datePublished: '2026-04-09',
+  mainEntity: {
+    '@type': 'Dataset',
+    name: 'AI Marketing & Content Generation Benchmark',
+    description: 'Human evaluation of AI-generated marketing content across email, social, ads, and more.',
+    measurementTechnique: 'Blind evaluation by verified human reviewers with mandatory reasoning',
+    variableMeasured: [
+      { '@type': 'PropertyValue', name: 'GPT-5.4 pass rate', value: 98.7 },
+      { '@type': 'PropertyValue', name: 'GPT-5.2 Chat pass rate', value: 95.5 },
+      { '@type': 'PropertyValue', name: 'Claude Sonnet 4.6 pass rate', value: 93.6 },
+      { '@type': 'PropertyValue', name: 'Claude Opus 4.6 pass rate', value: 93.2 },
+    ],
+  },
+};
+
+const models = [
+  { name: 'GPT-5.4', votes: 602, passes: 594, flags: 8, rate: 98.7 },
+  { name: 'GPT-5.2 Chat', votes: 1571, passes: 1501, flags: 70, rate: 95.5 },
+  { name: 'GPT-5.2', votes: 1557, passes: 1470, flags: 87, rate: 94.4 },
+  { name: 'Claude Sonnet 4.6', votes: 1573, passes: 1473, flags: 100, rate: 93.6 },
+  { name: 'Claude Opus 4.6', votes: 1569, passes: 1463, flags: 106, rate: 93.2 },
+];
+
+const flagExamples = [
+  { model: 'GPT-5.2', slug: 'the-response-is-the-definition-of-generic-ai-it-uses-safe', quote: 'The response is the definition of "generic AI." It uses safe, bloated phrases like "unparalleled abi...' },
+  { model: 'Claude Opus 4.6', slug: 'i-am-flagging-this-response-because-it-demonstrates-a-fundam', quote: 'Demonstrates a fundamental lack of understanding of both luxury branding and...' },
+  { model: 'Claude Sonnet 4.6', slug: 'the-prompt-explicitly-says-dont-pitch-anything-make-t', quote: 'The prompt explicitly says "Don\'t pitch anything." Make them realize the pain so they reach out...' },
+  { model: 'GPT-5.2 Chat', slug: 'the-prompt-explicitly-says-dont-pitch-anything-however', quote: 'The prompt explicitly says "don\'t pitch anything." However, the response ends with "let\'s talk"...' },
+  { model: 'Claude Opus 4.6', slug: 'this-isn-t-subtle-enough-the-intro-tries-to-hook-but-it-doe', quote: 'This isn\'t subtle enough. The intro tries to hook but it does a poor job at it...' },
+  { model: 'GPT-5.2', slug: 'the-prompt-specifically-instructs-not-to-pitch-anything-but', quote: 'The prompt specifically instructs not to pitch anything, but the response ends with "message me PRO..."' },
+];
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd} keywords={keywords}>
+
+<article class="max-w-3xl mx-auto px-6 py-16">
+
+  <!-- Hero -->
+  <h1 class="text-4xl sm:text-5xl font-normal leading-snug text-primary mb-6">
+    ChatGPT vs Claude for Marketing: What 147 Human Reviewers Found
+  </h1>
+  <p class="text-lg text-secondary leading-relaxed mb-4">
+    We asked verified reviewers to blindly evaluate marketing content from GPT-5.4, GPT-5.2, Claude Sonnet 4.6, and Claude Opus 4.6. No reviewer knew which AI wrote what. Here's what they found.
+  </p>
+  <p class="text-sm text-tertiary mb-12">
+    Data from <a href="/ai-reviews/ai-marketing-content-generation" class="text-accent hover:underline">AI Marketing & Content Generation</a> benchmark · Updated April 2026 · <a href="/pulse" class="text-accent hover:underline">See live feed →</a>
+  </p>
+
+  <!-- TL;DR -->
+  <section class="bg-surface-elevated rounded-xl p-6 mb-12 border border-border-subtle">
+    <h2 class="text-sm font-bold text-primary uppercase tracking-wider mb-4">The short answer</h2>
+    <p class="text-secondary leading-relaxed">
+      <strong class="text-primary">GPT-5.4 leads at 98.7% pass rate</strong> — nearly flawless across 602 reviews. GPT-5.2 Chat follows at 95.5%. Claude models cluster around 93% — still strong, but reviewers flagged them more for being <em>too long</em>, <em>too dramatic</em>, and <em>trying too hard</em>. Both brands produce marketing content that real professionals would use — the difference is in the failure modes.
+    </p>
+  </section>
+
+  <!-- Leaderboard -->
+  <section class="mb-12">
+    <h2 class="text-2xl font-normal text-primary mb-6">Pass rates: head to head</h2>
+    <div class="space-y-3">
+      {models.map((m) => (
+        <div class="flex items-center gap-4">
+          <span class="text-sm text-secondary w-40 truncate">{m.name}</span>
+          <div class="flex-1 h-3 bg-surface-elevated rounded-full overflow-hidden flex">
+            <div class="h-full bg-info rounded-full" style={`width: ${m.rate}%`}></div>
+          </div>
+          <span class="text-sm font-mono text-primary w-14 text-right">{m.rate}%</span>
+          <span class="text-xs text-tertiary w-20 text-right">{m.votes.toLocaleString()} votes</span>
+        </div>
+      ))}
+    </div>
+    <p class="text-xs text-tertiary mt-4">Blind evaluation by verified reviewers. Each reviewer saw anonymized AI outputs without knowing which model generated them.</p>
+  </section>
+
+  <!-- What GPT gets flagged for -->
+  <section class="mb-12">
+    <h2 class="text-2xl font-normal text-primary mb-4">What GPT gets flagged for</h2>
+    <p class="text-secondary leading-relaxed mb-6">
+      GPT's rare flags (70-87 out of ~1,500) tend to be about <strong class="text-primary">generic phrasing</strong> and <strong class="text-primary">ignoring instructions</strong>. Reviewers catch "safe, bloated phrases" and responses that pitch when told not to.
+    </p>
+    <div class="space-y-3">
+      {flagExamples.filter(f => f.model.includes('GPT')).map((f) => (
+        <a href={`/claims/${f.slug}`} class="block p-4 bg-surface-elevated rounded-lg border border-border-subtle hover:border-accent/30 transition-colors">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs px-1.5 py-0.5 rounded-sm bg-danger/15 text-danger font-medium">flag</span>
+            <span class="text-xs text-secondary">{f.model}</span>
+          </div>
+          <p class="text-sm text-primary leading-relaxed">"{f.quote}"</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- What Claude gets flagged for -->
+  <section class="mb-12">
+    <h2 class="text-2xl font-normal text-primary mb-4">What Claude gets flagged for</h2>
+    <p class="text-secondary leading-relaxed mb-6">
+      Claude's flags (100-106 out of ~1,500) cluster around <strong class="text-primary">being too verbose</strong>, <strong class="text-primary">tone mismatches</strong>, and <strong class="text-primary">overreaching</strong>. Reviewers say the output "tries too hard" or "doesn't sound human."
+    </p>
+    <div class="space-y-3">
+      {flagExamples.filter(f => f.model.includes('Claude')).map((f) => (
+        <a href={`/claims/${f.slug}`} class="block p-4 bg-surface-elevated rounded-lg border border-border-subtle hover:border-accent/30 transition-colors">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs px-1.5 py-0.5 rounded-sm bg-danger/15 text-danger font-medium">flag</span>
+            <span class="text-xs text-secondary">{f.model}</span>
+          </div>
+          <p class="text-sm text-primary leading-relaxed">"{f.quote}"</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Bottom line -->
+  <section class="mb-12">
+    <h2 class="text-2xl font-normal text-primary mb-4">The bottom line</h2>
+    <p class="text-secondary leading-relaxed mb-4">
+      Both GPT and Claude produce marketing content that passes human review 93-99% of the time. The practical difference isn't quality — it's <em>how they fail</em>.
+    </p>
+    <ul class="space-y-2 text-secondary">
+      <li><strong class="text-primary">Choose GPT</strong> if you want safer, more concise output with less editing. GPT-5.4 is nearly perfect at 98.7%.</li>
+      <li><strong class="text-primary">Choose Claude</strong> if you want more creative depth — but expect to trim verbose output and check tone.</li>
+      <li><strong class="text-primary">Don't trust either blindly</strong> — 5-7% of Claude's output and 1-5% of GPT's output gets flagged by experienced marketers.</li>
+    </ul>
+  </section>
+
+  <!-- CTA -->
+  <section class="bg-surface-elevated rounded-xl p-6 border border-border-subtle text-center">
+    <p class="text-secondary mb-4">These results update continuously as new reviews come in.</p>
+    <div class="flex flex-wrap justify-center gap-3">
+      <a href="/pulse" class="inline-flex items-center px-5 py-2.5 rounded-md bg-accent text-accent-on text-sm font-medium hover:bg-accent-hover transition-colors">
+        See live feed →
+      </a>
+      <a href="/pulse?subscribe=true" class="inline-flex items-center px-5 py-2.5 rounded-md bg-surface border border-border-subtle text-secondary text-sm font-medium hover:text-primary hover:border-border transition-colors">
+        Full benchmark report
+      </a>
+    </div>
+  </section>
+
+  <!-- Methodology -->
+  <footer class="mt-12 pt-8 border-t border-border-subtle">
+    <p class="text-xs text-tertiary leading-relaxed">
+      <strong>Methodology:</strong> All evaluations are blind — reviewers see anonymized AI outputs without knowing which model generated them. Each reviewer must provide written reasoning for their pass or flag verdict. Data sourced from the <a href="/ai-reviews/ai-marketing-content-generation" class="text-accent hover:underline">AI Marketing & Content Generation</a> benchmark on HumanJudge. Tasks include email subject lines, cold emails, social media posts, ad copy, taglines, and blog posts.
+    </p>
+  </footer>
+
+</article>
+
+</BaseLayout>

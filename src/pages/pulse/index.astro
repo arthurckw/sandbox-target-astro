@@ -1,0 +1,78 @@
+---
+/**
+ * Pulse — Feed/discovery page for claims.
+ * SSR — fetches fresh data on each request.
+ * HJ header/footer visible (not hideChrome).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PulseFeedIsland from '../../components/PulseFeedIslandWithRealtime';
+
+const API_BASE = 'https://grandjury-server.onrender.com';
+
+// Fetch initial claims + arenas
+let claims: any[] = [];
+let arenas: any[] = [];
+let total = 0;
+
+try {
+  const [claimsRes, arenasRes] = await Promise.all([
+    fetch(`${API_BASE}/api/v1/claims/?limit=30&sort=recent&comments_only=true`),
+    fetch(`${API_BASE}/api/v1/claims/arenas`),
+  ]);
+  if (claimsRes.ok) {
+    const data = await claimsRes.json();
+    claims = data.claims;
+    total = data.total;
+  }
+  if (arenasRes.ok) {
+    const data = await arenasRes.json();
+    arenas = data.arenas;
+  }
+} catch {}
+
+const title = 'Pulse Check — AI Quality Feed | HumanJudge';
+const description = `${total} real-time AI evaluation claims from verified human reviewers. See what passes and what gets flagged across ${arenas.length} arenas.`;
+---
+
+<BaseLayout title={title} description={description}>
+
+<div class="min-h-screen">
+  <!-- Pulse feed React island with Realtime -->
+  <PulseFeedIsland
+    client:load
+    initialClaims={claims}
+    arenas={arenas}
+    totalClaims={total}
+    apiBase={API_BASE}
+  />
+
+  <!-- Programmatic access section (SSR — crawlable internal links to docs) -->
+  <section class="border-t border-border-subtle bg-surface" data-track-section="pulse_access_methods">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <h2 class="text-2xl sm:text-3xl font-bold text-primary mb-3">Access this data from your workflow</h2>
+      <p class="text-secondary mb-8 max-w-2xl">
+        Pulse is also queryable from ChatGPT, Claude Desktop, Claude Code, or Python — same human evaluation data, accessible from where you already work.
+      </p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <a href="/docs/pulse/chatgpt" data-track-cta="pulse_access_chatgpt" class="block bg-surface-elevated border border-border-subtle rounded-lg p-5 hover:border-accent/50 transition-colors group">
+          <h3 class="font-semibold text-primary group-hover:text-accent mb-1">In ChatGPT →</h3>
+          <p class="text-secondary text-sm">Ask the AI Quality Check GPT about model rankings, flag patterns, and content checks.</p>
+        </a>
+        <a href="/docs/pulse/claude-desktop" data-track-cta="pulse_access_claude_desktop" class="block bg-surface-elevated border border-border-subtle rounded-lg p-5 hover:border-accent/50 transition-colors group">
+          <h3 class="font-semibold text-primary group-hover:text-accent mb-1">In Claude Desktop →</h3>
+          <p class="text-secondary text-sm">Add the HumanJudge MCP server as a Claude connector. One-click setup.</p>
+        </a>
+        <a href="/docs/pulse/claude-code" data-track-cta="pulse_access_claude_code" class="block bg-surface-elevated border border-border-subtle rounded-lg p-5 hover:border-accent/50 transition-colors group">
+          <h3 class="font-semibold text-primary group-hover:text-accent mb-1">In Claude Code →</h3>
+          <p class="text-secondary text-sm">Add as remote MCP server in VS Code or the CLI. Query evaluations while you build.</p>
+        </a>
+        <a href="/docs/pulse/python-sdk" data-track-cta="pulse_access_python" class="block bg-surface-elevated border border-border-subtle rounded-lg p-5 hover:border-accent/50 transition-colors group">
+          <h3 class="font-semibold text-primary group-hover:text-accent mb-1">In Python →</h3>
+          <p class="text-secondary text-sm">pip install grandjury. Pandas integration, leaderboards, votes — built for notebooks.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
+
+</BaseLayout>

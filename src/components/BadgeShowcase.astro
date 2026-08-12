@@ -1,0 +1,297 @@
+---
+// Badge Showcase Component
+// Displays static badge previews (mock data) for homepage showcase.
+// Real badges use the actual API endpoint at /api/v1/public/badge/{project_id}/iframe.
+//
+// HEX-COLOR EXEMPTION: these SVG mockups intentionally use hardcoded
+// fills/strokes that match the published verified-badge product spec
+// (green-on-light, green-on-dark, monochrome variants). They are
+// customer-facing brand artifacts, NOT page chrome — design tokens
+// don't apply here on purpose.
+---
+
+<div class="badge-showcase">
+  <div class="text-center mb-12">
+    <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-4">
+      Trust Badges You Can Embed
+    </h2>
+    <p class="text-xl text-secondary max-w-2xl mx-auto">
+      Show your AI has been verified by real experts. Copy the badge code and embed it anywhere.
+    </p>
+  </div>
+
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+    <!-- Performance Badge Example -->
+    <div class="bg-surface-elevated border border-border-subtle rounded-lg p-6 hover:border-accent/50 transition-micro">
+      <h3 class="font-semibold text-primary mb-2">Performance Badge</h3>
+      <p class="text-sm text-secondary mb-6">Shows approval rating when you have 5+ evaluations from 3+ verified evaluators</p>
+
+      <div class="space-y-4">
+        <div>
+          <p class="text-xs text-tertiary mb-2">Light Theme</p>
+          <div class="bg-white p-4 rounded border border-border-subtle flex items-center justify-center">
+            <!-- Static Performance Badge (Light) -->
+            <div class="badge-performance-light">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#047857" stroke="#10b981" stroke-width="1.5"/>
+                <circle cx="12" cy="12" r="3" fill="#ecfdf5"/>
+              </svg>
+              <div class="badge-content">
+                <div class="badge-subtitle">HumanJudge Verified</div>
+                <div class="badge-score">92% Positive</div>
+                <div class="badge-evaluators">127 evaluators</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="text-xs text-tertiary mb-2">Dark Theme</p>
+          <div class="bg-bg p-4 rounded border border-border-emphasis flex items-center justify-center">
+            <!-- Static Performance Badge (Dark) -->
+            <div class="badge-performance-dark">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+                <circle cx="12" cy="12" r="3" fill="#064e3b"/>
+              </svg>
+              <div class="badge-content">
+                <div class="badge-subtitle">HumanJudge Verified</div>
+                <div class="badge-score">92% Positive</div>
+                <div class="badge-evaluators">127 evaluators</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Base Badge Example -->
+    <div class="bg-surface-elevated border border-border-subtle rounded-lg p-6 hover:border-accent/50 transition-micro">
+      <h3 class="font-semibold text-primary mb-2">Base Badge</h3>
+      <p class="text-sm text-secondary mb-6">Shows monitoring status when you have 1+ evaluations</p>
+
+      <div class="space-y-4">
+        <div>
+          <p class="text-xs text-tertiary mb-2">Light Theme</p>
+          <div class="bg-white p-4 rounded border border-border-subtle flex items-center justify-center">
+            <!-- Static Base Badge (Light) -->
+            <div class="badge-base-light">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#111827" stroke="#6b7280" stroke-width="1"/>
+                <circle cx="12" cy="12" r="3" fill="#ffffff"/>
+              </svg>
+              <div class="badge-content-base">
+                <div class="badge-title">Monitored by HumanJudge</div>
+                <div class="badge-timestamp">Last evaluation: Jan 23, 2026</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="text-xs text-tertiary mb-2">Dark Theme</p>
+          <div class="bg-bg p-4 rounded border border-border-emphasis flex items-center justify-center">
+            <!-- Static Base Badge (Dark) -->
+            <div class="badge-base-dark">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#f9fafb" stroke="#9ca3af" stroke-width="1"/>
+                <circle cx="12" cy="12" r="3" fill="#1f2937"/>
+              </svg>
+              <div class="badge-content-base">
+                <div class="badge-title">Monitored by HumanJudge</div>
+                <div class="badge-timestamp">Last evaluation: Jan 23, 2026</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code Example Card -->
+    <div class="bg-surface-elevated border border-border-subtle rounded-lg p-6">
+      <h3 class="font-semibold text-primary mb-2 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+        Embed Code
+      </h3>
+      <p class="text-sm text-secondary mb-6">Add to your website in seconds</p>
+
+      <pre class="bg-background border border-border-subtle rounded p-3 overflow-x-auto text-xs"><code>&lt;iframe
+  src="https://grandjury-server.onrender.com/api/v1/public/badge/YOUR_PROJECT_ID/iframe?theme=light"
+  width="200"
+  height="60"
+  frameborder="0"
+  sandbox="allow-scripts allow-popups allow-same-origin"
+  style="border: none;"
+&gt;&lt;/iframe&gt;</code></pre>
+
+      <div class="mt-6 space-y-3">
+        <div class="flex items-start text-sm">
+          <svg class="w-4 h-4 mr-2 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span class="text-secondary">Auto-updates with latest data</span>
+        </div>
+        <div class="flex items-start text-sm">
+          <svg class="w-4 h-4 mr-2 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span class="text-secondary">Cached for fast loading</span>
+        </div>
+        <div class="flex items-start text-sm">
+          <svg class="w-4 h-4 mr-2 text-success flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span class="text-secondary">GDPR-compliant</span>
+        </div>
+      </div>
+
+      <a href="/for-developers" class="mt-6 inline-flex items-center text-accent hover:underline font-medium text-sm">
+        See integration docs →
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .badge-showcase {
+    padding: 4rem 0;
+  }
+
+  /* Performance Badge - Light */
+  .badge-performance-light {
+    width: 200px;
+    height: 60px;
+    border: 2px solid #10b981;
+    padding: 12px;
+    background: #ecfdf5;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .badge-performance-light .badge-subtitle {
+    font-size: 11px;
+    color: #059669;
+    margin-bottom: 2px;
+  }
+
+  .badge-performance-light .badge-score {
+    font-size: 18px;
+    font-weight: 700;
+    color: #047857;
+  }
+
+  .badge-performance-light .badge-evaluators {
+    font-size: 9px;
+    color: #6ee7b7;
+    margin-top: 2px;
+  }
+
+  /* Performance Badge - Dark */
+  .badge-performance-dark {
+    width: 200px;
+    height: 60px;
+    border: 2px solid #10b981;
+    padding: 12px;
+    background: #064e3b;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .badge-performance-dark .badge-subtitle {
+    font-size: 11px;
+    color: #6ee7b7;
+    margin-bottom: 2px;
+  }
+
+  .badge-performance-dark .badge-score {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ecfdf5;
+  }
+
+  .badge-performance-dark .badge-evaluators {
+    font-size: 9px;
+    color: #34d399;
+    margin-top: 2px;
+  }
+
+  /* Base Badge - Light */
+  .badge-base-light {
+    width: 200px;
+    height: 60px;
+    border: 2px solid #e5e7eb;
+    padding: 12px;
+    background: #ffffff;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .badge-base-light .badge-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 4px;
+  }
+
+  .badge-base-light .badge-timestamp {
+    font-size: 10px;
+    color: #6b7280;
+  }
+
+  /* Base Badge - Dark */
+  .badge-base-dark {
+    width: 200px;
+    height: 60px;
+    border: 2px solid #374151;
+    padding: 12px;
+    background: #1f2937;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .badge-base-dark .badge-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f9fafb;
+    margin-bottom: 4px;
+  }
+
+  .badge-base-dark .badge-timestamp {
+    font-size: 10px;
+    color: #9ca3af;
+  }
+
+  .badge-content,
+  .badge-content-base {
+    flex: 1;
+    min-width: 0;
+  }
+
+  code {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+
+  pre {
+    font-family: 'Monaco', 'Courier New', monospace;
+    line-height: 1.6;
+  }
+</style>

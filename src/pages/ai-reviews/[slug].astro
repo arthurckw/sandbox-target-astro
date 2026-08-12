@@ -1,0 +1,426 @@
+---
+export const prerender = true;
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import FAQ from '../../components/FAQ.astro';
+import CTA from '../../components/CTA.astro';
+import { getPublishedIdeas, getIdeaBySlug, getRelatedIdeas, type EvalProjIdea } from '../../lib/supabase';
+
+// SSG: Generate static paths for all published ideas
+// Rebuild trigger: 2026-01-30 - evaluation_id now populated for tennis-goat-debate
+export async function getStaticPaths() {
+  // Slugs with dedicated Astro pages (not generated from DB template)
+  const DEDICATED_PAGES = new Set(['openclaw', 'ai-marketing-content-generation']);
+  const ideas = await getPublishedIdeas();
+
+  return ideas
+    .filter((idea) => !DEDICATED_PAGES.has(idea.slug))
+    .map((idea) => ({
+      params: { slug: idea.slug },
+      props: { idea },
+    }));
+}
+
+// Get the idea from props (passed from getStaticPaths)
+const { idea } = Astro.props as { idea: EvalProjIdea };
+
+// Fetch related ideas if specified
+const relatedIdeas = idea.related_slugs?.length
+  ? await getRelatedIdeas(idea.related_slugs)
+  : [];
+
+// Build page URL
+const pageUrl = `https://humanjudge.com/ai-reviews/${idea.slug}`;
+
+// Build JSON-LD
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": idea.headline,
+  "description": idea.meta_description,
+  "url": pageUrl,
+  "publisher": {
+    "@type": "Organization",
+    "name": "HumanJudge",
+    "url": "https://humanjudge.com"
+  },
+  "mainEntity": {
+    "@type": "Event",
+    "name": idea.headline,
+    "description": `Help evaluate AI accuracy. Takes ${idea.time_estimate}.`,
+    "eventStatus": "https://schema.org/EventScheduled",
+    "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+    "organizer": {
+      "@type": "Organization",
+      "name": "HumanJudge",
+      "url": "https://humanjudge.com"
+    },
+    "location": {
+      "@type": "VirtualLocation",
+      "url": pageUrl
+    }
+  },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "AI Reviews", "item": "https://humanjudge.com/ai-reviews"},
+      {"@type": "ListItem", "position": 2, "name": idea.category_name, "item": `https://humanjudge.com/ai-reviews#${idea.category_slug}`},
+      {"@type": "ListItem", "position": 3, "name": idea.headline}
+    ]
+  }
+};
+
+// Share URLs
+const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(idea.headline + ' — You be the judge →')} ${encodeURIComponent(pageUrl)}`;
+const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(pageUrl)}`;
+const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(idea.headline + ' — Test it yourself → ' + pageUrl)}`;
+
+// Report URL with origin tracking for back navigation
+const reportUrl = idea.evaluation_id
+  ? `/reports/${idea.evaluation_id}?from=${encodeURIComponent(`/ai-reviews/${idea.slug}`)}`
+  : null;
+---
+
+<BaseLayout
+  title={idea.meta_title}
+  description={idea.meta_description}
+  currentPath={`/ai-reviews/${idea.slug}`}
+  keywords={idea.keywords.join(', ')}
+  jsonLd={jsonLd}
+>
+
+  <!-- Breadcrumb Navigation -->
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4" aria-label="Breadcrumb">
+    <ol class="flex items-center space-x-1 text-sm text-secondary">
+      <li>
+        <a href="/ai-reviews" class="hover:text-accent transition-colors whitespace-nowrap">AI Reviews</a>
+      </li>
+      <li class="flex items-center">
+        <svg class="w-3 h-3 mx-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+        <a href={`/ai-reviews#${idea.category_slug}`} class="hover:text-accent transition-colors whitespace-nowrap">{idea.category_name}</a>
+      </li>
+      <li class="flex items-center min-w-0">
+        <svg class="w-3 h-3 mx-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+        <span class="text-primary font-medium truncate">{idea.headline.split('.')[0].slice(0, 40)}{idea.headline.split('.')[0].length > 40 ? '...' : ''}</span>
+      </li>
+    </ol>
+  </nav>
+
+  <style>
+    .topic-card {
+      animation: bob 3s ease-in-out infinite;
+    }
+    .topic-card:nth-child(1) { animation-delay: 0s; }
+    .topic-card:nth-child(2) { animation-delay: 0.5s; }
+    .topic-card:nth-child(3) { animation-delay: 1s; }
+    .topic-card:nth-child(4) { animation-delay: 1.5s; }
+    .topic-card:nth-child(5) { animation-delay: 2s; }
+    .topic-card:nth-child(6) { animation-delay: 2.5s; }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .topic-card { animation: none; }
+    }
+  </style>
+
+  <!-- Hero Section -->
+  <Hero
+    headline={idea.headline}
+    subheadline={idea.subheadline}
+    primaryCTA={{ text: "Join", href: idea.evaluation_id ? `/auth?project=${idea.evaluation_id}` : "/auth" }}
+    secondaryCTA={reportUrl ? { text: "View Live Report →", href: reportUrl } : { text: "See What You'll Do ↓", href: "#how-it-works" }}
+  >
+    <div class="mt-8 text-center">
+      {idea.reward_amount && (
+        <div class="inline-flex items-center gap-2 bg-accent/10 border border-accent/30 rounded-full px-4 py-2 mb-6">
+          <span class="text-accent font-semibold">${idea.reward_amount}</span>
+          <span class="text-secondary text-sm">for top performers</span>
+        </div>
+      )}
+    </div>
+    <div class="text-center">
+      <p class="text-secondary text-sm mb-4">Share this challenge</p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <a
+          href={twitterShareUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 bg-surface-elevated border border-border-subtle text-primary px-3 py-1.5 rounded-md hover:bg-surface-elevated/80 transition-colors text-sm"
+        >
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          Twitter/X
+        </a>
+        <a
+          href={linkedinShareUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 bg-surface-elevated border border-border-subtle text-primary px-3 py-1.5 rounded-md hover:bg-surface-elevated/80 transition-colors text-sm"
+        >
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+        <a
+          href={whatsappShareUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 bg-surface-elevated border border-border-subtle text-primary px-3 py-1.5 rounded-md hover:bg-surface-elevated/80 transition-colors text-sm"
+        >
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </a>
+        <button
+          id="copy-link-btn"
+          class="inline-flex items-center gap-2 bg-surface-elevated border border-border-subtle text-primary px-3 py-1.5 rounded-md hover:bg-surface-elevated/80 transition-colors text-sm"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          <span id="copy-link-text">Copy Link</span>
+        </button>
+      </div>
+      <p class="text-xl text-secondary mt-8">Takes {idea.time_estimate}. No prep needed.</p>
+    </div>
+  </Hero>
+
+  <!-- AI Claims Section -->
+  {idea.ai_claims?.length > 0 && (
+    <section class="py-20 border-t border-border-subtle">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl sm:text-4xl font-bold text-center text-primary mb-4" data-aos="fade-up">
+          What AI Claims About This Topic
+        </h2>
+        <p class="text-xl text-secondary text-center mb-12" data-aos="fade-up" data-aos-delay="50">
+          AI makes bold claims. But does it actually know what it's talking about?
+        </p>
+        <div class="space-y-4" data-aos="fade-up" data-aos-delay="100">
+          {idea.ai_claims.map((claim) => (
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg p-5 flex items-start gap-4">
+              <span class="text-2xl">{claim.emoji}</span>
+              <p class="text-lg text-primary" set:html={claim.text}></p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="py-20 bg-surface-elevated">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-primary mb-4" data-aos="fade-up">
+        Here's What You'll Do
+      </h2>
+      <p class="text-xl text-secondary text-center mb-12" data-aos="fade-up" data-aos-delay="50">
+        {idea.time_estimate}. No prep. Just react.
+      </p>
+
+      <div class="bg-surface border-2 border-accent/30 rounded-xl p-6 mb-12" data-aos="fade-up" data-aos-delay="100">
+        <p class="text-sm text-secondary mb-3">Example prompt:</p>
+        <p class="text-lg text-primary font-medium mb-4">"Tell me something interesting about this topic"</p>
+        <div class="bg-surface-elevated rounded-lg p-4 mb-6">
+          <p class="text-sm text-secondary mb-2">AI says:</p>
+          <p class="text-primary">"Here's what I know..."</p>
+        </div>
+        <div class="flex gap-4 justify-center mb-4">
+          <button class="bg-success/20 text-success border border-success/30 px-6 py-3 rounded-lg font-medium">
+            ✓ Accurate
+          </button>
+          <button class="bg-danger/20 text-danger border border-danger/30 px-6 py-3 rounded-lg font-medium">
+            ✗ Wrong
+          </button>
+        </div>
+        <p class="text-center text-secondary text-sm">
+          That's literally it. React to a few, share your take.
+        </p>
+      </div>
+
+      <div class="space-y-6 text-lg text-secondary">
+        <p data-aos="fade-up" data-aos-delay="150">
+          You'll see real questions people ask AI — and judge whether the answers are right.
+        </p>
+        <p data-aos="fade-up" data-aos-delay="200">
+          Caught something off? <span class="text-accent font-medium">Flag it</span> and share why. Looks good? <span class="text-accent font-medium">Pass it</span>.
+        </p>
+        <p class="text-xl text-primary font-medium pt-4 text-center" data-aos="fade-up" data-aos-delay="250">
+          Your calls help others know what AI actually gets right.
+        </p>
+        <div class="pt-8 text-center" data-aos="fade-up" data-aos-delay="300">
+          <a
+            href={idea.evaluation_id ? `/auth?project=${idea.evaluation_id}` : "/auth"}
+            class="bg-accent text-accent-on px-8 py-4 rounded-md hover:bg-accent-hover transition-micro ease-smooth font-medium text-lg inline-block"
+          >
+            Join
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Topics Grid -->
+  {idea.topics?.length > 0 && (
+    <section class="pt-8 pb-20 bg-surface-elevated">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h3 class="text-2xl sm:text-3xl font-bold text-center text-primary mb-4" data-aos="fade-up">
+          What Can You Ask?
+        </h3>
+        <p class="text-secondary text-center mb-8" data-aos="fade-up" data-aos-delay="50">
+          Here are some ideas to get you started.
+        </p>
+        <div class="grid md:grid-cols-3 gap-6">
+          {idea.topics.map((topic, index) => (
+            <div
+              class="topic-card bg-surface border border-border-subtle rounded-xl p-6"
+              data-aos="fade-up"
+              data-aos-delay={100 + index * 50}
+            >
+              <div class="text-4xl mb-4">{topic.emoji}</div>
+              <h3 class="text-xl font-semibold text-primary mb-2">{topic.title}</h3>
+              <p class="text-secondary">{topic.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Live Results Section (shown when evaluation exists) -->
+  {idea.evaluation_id && (
+    <section class="py-16 bg-gradient-to-r from-accent/5 to-purple-500/5 border-y border-accent/20">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-aos="fade-up">
+        <div class="inline-flex items-center gap-2 bg-accent/10 border border-accent/30 rounded-full px-4 py-1 mb-4">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+          </span>
+          <span class="text-accent text-sm font-medium">Live</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-primary mb-4">
+          See What Others Are Finding
+        </h2>
+        <p class="text-lg text-secondary mb-6">
+          Real-time results from reviewers who've already evaluated this topic.
+        </p>
+        <a
+          href={reportUrl}
+          class="inline-flex items-center gap-2 bg-surface border border-border-emphasis text-primary px-6 py-3 rounded-lg hover:bg-surface-elevated transition-micro ease-smooth font-medium"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          View Live Report
+        </a>
+      </div>
+    </section>
+  )}
+
+  <!-- About HumanJudge -->
+  <section class="py-16">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <p class="text-xl text-secondary" data-aos="fade-up">
+        HumanJudge is independent — not affiliated with OpenAI or any AI lab.
+      </p>
+    </div>
+  </section>
+
+  <!-- Why This Matters -->
+  {idea.why_matters && (
+    <section class="py-12 border-t border-border-subtle">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <details class="group">
+          <summary class="cursor-pointer list-none flex items-center justify-center gap-2 text-secondary hover:text-primary transition-micro">
+            <span class="text-lg">Why does this actually matter?</span>
+            <svg class="w-5 h-5 transform transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="mt-6 space-y-4 text-secondary" set:html={idea.why_matters}></div>
+        </details>
+      </div>
+    </section>
+  )}
+
+  <!-- Related Challenges -->
+  {relatedIdeas.length > 0 && (
+    <section class="py-16 border-t border-border-subtle">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-primary mb-2 text-center" data-aos="fade-up">
+          Related Challenges
+        </h2>
+        <p class="text-secondary text-center mb-8" data-aos="fade-up" data-aos-delay="50">
+          Explore more {idea.category_name} challenges
+        </p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4" data-aos="fade-up" data-aos-delay="100">
+          {relatedIdeas.map((related) => (
+            <a
+              href={`/ai-reviews/${related.slug}`}
+              class="group bg-surface border border-border-subtle rounded-lg p-4 hover:border-accent/50 transition-colors"
+            >
+              <h3 class="font-semibold text-primary group-hover:text-accent transition-colors">{related.headline}</h3>
+              <p class="text-sm text-secondary">{related.category_name}</p>
+            </a>
+          ))}
+          <a href="/ai-reviews" class="group bg-accent/10 border border-accent/30 rounded-lg p-4 hover:bg-accent/20 transition-colors">
+            <div class="text-2xl mb-2">🔍</div>
+            <h3 class="font-semibold text-accent">See All</h3>
+            <p class="text-sm text-secondary">Browse all topics</p>
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- FAQ Section -->
+  {idea.faq?.length > 0 && (
+    <div data-aos="fade-up">
+      <FAQ
+        title="Quick Questions"
+        items={idea.faq}
+      />
+    </div>
+  )}
+
+  <!-- Final CTA -->
+  <div data-aos="fade-up">
+    <CTA
+      title={`${idea.time_estimate}. Real Impact.`}
+      description="You know this topic better than any AI. Help prove it."
+      primaryButton={{ text: "Join", href: idea.evaluation_id ? `/auth?project=${idea.evaluation_id}` : "/auth" }}
+      variant="accent"
+    />
+  </div>
+
+  <!-- AOS Animation Library -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <script is:inline src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script is:inline define:vars={{ pageUrl }}>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Copy Link button handler
+      const copyBtn = document.getElementById('copy-link-btn');
+      const copyText = document.getElementById('copy-link-text');
+      if (copyBtn && copyText) {
+        copyBtn.addEventListener('click', async function() {
+          try {
+            await navigator.clipboard.writeText(pageUrl);
+            copyText.textContent = 'Copied!';
+            setTimeout(() => { copyText.textContent = 'Copy Link'; }, 2000);
+          } catch (err) {
+            console.error('Failed to copy:', err);
+          }
+        });
+      }
+
+      AOS.init({
+        duration: 800,
+        easing: 'ease-out-cubic',
+        once: true,
+        offset: 50
+      });
+    });
+  </script>
+</BaseLayout>

@@ -1,0 +1,48 @@
+---
+// FAQ component - Accordion-style FAQ section
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  title?: string;
+  items: FAQItem[];
+}
+
+const { title = 'Frequently Asked Questions', items } = Astro.props;
+---
+
+<section class="py-20">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-12 text-center">
+      {title}
+    </h2>
+
+    <div class="space-y-4">
+      {items.map((item, index) => (
+        <details class="group bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden">
+          <summary class="flex justify-between items-center cursor-pointer px-6 py-5 hover:bg-surface transition-micro ease-smooth">
+            <h3 class="text-lg font-semibold text-primary pr-8">
+              {item.question}
+            </h3>
+            <svg
+              class="w-5 h-5 text-secondary group-open:rotate-180 transition-transform ease-smooth flex-shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="px-6 pb-5 pt-2 text-secondary border-t border-border-subtle">
+            <p set:html={item.answer} />
+          </div>
+        </details>
+      ))}
+    </div>
+
+    <!-- Slot for additional content -->
+    <slot />
+  </div>
+</section>

@@ -1,0 +1,257 @@
+---
+export const prerender = true;
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import DocsSidebar from '../../../components/DocsSidebar.astro';
+
+// Auto-updates on every deploy
+const lastUpdated = new Date().toISOString().split('T')[0];
+
+const faqs = [
+  { q: "How do I add an MCP server to Claude Code?",
+    a: "Add it to your project's .mcp.json file with type 'http' and the server URL. Reload VS Code (or restart the CLI), click 'needs auth' next to the server name, and complete OAuth in the browser." },
+  { q: "Does this work in both VS Code extension and CLI?",
+    a: "Yes. Both use the same .mcp.json config file at your project root. Adding the entry once enables it for both surfaces." },
+  { q: "Do I need to install anything?",
+    a: "No. Remote MCP — just config + auth. No npm install, no pip install, no local server. Claude Code talks to api.humanjudge.com directly." },
+  { q: "Is the HumanJudge MCP server free?",
+    a: "Yes, the server is free. You'll need a Claude account with MCP access (varies by plan) and a free HumanJudge account for OAuth." },
+  { q: "What MCP tools does Claude get?",
+    a: "5 tools: get_model_scores (leaderboard), compare_models (side-by-side), get_flags (flag patterns), check_content (semantic match against evaluated outputs), get_latest (recent verdicts)." },
+  { q: "Can I use this while writing AI code?",
+    a: "Yes — that's the point. While building an AI feature, ask Claude 'which model has the lowest flag rate for marketing emails?' or 'check this prompt response against real human evaluations' and get answers without leaving your IDE." },
+  { q: "Is the data live?",
+    a: "Yes. Each tool call hits the live HumanJudge API. Claude sees what's true right now, not a stale snapshot." }
+];
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "name": "HumanJudge MCP Server for Claude Code (VS Code, CLI) — Query AI Quality Data While You Build",
+    "url": "https://humanjudge.com/docs/pulse/claude-code",
+    "description": "Add HumanJudge as a remote MCP server in Claude Code. Query 16,668+ blind human evaluations of AI models inside VS Code or the CLI. Free, no install required.",
+    "datePublished": "2026-04-23",
+    "dateModified": lastUpdated,
+    "author": { "@type": "Organization", "name": "HumanJudge", "url": "https://humanjudge.com" },
+    "publisher": { "@type": "Organization", "name": "HumanJudge", "url": "https://humanjudge.com" },
+    "mainEntityOfPage": "https://humanjudge.com/docs/pulse/claude-code"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to add HumanJudge MCP server to Claude Code",
+    "description": "Configure the HumanJudge MCP server in Claude Code via .mcp.json and authenticate with OAuth.",
+    "totalTime": "PT1M",
+    "step": [
+      { "@type": "HowToStep", "name": "Add to .mcp.json", "text": "Add a 'humanjudge' entry with type 'http' and url 'https://api.humanjudge.com/mcp' to your project's .mcp.json file." },
+      { "@type": "HowToStep", "name": "Reload editor", "text": "Reload VS Code window (Cmd+Shift+P → 'Reload Window') or restart the Claude Code CLI session." },
+      { "@type": "HowToStep", "name": "Trigger authentication", "text": "Click 'needs auth' next to the humanjudge entry in the MCP servers list." },
+      { "@type": "HowToStep", "name": "Complete OAuth", "text": "Sign in with your HumanJudge account in the browser and click Allow. The connector becomes active." }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(f => ({
+      "@type": "Question",
+      "name": f.q,
+      "acceptedAnswer": { "@type": "Answer", "text": f.a }
+    }))
+  }
+];
+---
+
+<BaseLayout
+  title="HumanJudge MCP Server for Claude Code (VS Code, CLI) | HumanJudge"
+  description="Add HumanJudge as a remote MCP server in Claude Code. Query 16,668+ blind human reviews of AI models inside VS Code or the CLI. Free, no install needed."
+  currentPath="/docs"
+  jsonLd={jsonLd}
+>
+  <div class="min-h-screen bg-surface">
+    <div class="bg-surface-elevated border-b border-border-subtle">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <nav class="text-sm text-secondary mb-4">
+          <a href="/docs" class="hover:text-primary">Docs</a>
+          <span class="mx-2">/</span>
+          <a href="/docs" class="hover:text-primary">Pulse</a>
+          <span class="mx-2">/</span>
+          <span class="text-primary">Claude Code</span>
+        </nav>
+        <h1 class="text-4xl font-bold text-primary mb-4">Query human AI evaluations in Claude Code — without leaving your IDE</h1>
+        <p class="text-xl text-secondary max-w-3xl">
+          Add HumanJudge as a remote MCP server in Claude Code (VS Code or CLI). Ask Claude to compare models, surface flag patterns, or check AI output quality — backed by 16,668+ blind human reviews. No install. Free.
+        </p>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid md:grid-cols-3 gap-8">
+        <DocsSidebar currentPath="/docs/pulse/claude-code" />
+
+        <div class="md:col-span-2 prose prose-invert max-w-none">
+
+          <!-- Hook -->
+          <section class="mb-10">
+            <p class="text-secondary text-lg mb-4">
+              You're building an AI feature in Claude Code. Halfway through, you stop and wonder: should this be GPT-5.4 or Claude Opus? Will users hate the tone? Has anyone actually tested this kind of output with humans?
+            </p>
+            <p class="text-secondary mb-4">
+              Most of the time you switch tabs to Google, get vague answers, and switch back. The HumanJudge MCP server gives Claude Code <strong class="text-primary">5 native tools</strong> that query <strong class="text-primary">16,668 blind human evaluations of 15 AI models</strong> directly. Ask in chat, get the answer, keep building.
+            </p>
+          </section>
+
+          <!-- Who this is for -->
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold text-primary mb-4">Who this is for</h2>
+            <ul class="text-secondary space-y-1">
+              <li>• <strong class="text-primary">AI engineers</strong> picking models for production features</li>
+              <li>• <strong class="text-primary">Full-stack developers</strong> building AI-powered products who need a sanity check on output quality</li>
+              <li>• <strong class="text-primary">Anyone</strong> using Claude Code to write code that calls LLMs and wants real evaluation data while they build</li>
+            </ul>
+          </section>
+
+          <!-- What you can ask -->
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold text-primary mb-4">What you can ask while you code</h2>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-border-subtle">
+                    <th class="text-left py-2 pr-4 text-primary font-medium">Question</th>
+                    <th class="text-left py-2 text-primary font-medium">What Claude returns (via MCP)</th>
+                  </tr>
+                </thead>
+                <tbody class="text-secondary">
+                  <tr class="border-b border-border-subtle/50"><td class="py-3 pr-4">"Which model should I default to for marketing copy?"</td><td class="py-3">Ranked leaderboard with pass rates from 16K+ reviews</td></tr>
+                  <tr class="border-b border-border-subtle/50"><td class="py-3 pr-4">"Compare GPT-5.4 and Claude Opus head to head"</td><td class="py-3">Side-by-side stats, where they differ, real reviewer quotes</td></tr>
+                  <tr class="border-b border-border-subtle/50"><td class="py-3 pr-4">"What flag patterns does Grok have most of?"</td><td class="py-3">Top flag categories with examples</td></tr>
+                  <tr class="border-b border-border-subtle/50"><td class="py-3 pr-4">"Check this LLM output: [paste]"</td><td class="py-3">Semantic match against 913 evaluated outputs</td></tr>
+                  <tr><td class="py-3 pr-4">"What's the most-flagged AI model right now?"</td><td class="py-3">Live feed of recent verdicts</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Setup -->
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold text-primary mb-4">Setup (1 minute)</h2>
+            <p class="text-secondary mb-4">Add HumanJudge to your project's <code class="text-accent bg-surface-elevated px-1.5 py-0.5 rounded">.mcp.json</code> file:</p>
+
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden mb-6">
+              <div class="bg-surface px-4 py-2 border-b border-border-subtle">
+                <span class="text-sm text-secondary">.mcp.json</span>
+              </div>
+              <pre class="p-4 overflow-x-auto"><code class="text-sm text-primary">{`{
+  "mcpServers": {
+    "humanjudge": {
+      "type": "http",
+      "url": "https://api.humanjudge.com/mcp"
+    }
+  }
+}`}</code></pre>
+            </div>
+
+            <ol class="space-y-4 mb-6">
+              <li class="flex items-start gap-3">
+                <span class="bg-accent/10 text-accent rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0 mt-0.5">1</span>
+                <div>
+                  <p class="text-primary font-medium">Add the config above to your project's .mcp.json</p>
+                  <p class="text-secondary text-sm">Create the file at your project root if it doesn't exist. If you have other MCP servers, add <code class="text-accent bg-surface-elevated px-1.5 py-0.5 rounded">"humanjudge"</code> alongside them.</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="bg-accent/10 text-accent rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0 mt-0.5">2</span>
+                <div>
+                  <p class="text-primary font-medium">Reload your editor</p>
+                  <p class="text-secondary text-sm">VS Code: <code class="text-accent bg-surface-elevated px-1.5 py-0.5 rounded">Cmd+Shift+P</code> → "Reload Window". CLI: restart the session.</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="bg-accent/10 text-accent rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0 mt-0.5">3</span>
+                <div>
+                  <p class="text-primary font-medium">Click "needs auth" next to humanjudge</p>
+                  <p class="text-secondary text-sm">In the MCP servers list, you'll see <strong class="text-primary">humanjudge</strong> with a "needs auth" label. Click it.</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="bg-accent/10 text-accent rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0 mt-0.5">4</span>
+                <div>
+                  <p class="text-primary font-medium">Sign in with your HumanJudge account</p>
+                  <p class="text-secondary text-sm">Browser opens — sign in (free account, 30 seconds) and click Allow.</p>
+                </div>
+              </li>
+            </ol>
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+              <p class="text-secondary text-sm">🔔 Works for both the VS Code extension and the CLI — they share the same <code class="text-accent">.mcp.json</code> config.</p>
+            </div>
+          </section>
+
+          <!-- Example questions -->
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold text-primary mb-4">Example questions to try right now</h2>
+            <div class="space-y-3">
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                <p class="text-accent font-mono text-sm">"Which AI model should I use for marketing emails in my app?"</p>
+                <p class="text-secondary text-xs mt-1">Ranked leaderboard with pass rates from real human reviewers.</p>
+              </div>
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                <p class="text-accent font-mono text-sm">"Compare GPT-5.4 vs Claude Opus 4.6 for ad copy"</p>
+                <p class="text-secondary text-xs mt-1">Side-by-side stats with reviewer quotes from real ad-copy evaluations.</p>
+              </div>
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                <p class="text-accent font-mono text-sm">"What flag patterns are most common in Grok's outputs?"</p>
+                <p class="text-secondary text-xs mt-1">Flag category breakdown with frequency.</p>
+              </div>
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                <p class="text-accent font-mono text-sm">"Check this output from my AI: [paste]"</p>
+                <p class="text-secondary text-xs mt-1">Semantic match against 913 evaluated outputs.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- FAQ -->
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold text-primary mb-4">FAQ</h2>
+            <div class="space-y-3">
+              {faqs.map((f) => (
+                <details class="bg-surface-elevated border border-border-subtle rounded-lg p-4 group">
+                  <summary class="cursor-pointer text-primary font-medium list-none flex items-center justify-between">
+                    <span>{f.q}</span>
+                    <span class="text-tertiary group-open:rotate-180 transition-transform">▾</span>
+                  </summary>
+                  <p class="text-secondary text-sm mt-3">{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+
+          <!-- Cross-links -->
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold text-primary mb-4">Want this in your other tools?</h2>
+            <div class="grid sm:grid-cols-2 gap-3">
+              <a href="/docs/pulse/claude-desktop" class="bg-surface-elevated border border-border-subtle rounded-lg p-4 hover:border-accent/50 transition-colors group block">
+                <h3 class="font-semibold text-primary group-hover:text-accent">Claude Desktop →</h3>
+                <p class="text-secondary text-sm">Same connector, standalone app.</p>
+              </a>
+              <a href="/docs/pulse/chatgpt" class="bg-surface-elevated border border-border-subtle rounded-lg p-4 hover:border-accent/50 transition-colors group block">
+                <h3 class="font-semibold text-primary group-hover:text-accent">ChatGPT →</h3>
+                <p class="text-secondary text-sm">Free GPT in the GPT Store. No setup.</p>
+              </a>
+              <a href="/docs/pulse/python-sdk" class="bg-surface-elevated border border-border-subtle rounded-lg p-4 hover:border-accent/50 transition-colors group block">
+                <h3 class="font-semibold text-primary group-hover:text-accent">Python SDK →</h3>
+                <p class="text-secondary text-sm">For Jupyter notebooks and pandas analysis.</p>
+              </a>
+              <a href="/pulse" class="bg-surface-elevated border border-border-subtle rounded-lg p-4 hover:border-accent/50 transition-colors group block">
+                <h3 class="font-semibold text-primary group-hover:text-accent">Browse the live feed →</h3>
+                <p class="text-secondary text-sm">See new reviewer verdicts as they happen.</p>
+              </a>
+            </div>
+          </section>
+
+          <p class="text-xs text-tertiary mt-12 pt-6 border-t border-border-subtle">Last updated: {lastUpdated} · Data refreshes live from humanjudge.com</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

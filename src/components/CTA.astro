@@ -1,0 +1,62 @@
+---
+// CTA component - Reusable call-to-action section
+interface Props {
+  title: string;
+  description?: string;
+  primaryButton?: {
+    text: string;
+    href: string;
+  };
+  secondaryButton?: {
+    text: string;
+    href: string;
+  };
+  variant?: 'default' | 'accent' | 'bordered';
+}
+
+const { title, description, primaryButton, secondaryButton, variant = 'default' } = Astro.props;
+
+const sectionClasses = {
+  default: 'bg-surface-elevated',
+  accent: 'bg-accent/10 border border-accent/20',
+  bordered: 'border-2 border-border-emphasis'
+};
+---
+
+<section class={`py-16 ${sectionClasses[variant]} rounded-lg`}>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-6">
+      {title}
+    </h2>
+
+    {description && (
+      <p class="text-xl text-secondary mb-8">
+        {description}
+      </p>
+    )}
+
+    {(primaryButton || secondaryButton) && (
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        {primaryButton && (
+          <a
+            href={primaryButton.href}
+            class="bg-accent text-accent-on px-8 py-4 rounded-md hover:bg-accent-hover transition-micro ease-smooth font-medium text-lg inline-block"
+          >
+            {primaryButton.text}
+          </a>
+        )}
+        {secondaryButton && (
+          <a
+            href={secondaryButton.href}
+            class="border border-border-emphasis text-primary px-8 py-4 rounded-md hover:bg-surface-elevated transition-micro ease-smooth font-medium text-lg inline-block"
+          >
+            {secondaryButton.text}
+          </a>
+        )}
+      </div>
+    )}
+
+    <!-- Slot for additional content -->
+    <slot />
+  </div>
+</section>

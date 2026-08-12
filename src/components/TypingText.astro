@@ -1,0 +1,98 @@
+---
+interface Props {
+  phrases: string[];
+  staticPrefix?: string;
+  staticSuffix?: string;
+  typingSpeed?: number;
+  deletingSpeed?: number;
+  pauseDuration?: number;
+  class?: string;
+}
+
+const {
+  phrases,
+  staticPrefix = '',
+  staticSuffix = '',
+  typingSpeed = 100,
+  deletingSpeed = 50,
+  pauseDuration = 2000,
+  class: className = ''
+} = Astro.props;
+---
+
+<span
+  class={`typing-text ${className}`}
+  data-phrases={JSON.stringify(phrases)}
+  data-typing-speed={typingSpeed}
+  data-deleting-speed={deletingSpeed}
+  data-pause-duration={pauseDuration}
+>
+  {staticPrefix}<span class="typing-dynamic"></span><span class="typing-cursor">|</span>{staticSuffix}
+</span>
+
+<style>
+  .typing-cursor {
+    animation: blink 1s infinite;
+    color: var(--color-accent);
+  }
+
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+</style>
+
+<script>
+  function initTypingText() {
+    const elements = document.querySelectorAll('.typing-text');
+
+    elements.forEach(el => {
+      const htmlEl = el as HTMLElement;
+      if (htmlEl.dataset.initialized) return;
+      htmlEl.dataset.initialized = 'true';
+
+      const phrases = JSON.parse(htmlEl.dataset.phrases || '[]');
+      const typingSpeed = parseInt(htmlEl.dataset.typingSpeed || '100');
+      const deletingSpeed = parseInt(htmlEl.dataset.deletingSpeed || '50');
+      const pauseDuration = parseInt(htmlEl.dataset.pauseDuration || '2000');
+      const dynamicEl = htmlEl.querySelector('.typing-dynamic');
+
+      if (!dynamicEl || phrases.length === 0) return;
+
+      let phraseIndex = 0;
+      let charIndex = 0;
+      let isDeleting = false;
+
+      function type() {
+        const currentPhrase = phrases[phraseIndex];
+
+        if (isDeleting) {
+          dynamicEl.textContent = currentPhrase.substring(0, charIndex - 1);
+          charIndex--;
+        } else {
+          dynamicEl.textContent = currentPhrase.substring(0, charIndex + 1);
+          charIndex++;
+        }
+
+        let timeout = isDeleting ? deletingSpeed : typingSpeed;
+
+        if (!isDeleting && charIndex === currentPhrase.length) {
+          timeout = pauseDuration;
+          isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+          isDeleting = false;
+          phraseIndex = (phraseIndex + 1) % phrases.length;
+          timeout = 500;
+        }
+
+        setTimeout(type, timeout);
+      }
+
+      // Start typing
+      setTimeout(type, 1000);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initTypingText);
+  document.addEventListener('astro:page-load', initTypingText);
+</script>

@@ -1,0 +1,44 @@
+---
+interface Props {
+  videoId: string;
+  title?: string;
+  autoplay?: boolean;
+  muted?: boolean;
+  loop?: boolean;
+  class?: string;
+}
+
+const {
+  videoId,
+  title = 'Video',
+  autoplay = false,
+  muted = false,
+  loop = false,
+  class: className = ''
+} = Astro.props;
+
+// Build YouTube embed URL with parameters
+const params = new URLSearchParams();
+if (autoplay) params.set('autoplay', '1');
+if (muted) params.set('mute', '1');
+if (loop) {
+  params.set('loop', '1');
+  params.set('playlist', videoId);
+}
+params.set('rel', '0'); // Don't show related videos
+params.set('modestbranding', '1'); // Minimal YouTube branding
+
+const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
+---
+
+<div class={`youtube-embed relative w-full overflow-hidden rounded-lg shadow-lg ${className}`} style="padding-bottom: 56.25%;">
+  <iframe
+    src={embedUrl}
+    title={title}
+    class="absolute top-0 left-0 w-full h-full"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+    loading="lazy"
+  ></iframe>
+</div>

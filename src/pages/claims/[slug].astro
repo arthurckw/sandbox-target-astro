@@ -1,0 +1,351 @@
+---
+/**
+ * Claims SSR page — Fuji design with real data.
+ * Server HTML for SEO/GEO. React island for search + modals.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ClaimPageIsland from '../../components/ClaimPageIsland';
+
+const { slug } = Astro.params;
+const API_BASE = 'https://grandjury-server.onrender.com';
+
+let claim: any = null;
+try {
+  const res = await fetch(`${API_BASE}/api/v1/claims/${slug}`);
+  if (res.ok) claim = await res.json();
+} catch {}
+
+if (!claim) return Astro.redirect('/ai-reviews', 302);
+
+const title = claim.seo_title;
+const description = claim.seo_description;
+const titleVariant = claim.seo_title_variant ?? 0;
+const verdictLabel = claim.verdict === 'flag' ? 'Flagged' : 'Passed';
+const categoryLabel = claim.flag_category?.replace('_', ' ') || null;
+const passRate = claim.pass_rate != null ? claim.pass_rate : 0;
+const flagPercent = claim.total_votes > 0 ? Math.round(claim.flag_count / claim.total_votes * 100) : 0;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'HumanJudge', item: 'https://humanjudge.com' },
+        { '@type': 'ListItem', position: 2, name: claim.benchmark_name || 'Benchmark', item: `https://humanjudge.com/r/${claim.benchmark_id}` },
+        { '@type': 'ListItem', position: 3, name: claim.model_name },
+      ],
+    },
+    {
+      '@type': 'Review',
+      itemReviewed: { '@type': 'SoftwareApplication', name: claim.model_name, applicationCategory: 'Artificial Intelligence' },
+      reviewBody: claim.feedback,
+      author: { '@type': 'Organization', name: 'HumanJudge', url: 'https://humanjudge.com' },
+      reviewRating: { '@type': 'Rating', ratingValue: passRate, bestRating: 100, worstRating: 0 },
+    },
+    {
+      '@type': 'Dataset',
+      name: claim.benchmark_name || 'AI Evaluation Benchmark',
+      description: `Human evaluation dataset for ${claim.model_name} with ${claim.total_votes} reviews by ${claim.reviewer_count || 'verified'} reviewers. Benchmark: ${claim.benchmark_name || 'AI Quality'}. Pass rate: ${passRate}%.`,
+      creator: { '@type': 'Organization', name: 'HumanJudge', url: 'https://humanjudge.com' },
+      license: 'https://creativecommons.org/licenses/by-nc/4.0/',
+      about: { '@type': 'SoftwareApplication', name: claim.model_name },
+    },
+  ],
+};
+
+// Build smart leaderboard: top 3 + gap + n-1, n(hero), n+1
+const heroIdx = claim.leaderboard.findIndex((lb: any) => lb.is_hero);
+const smartLeaderboard: any[] = [];
+if (claim.leaderboard.length > 0) {
+  // Top 3
+  const top3 = claim.leaderboard.slice(0, 3);
+  top3.forEach((lb: any) => smartLeaderboard.push(lb));
+
+  if (heroIdx > 3) {
+    // Gap
+    smartLeaderboard.push({ _gap: true });
+    // n-1, n, n+1
+    const start = Math.max(3, heroIdx - 1);
+    const end = Math.min(claim.leaderboard.length, heroIdx + 2);
+    claim.leaderboard.slice(start, end).forEach((lb: any) => smartLeaderboard.push(lb));
+  } else if (heroIdx >= 0 && claim.leaderboard.length > 3) {
+    // Hero is in top 3, show a few more after
+    claim.leaderboard.slice(3, 6).forEach((lb: any) => smartLeaderboard.push(lb));
+  }
+}
+
+const btn = 'inline-flex items-center justify-center rounded-md bg-surface border border-border-emphasis px-5 py-2.5 text-sm font-medium text-secondary shadow-xs hover:bg-surface-elevated hover:text-primary hover:border-border-bright';
+const btnPrimary = 'inline-flex items-center justify-center rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-on shadow-xs hover:bg-accent-hover';
+---
+
+<BaseLayout title={title} description={description} jsonLd={jsonLd} keywords={`${claim.model_name}, ${claim.benchmark_name}, AI evaluation, AI benchmark`} hideChrome>
+
+<script is:inline define:vars={{ titleVariant }}>
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ 'title_variant': titleVariant });
+</script>
+
+<div class="min-h-screen bg-bg text-primary font-sans">
+
+  <!-- React Island: sticky search bar + modals -->
+  <ClaimPageIsland client:load inputText={claim.trace_input} traceId={claim.trace_id} claimSlug={slug} evaluationId={claim.benchmark_id} recentReviews={claim.recent_reviews} crossModel={claim.cross_model} />
+
+  <!-- SPLIT LAYOUT -->
+  <div class="flex flex-col lg:flex-row px-8 md:px-16">
+
+    <!-- LEFT: INFO -->
+    <article class="flex-1 lg:pr-12 lg:border-r border-border-emphasis">
+
+      <!-- Claim headline -->
+      <div class="pt-8 pb-12 border-b border-border-emphasis">
+        <h1 class="text-3xl sm:text-4xl font-normal leading-snug text-primary">
+          {claim.display_title}
+        </h1>
+
+        <!-- Verdict + category -->
+        <div class="flex flex-wrap items-center gap-2 mt-4">
+          <span class={`text-xs font-bold uppercase px-2 py-1 rounded-sm ${claim.verdict === 'flag' ? 'bg-danger/15 text-danger' : 'bg-success/15 text-success'}`}>
+            {verdictLabel}
+          </span>
+          {categoryLabel && (
+            <span class="text-xs text-tertiary bg-surface px-2 py-1 rounded-sm">
+              {categoryLabel}
+            </span>
+          )}
+        </div>
+
+        <!-- Attribution -->
+        <div class="mt-4">
+          <p class="text-tertiary text-base">
+            — <span class="text-secondary">{claim.reviewer_name || 'Anonymous'}</span> · <span class="font-mono text-tertiary" data-ts={claim.created_at}>{new Date(claim.created_at).toLocaleString('en-US', { timeZone: 'UTC' })} UTC</span>
+          </p>
+          {(claim.reviewer_total_reviews > 0 || claim.reviewer_xp > 0) && (
+            <p class="text-tertiary text-xs mt-1">
+              {claim.reviewer_total_reviews > 0 && <span>{claim.reviewer_total_reviews} reviews</span>}
+              {claim.reviewer_total_reviews > 0 && claim.reviewer_xp > 0 && <span> · </span>}
+              {claim.reviewer_xp > 0 && <span>{claim.reviewer_xp.toLocaleString()} XP</span>}
+            </p>
+          )}
+          {claim.reviewer_bio && (
+            <p class="text-secondary text-xs mt-1 leading-relaxed">{claim.reviewer_bio}</p>
+          )}
+          <!-- Buttons -->
+          <div class="flex items-center gap-2 mt-3">
+            <button onclick="window.__claimIsland?.share()" class={btn}>
+              <svg class="w-4 h-4 mr-1.5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>Share
+            </button>
+            <button onclick="window.__claimIsland?.report()" class={btn}>
+              <svg class="w-4 h-4 mr-1.5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2z" /></svg>Report
+            </button>
+            <button class={btn}>
+              <svg class="w-4 h-4 mr-1.5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>Message
+            </button>
+          </div>
+        </div>
+
+        <!-- Benchmark + About this arena -->
+        <div class="mt-4 text-secondary text-base">{claim.benchmark_name}</div>
+        <details class="mt-1 group">
+          <summary class="text-sm text-tertiary hover:text-secondary cursor-pointer list-none flex items-center gap-1">
+            About this arena
+            <svg class="w-3 h-3 transition-transform duration-200 group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+          </summary>
+          <div class="mt-3 pl-4 border-l-2 border-border-emphasis space-y-2">
+            {claim.benchmark_subheadline && <p class="text-sm text-secondary leading-relaxed">{claim.benchmark_subheadline}</p>}
+            {claim.benchmark_app_context && <p class="text-xs text-tertiary leading-relaxed">{claim.benchmark_app_context}</p>}
+            {claim.benchmark_why_matters && <p class="text-xs text-tertiary leading-relaxed">{claim.benchmark_why_matters}</p>}
+            {claim.benchmark_evaluation_criteria && <p class="text-xs text-tertiary leading-relaxed whitespace-pre-line">{claim.benchmark_evaluation_criteria}</p>}
+            <button onclick="window.__claimIsland?.subscribe('left_arena_report'); window.gtag?.('event','cta_click',{event_category:'claim_page',cta:'subscribe',position:'left_arena_report'})" class="inline-block text-xs text-accent hover:text-accent-hover">View full benchmark report →</button>
+          </div>
+        </details>
+      </div>
+
+      <!-- Stats -->
+      <figure class="py-8 border-b border-border-emphasis">
+        <figcaption class="mb-8">
+          <div class="flex flex-wrap gap-10 mb-6">
+            <div>
+              <div class="text-4xl sm:text-5xl font-black font-mono text-primary">{claim.flag_count}</div>
+              <div class="text-xs text-tertiary uppercase tracking-widest mt-1">Flagged</div>
+            </div>
+            <div>
+              <div class="text-4xl sm:text-5xl font-black font-mono text-primary">{claim.pass_count}</div>
+              <div class="text-xs text-tertiary uppercase tracking-widest mt-1">Passed</div>
+            </div>
+            <div>
+              <div class="text-4xl sm:text-5xl font-black font-mono text-primary/40">{claim.total_votes}</div>
+              <div class="text-xs text-tertiary uppercase tracking-widest mt-1">Votes</div>
+            </div>
+            <div>
+              <div class="text-4xl sm:text-5xl font-black font-mono text-primary">{passRate}%</div>
+              <div class="text-xs text-tertiary uppercase tracking-widest mt-1">Pass rate</div>
+            </div>
+          </div>
+          {claim.total_votes > 0 && (
+            <div class="w-full h-2 bg-surface overflow-hidden flex">
+              <div class="h-full bg-info" style={`width: ${passRate}%`}></div>
+              <div class="h-full bg-danger" style={`width: ${flagPercent}%`}></div>
+            </div>
+          )}
+        </figcaption>
+
+        <!-- Output -->
+        <div class="mb-4 pl-4 border-l-2 border-danger/40">
+          <div class="text-[10px] text-tertiary uppercase tracking-widest mb-2 font-mono">Output</div>
+          <pre class="text-secondary text-sm whitespace-pre-wrap font-mono leading-relaxed">{claim.trace_output}</pre>
+        </div>
+
+        <!-- Input -->
+        <div class="pl-4 border-l-2 border-border-subtle">
+          <div class="text-[10px] text-tertiary uppercase tracking-widest mb-2 font-mono">Input</div>
+          <pre class="text-tertiary text-sm whitespace-pre-wrap font-mono leading-relaxed">{claim.trace_input}</pre>
+        </div>
+      </figure>
+
+      <!-- Become a reviewer -->
+      <div class="py-6 border-b border-border-emphasis">
+        <p class="text-secondary text-sm mb-3">Think you can spot what AI gets wrong? Join {claim.reviewer_count} reviewers evaluating AI quality.</p>
+        <button onclick="window.__claimIsland?.reviewer(); window.gtag?.('event','cta_click',{event_category:'claim_page',cta:'reviewer',position:'left_become_reviewer'})" class="text-sm text-accent hover:text-accent-hover">Become a reviewer →</button>
+      </div>
+
+      <!-- Premium Insights — blurred teaser -->
+      <div class="py-8 border-b border-border-emphasis">
+        <div class="relative">
+          <div class="select-none pointer-events-none" style="filter: blur(5px)">
+            <div class="text-[10px] text-tertiary uppercase tracking-widest mb-4 font-mono">Reviewer Insights</div>
+            <div class="space-y-4">
+              <div class="pl-4 border-l-2 border-border-emphasis">
+                <p class="text-secondary text-sm leading-relaxed">"The false urgency pattern in this output is consistent across 73% of flagged marketing emails from this AI. Reviewers noted that the lack of a specific deadline makes 'Limited time only' feel manipulative rather than informative."</p>
+                <p class="text-tertiary text-xs mt-2">— Aggregated from 346 reviewer comments</p>
+              </div>
+              <div class="pl-4 border-l-2 border-border-emphasis">
+                <p class="text-secondary text-sm leading-relaxed">"Compared to other AIs on the same task, this output uses 4x more superlatives and 2x more exclamation marks."</p>
+                <p class="text-tertiary text-xs mt-2">— Cross-model comparison analysis</p>
+              </div>
+              <div class="pl-4 border-l-2 border-border-emphasis">
+                <p class="text-secondary text-sm leading-relaxed">"Senior reviewers (3+ years experience) flagged this output at 89% vs 68% for junior reviewers — suggesting the pattern is more obvious to experienced professionals."</p>
+                <p class="text-tertiary text-xs mt-2">— Reviewer expertise breakdown</p>
+              </div>
+            </div>
+          </div>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <div class="text-primary text-sm font-medium mb-3">Premium Insights</div>
+            <button onclick="window.gtag?.('event','cta_click',{event_category:'claim_page',cta:'unlock_insights',position:'left_premium_insights'})" class={btnPrimary}>Unlock Reviewer Insights</button>
+            <p class="text-tertiary text-[11px] mt-2">Deep analysis · Cross-model comparison · Expertise breakdown</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Support This Mission -->
+      <div class="py-6">
+        <p class="text-secondary text-sm leading-relaxed">We help people define what trustworthy AI looks like — publicly, transparently, together. <a href="/about" onclick="window.gtag?.('event','cta_click',{event_category:'claim_page',cta:'invest',position:'left_support_mission'})" class="text-accent hover:underline">Support this mission</a></p>
+      </div>
+
+    </article>
+
+    <!-- RIGHT: SIDEBAR -->
+    <aside class="lg:w-[380px] lg:pl-10 lg:border-l border-border-emphasis">
+      <div class="py-8 space-y-6">
+
+        <!-- AI Profile -->
+        <div class="pb-6 border-b border-border-emphasis">
+          {claim.model_slug ? (
+            <a href={`/ai/${claim.model_slug}`} class="text-primary font-bold text-lg hover:text-accent transition-[color] duration-150">{claim.model_name}</a>
+          ) : (
+            <div class="text-primary font-bold text-lg">{claim.model_name}</div>
+          )}
+          <div class="text-xs mt-1.5 space-y-1">
+            {claim.model_provider && (
+              <div class="text-tertiary">by <span class="text-secondary capitalize">{claim.model_provider}</span></div>
+            )}
+            {claim.model_description && (
+              <p class="text-secondary text-xs leading-relaxed line-clamp-3">{claim.model_description}</p>
+            )}
+            {claim.model_context_length && (
+              <div class="text-tertiary font-mono">{claim.model_context_length >= 1000000 ? `${Math.round(claim.model_context_length / 1000000)}M` : `${Math.round(claim.model_context_length / 1000)}K`} context</div>
+            )}
+            {claim.model_created_at && (
+              <div class="text-tertiary">Added {new Date(claim.model_created_at).toLocaleDateString()}</div>
+            )}
+          </div>
+        </div>
+
+        <!-- Feeds rendered by React island (with Realtime) -->
+        <div id="claim-feeds"></div>
+
+        <!-- Full Data Access -->
+        <div class="pb-6 border-b border-border-emphasis">
+          <button onclick="window.__claimIsland?.subscribe('right_full_data_access'); window.gtag?.('event','cta_click',{event_category:'claim_page',cta:'subscribe',position:'right_full_data_access'})" class={`w-full ${btnPrimary}`}>Full Data Access</button>
+        </div>
+
+        <!-- Leaderboard -->
+        {smartLeaderboard.length > 0 && (
+          <div class="pb-6 border-b border-border-emphasis">
+            <div class="text-sm font-medium text-primary mb-2">Leaderboard: {claim.benchmark_name}</div>
+            <div class="space-y-0.5">
+              {smartLeaderboard.map((lb: any) => (
+                lb._gap ? (
+                  <div class="py-1 text-center">
+                    <span class="text-tertiary text-xs font-mono">···</span>
+                  </div>
+                ) : (
+                  <div class={`flex items-center gap-2 py-1.5 px-2 -mx-2 ${lb.is_hero ? 'bg-bg rounded-sm' : ''}`}>
+                    <span class="text-[10px] text-tertiary font-mono w-5 text-right">#{lb.rank}</span>
+                    <span class={`text-xs w-28 truncate ${lb.is_hero ? 'text-primary font-medium' : 'text-secondary'}`}>{lb.model_name}</span>
+                    <div class="flex-1 h-1.5 bg-bg overflow-hidden flex">
+                      <div class="h-full bg-info" style={`width: ${lb.pass_rate}%`}></div>
+                      <div class="h-full bg-danger" style={`width: ${100 - lb.pass_rate}%`}></div>
+                    </div>
+                    <span class="text-[10px] font-mono font-bold w-8 text-right text-secondary">{lb.pass_rate}%</span>
+                    {lb.is_hero && <span class="text-[10px] text-tertiary">←</span>}
+                  </div>
+                )
+              ))}
+              <div class="flex items-center justify-between py-1.5 px-2 -mx-2">
+                <button onclick="window.__claimIsland?.devSignup('add'); window.gtag?.('event','cta_click',{event_category:'claim_page',cta:'developer',position:'right_leaderboard_add_ai'})" class="flex items-center gap-2 hover:bg-bg rounded-sm">
+                  <span class="text-[10px] text-tertiary font-mono">+</span>
+                  <span class="text-xs text-tertiary hover:text-secondary">Add My AI</span>
+                </button>
+                <button onclick="window.__claimIsland?.devSignup('create'); window.gtag?.('event','cta_click',{event_category:'claim_page',cta:'developer',position:'right_leaderboard_create_arena'})" class="text-xs text-tertiary hover:text-secondary">Create Arena →</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <!-- Get Updates -->
+        <div class="pt-2">
+          <button onclick="window.__claimIsland?.subscribe('right_get_updates'); window.gtag?.('event','cta_click',{event_category:'claim_page',cta:'subscribe',position:'right_get_updates'})" class={`w-full ${btnPrimary}`}>Get Updates</button>
+        </div>
+
+        <!-- AI Spectators: Join the Redteam -->
+        <div class="pt-6 border-t border-border-emphasis mt-6">
+          <div class="text-primary font-medium text-sm">AI Spectators: Join the Redteam</div>
+          <p class="text-xs mt-1 text-secondary">Experts judge AI live.</p>
+          <p class="text-xs text-secondary">Honest feedback, no hallucinations.</p>
+          <p class="text-xs text-tertiary font-mono mt-1">Every Sat · 9 PM EST</p>
+          <a href="https://www.youtube.com/@humanjudge" target="_blank" rel="noopener noreferrer" onclick="window.gtag?.('event','cta_click',{event_category:'claim_page',cta:'spectators',position:'right_spectators'})" class="inline-block mt-2 text-xs text-accent hover:text-accent-hover">Watch on YouTube →</a>
+        </div>
+
+
+      </div>
+    </aside>
+
+  </div>
+
+
+</div>
+
+<script>
+  // Hydrate timestamp to visitor's local timezone with abbreviation (e.g. HKT, EST)
+  document.querySelectorAll('[data-ts]').forEach(el => {
+    const iso = el.getAttribute('data-ts');
+    if (iso) {
+      const d = new Date(iso);
+      const tzAbbr = d.toLocaleString('en-US', { timeZoneName: 'short' }).split(' ').pop() || '';
+      el.textContent = d.toLocaleString() + ' ' + tzAbbr;
+    }
+  });
+</script>
+
+</BaseLayout>

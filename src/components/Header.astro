@@ -1,0 +1,259 @@
+---
+// Header — floating island nav. Used on every page via BaseLayout.
+// Recipe lives in design-tokens.css (--island-bg / --island-border /
+// --island-shadow). The teal logo box is the ONE place --color-logo
+// shows up; everything else flows through --color-accent (mono).
+//
+// BaseLayout adds top padding to <main> so content clears the island.
+const { currentPath = '/' } = Astro.props;
+
+// Every nav link collapses into the hamburger overlay below md. The
+// island pill on phones shows only brand + hamburger (iOS Safari
+// renders Inter slightly wider than Blink at the same px size, plus
+// user text-size accessibility can push items past the viewport edge
+// — hiding all links on mobile is the only bulletproof fix).
+const navLinks = [
+  { href: '/ai-reviews',             label: 'Reports',  isActive: currentPath.startsWith('/ai-reviews') },
+  { href: '/pulse',                  label: 'Pulse',    isActive: currentPath.startsWith('/pulse'), beta: true },
+  { href: '/products/for-reviewers', label: 'Judge',    isActive: currentPath === '/products/for-reviewers' || currentPath.startsWith('/programs') },
+  { href: '/for-developers',         label: 'Build',    isActive: currentPath === '/for-developers' },
+  { href: '/about',                  label: 'Mission',  isActive: currentPath === '/about' },
+];
+---
+
+<!-- Floating island nav. Desktop: full pill with all links inline.
+     Mobile: collapsed pill with brand + toggles + hamburger.
+     The hamburger opens a full-screen overlay (#mobile-overlay). -->
+<nav
+  class="fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-[calc(100vw-1rem)]"
+  aria-label="Primary navigation"
+>
+  <div
+    class="island flex items-center gap-0.5 sm:gap-1 p-1.5 sm:p-2 rounded-pill border max-w-full"
+    style="background: var(--island-bg); border-color: var(--island-border); box-shadow: var(--island-shadow); backdrop-filter: blur(40px) saturate(1.8); -webkit-backdrop-filter: blur(40px) saturate(1.8);"
+  >
+    <!-- Brand: HumanJudge icon (square — drops the rounded box so the
+         icon's natural shape isn't clipped into a "circle lasso") +
+         wordmark. -->
+    <a href="/" class="flex items-center gap-2 pl-1 pr-3 py-0.5 group flex-shrink-0" aria-label="HumanJudge home">
+      <img
+        src="/apple-touch-icon.png"
+        alt=""
+        aria-hidden="true"
+        class="w-6 h-6 flex-shrink-0"
+        width="24"
+        height="24"
+      />
+      <span class="text-sm font-semibold tracking-tight text-primary hidden lg:inline whitespace-nowrap">HumanJudge</span>
+    </a>
+
+    <!-- Nav links — all collapse to the hamburger overlay below md.
+         Divider hidden on mobile too. -->
+    <span class="hidden md:block w-px h-5 mx-1" style="background: var(--border-emphasis);" aria-hidden="true"></span>
+    <ul class="hidden md:flex items-center gap-0.5" role="menubar">
+      {navLinks.map(link => (
+        <li role="none">
+          <a
+            href={link.href}
+            role="menuitem"
+            class:list={[
+              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill text-sm font-medium whitespace-nowrap transition-colors hover:bg-accent-soft",
+              link.isActive ? "text-primary" : "text-secondary hover:text-primary"
+            ]}
+          >
+            {link.label}
+            {link.beta && (
+              <span class="text-[8px] font-mono font-bold uppercase tracking-wider leading-none mt-[-2px]" style="color: var(--color-logo)">beta</span>
+            )}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <!-- Toggles + Sign in -->
+    <span class="hidden md:block w-px h-5 mx-1" style="background: var(--border-emphasis);" aria-hidden="true"></span>
+    <div class="flex items-center gap-0.5">
+      <!-- Theme toggle (sun ↔ moon) -->
+      <button
+        id="theme-toggle"
+        type="button"
+        class="hidden md:grid w-8 h-8 place-items-center rounded-pill text-secondary hover:text-primary hover:bg-accent-soft transition-colors"
+        aria-label="Toggle light / dark theme"
+        title="Toggle theme"
+      >
+        <!-- sun (visible in dark mode → click to switch to light) -->
+        <svg class="w-4 h-4 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707"/>
+        </svg>
+        <!-- moon (visible in light mode → click to switch to dark) -->
+        <svg class="w-4 h-4 block dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/>
+        </svg>
+      </button>
+
+      <!-- Font size toggle — small-A / big-A glyph (both uppercase, sized).
+           Apple iOS Settings convention; reads as "one letter, two sizes"
+           rather than two distinct letters. -->
+      <button
+        id="font-toggle"
+        type="button"
+        class="hidden md:inline-flex w-8 h-8 items-center justify-center rounded-pill text-secondary hover:text-primary hover:bg-accent-soft transition-colors font-bold"
+        aria-label="Toggle larger text size"
+        aria-pressed="false"
+        title="Larger text"
+      >
+        <!-- inner span baseline-aligns the two A's; outer button centers the group. -->
+        <span aria-hidden="true" class="inline-flex items-baseline gap-0.5">
+          <span class="text-[10px] leading-none">A</span>
+          <span class="text-base leading-none">A</span>
+        </span>
+      </button>
+
+      <!-- Sign in — desktop only; mobile users get it inside the hamburger. -->
+      {currentPath !== '/auth' && (
+        <a
+          href="/auth"
+          class="hidden md:inline-flex ml-1 items-center px-3 h-8 rounded-pill bg-accent text-accent-on text-sm font-semibold whitespace-nowrap hover:bg-accent-hover transition-colors"
+        >
+          Sign in
+        </a>
+      )}
+
+      <!-- Hamburger (mobile only) -->
+      <button
+        id="mobile-menu-button"
+        type="button"
+        class="md:hidden ml-1 w-8 h-8 grid place-items-center rounded-pill text-secondary hover:text-primary hover:bg-accent-soft transition-colors"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobile-overlay"
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile overlay — full-screen nav drawer triggered by the hamburger. -->
+<div
+  id="mobile-overlay"
+  class="fixed inset-0 z-40 hidden flex-col pt-24 px-6 pb-12 bg-bg overflow-y-auto"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Site navigation"
+>
+  <ul class="flex flex-col gap-1" role="menu">
+    {navLinks.map(link => (
+      <li role="none">
+        <a
+          href={link.href}
+          role="menuitem"
+          class:list={[
+            "flex items-center justify-between text-lg font-medium py-3 px-2 rounded-md hover:bg-surface-elevated transition-colors",
+            link.isActive ? "text-primary" : "text-secondary"
+          ]}
+        >
+          <span class="inline-flex items-center gap-2">
+            {link.label}
+            {link.beta && (
+              <span class="text-[9px] font-mono font-bold uppercase tracking-wider" style="color: var(--color-logo)">beta</span>
+            )}
+          </span>
+          <svg class="w-4 h-4 text-tertiary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <!-- Sign in (mobile) — primary CTA, full-width inside the overlay. -->
+  {currentPath !== '/auth' && (
+    <a
+      href="/auth"
+      class="mt-8 inline-flex items-center justify-center h-12 rounded-md bg-accent text-accent-on text-base font-semibold hover:bg-accent-hover transition-colors"
+    >
+      Sign in
+    </a>
+  )}
+
+  <!-- Mobile toggles -->
+  <div class="mt-6 pt-6 border-t border-border-subtle flex items-center gap-3">
+    <button
+      id="theme-toggle-mobile"
+      type="button"
+      class="flex-1 h-10 grid place-items-center rounded-md border border-border-emphasis text-primary hover:bg-surface-elevated transition-colors text-sm font-medium"
+      aria-label="Toggle theme"
+    >
+      <span class="inline dark:hidden">Switch to dark</span>
+      <span class="hidden dark:inline">Switch to light</span>
+    </button>
+    <button
+      id="font-toggle-mobile"
+      type="button"
+      class="flex-1 h-10 grid place-items-center rounded-md border border-border-emphasis text-primary hover:bg-surface-elevated transition-colors text-sm font-medium"
+      aria-label="Toggle larger text"
+    >
+      <span>A+ Larger text</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  /* When mobile overlay is open, body is locked. */
+  :global(body.menu-open) { overflow: hidden; }
+</style>
+
+<script is:inline>
+  (function () {
+    const root = document.documentElement;
+    const themeBtn = document.getElementById('theme-toggle');
+    const themeBtnMobile = document.getElementById('theme-toggle-mobile');
+    const fontBtn = document.getElementById('font-toggle');
+    const fontBtnMobile = document.getElementById('font-toggle-mobile');
+    const menuBtn = document.getElementById('mobile-menu-button');
+    const overlay = document.getElementById('mobile-overlay');
+
+    function flipTheme() {
+      const next = root.classList.contains('light') ? 'dark' : 'light';
+      root.classList.remove('light', 'dark');
+      root.classList.add(next);
+      try { localStorage.setItem('hj_theme', next); } catch (e) {}
+    }
+
+    function flipFont() {
+      const on = root.classList.toggle('large-font');
+      try { localStorage.setItem('hj_font_large', on ? '1' : '0'); } catch (e) {}
+      [fontBtn, fontBtnMobile].forEach(b => b && b.setAttribute('aria-pressed', on ? 'true' : 'false'));
+    }
+
+    function toggleMenu(force) {
+      const open = typeof force === 'boolean' ? force : overlay.classList.contains('hidden');
+      overlay.classList.toggle('hidden', !open);
+      overlay.classList.toggle('flex', open);
+      menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.body.classList.toggle('menu-open', open);
+    }
+
+    themeBtn && themeBtn.addEventListener('click', flipTheme);
+    themeBtnMobile && themeBtnMobile.addEventListener('click', flipTheme);
+    fontBtn && fontBtn.addEventListener('click', flipFont);
+    fontBtnMobile && fontBtnMobile.addEventListener('click', flipFont);
+    menuBtn && menuBtn.addEventListener('click', () => toggleMenu());
+
+    // Sync the A+ aria-pressed on load so screen readers know current state.
+    const fontOn = root.classList.contains('large-font');
+    [fontBtn, fontBtnMobile].forEach(b => b && b.setAttribute('aria-pressed', fontOn ? 'true' : 'false'));
+
+    // Close mobile overlay on nav link click and on ESC.
+    overlay && overlay.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toggleMenu(false)));
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay && !overlay.classList.contains('hidden')) toggleMenu(false);
+    });
+  })();
+</script>

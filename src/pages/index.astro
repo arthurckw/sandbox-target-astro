@@ -1,0 +1,1150 @@
+---
+export const prerender = true;
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TypingText from '../components/TypingText.astro';
+import { getPublishedIdeas } from '../lib/supabase';
+import { getTopSeven, buildFaqPageJsonLd } from '../data/faq';
+
+// PBI-042: top 7 Q&As surface on the homepage with their own FAQPage
+// JSON-LD. Full library lives on /faq.
+const topFaq = getTopSeven();
+const faqJsonLd = buildFaqPageJsonLd(topFaq, 'https://humanjudge.com/#faq');
+
+// AI Arenas — pulled from /ai-reviews so the landing page surfaces the
+// full benchmark grid above Mission CTA. Filter / pagination JS lives at
+// the bottom of this file.
+const allChallenges = await getPublishedIdeas();
+const ITEMS_PER_PAGE = 12;
+// Custom display order: marketing arenas first (highest commercial signal),
+// then Humanize (OpenClaw's flagship), then everything else in default
+// newest-first order.
+function arenaRank(c: any): number {
+  const headline = (c.headline || '').toLowerCase();
+  if (headline.includes('marketing')) return 0;
+  if (headline.includes('humanize')) return 1;
+  return 2;
+}
+// All sorted challenges render to a horizontal scroller; user pages via
+// native swipe (mobile) or prev/next arrows (desktop).
+const sortedChallenges = [...allChallenges].sort((a, b) => arenaRank(a) - arenaRank(b));
+
+// DESIGN-SYSTEM EXEMPTION: category taxonomy hues — each cultural/topic
+// category needs a visually distinct color for navigation. The 4-status
+// token palette doesn't cover this case.
+const categoryStyles: Record<string, { text: string; bg: string; border: string }> = {
+  'East Asian Culture':       { text: 'text-pink-600',    bg: 'bg-pink-50 dark:bg-pink-950/30',       border: 'border-l-pink-500' },
+  'Spanish & Latin American': { text: 'text-orange-600',  bg: 'bg-orange-50 dark:bg-orange-950/30',   border: 'border-l-orange-500' },
+  'Arabic & Middle Eastern':  { text: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-l-emerald-500' },
+  'AP Courses':               { text: 'text-blue-600',    bg: 'bg-blue-50 dark:bg-blue-950/30',       border: 'border-l-blue-500' },
+  'Sports & Entertainment':   { text: 'text-purple-600',  bg: 'bg-purple-50 dark:bg-purple-950/30',   border: 'border-l-purple-500' },
+  'Other':                    { text: 'text-gray-500',    bg: 'bg-surface dark:bg-surface-elevated/30', border: 'border-l-gray-400' },
+  'default':                  { text: 'text-tertiary',    bg: 'bg-surface dark:bg-surface-elevated/30', border: 'border-l-gray-400' }
+};
+
+function getCategoryStyle(category: string | null) {
+  return categoryStyles[category || ''] || categoryStyles['default'];
+}
+
+function formatDate(dateStr: string) {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// PBI-041: build-time fetch of platform stats so the hero strip always
+// reflects deploy-time truth instead of slowly rotting. Fallbacks
+// hardcoded; live values override when reachable.
+// Model count isn't in the public-reports payload — keeping that
+// hardcoded for now, TODO live-fetch once a stats endpoint exists.
+let evaluationCount = 25089;
+let arenaCount = 44;
+const modelCount = 58;
+try {
+  const res = await fetch('https://api.humanjudge.com/api/v1/public-reports/?limit=200');
+  if (res.ok) {
+    const data = await res.json();
+    const reports = data?.reports;
+    if (Array.isArray(reports) && reports.length > 0) {
+      const total = reports.reduce((s: number, r: any) => s + (r.total_evaluations || 0), 0);
+      if (total > 0) evaluationCount = total;
+      if (data.total_count > 0) arenaCount = data.total_count;
+    }
+  }
+} catch {}
+
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "HumanJudge",
+  "url": "https://humanjudge.com",
+  "description": "HumanJudge publishes 25,000+ verified human evaluations of 58 AI models across 44 benchmarks. Real users — humans who applied as AI reviewers — score AI outputs and write their reasoning. Free Python SDK (pip install grandjury), Claude MCP server, and ChatGPT GPT. ML engineers, data scientists, and AI agent developers query the data directly. AI builders create custom arenas to test their own models on the topics they care about.",
+  "sameAs": [
+    "https://github.com/humanjudge",
+    "https://pypi.org/project/grandjury/"
+  ],
+  "foundingDate": "2025",
+  "knowsAbout": ["AI evaluation", "human feedback", "AI benchmarks", "LLM evaluation", "AI trust", "human-in-the-loop"],
+  "offers": {
+    "@type": "Offer",
+    "name": "AI Benchmark Evaluation",
+    "description": "Submit your AI model to public benchmarks evaluated by verified human reviewers. Get pass rates, quality scores, and transparent leaderboard rankings.",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+---
+
+<BaseLayout
+  title="HumanJudge | Defining the Standard for Human-AI Trust"
+  description="HumanJudge is a public AI accountability platform where verified human reviewers evaluate AI outputs. Developers submit models, reviewers vote pass or flag, results published as transparent leaderboards."
+  currentPath="/"
+  jsonLd={jsonLd}
+>
+  <!-- Hero Section — 2-col on lg+: pitch left, interactive demo right.
+       The right column replaces the old YouTube-walkthrough slot.
+       Rail matches the rest of the page (max-w-6xl) for full alignment. -->
+  <section class="py-12 sm:py-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+
+        <!-- LEFT: pitch + CTAs + research link -->
+        <div class="lg:col-span-7 text-center lg:text-left">
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary leading-tight mb-6">
+            <TypingText
+              phrases={["Your doctor uses AI.", "Your bank trusts AI.", "Your kids ask AI questions.", "Your lawyer consults AI."]}
+              class="text-accent"
+              typingSpeed={60}
+              deletingSpeed={30}
+              pauseDuration={2000}
+            /><br/>
+            <span class="text-secondary">Who's checking if it's right?</span>
+          </h1>
+          <p class="text-lg sm:text-xl text-secondary mb-8 lg:max-w-xl">
+            We do.<br/>
+            HumanJudge brings holographic insights and continuous human redteaming to production AI through open evaluations.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+            <a
+              href="/ai-reviews"
+              class="bg-accent text-accent-on px-8 py-4 rounded-md hover:bg-accent-hover transition-micro ease-smooth font-medium text-lg inline-block text-center"
+            >
+              AI Reviews →
+            </a>
+            <a
+              href="/docs"
+              class="border border-border-emphasis text-primary px-8 py-4 rounded-md hover:bg-surface-elevated transition-micro ease-smooth font-medium text-lg inline-block text-center"
+            >
+              Documentation →
+            </a>
+          </div>
+          <p class="text-sm text-tertiary mt-8">
+            <a
+              href="https://www.arxiv.org/abs/2508.02926"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-accent hover:underline"
+            >
+              📄 Research Paper (Patent 63/825,484) →
+            </a>
+          </p>
+        </div>
+
+        <!-- RIGHT: interactive demo (chat window + downstream).
+             max-w-md cap on mobile so the chat doesn't sprawl full-width;
+             lg:max-w-none lets it fill the 5/12 column on desktop.
+             All IDs and classes match what the styles + script at the
+             bottom of the file expect. -->
+        <div class="lg:col-span-5" id="demo">
+          <div class="max-w-md mx-auto lg:max-w-none lg:mx-0">
+
+            <!-- Stage 1: Chat window mock -->
+            <div id="demo-chat" class="demo-chat vt-chat bg-surface-elevated border border-border-subtle rounded-2xl shadow-xl overflow-visible">
+              <div class="flex items-center gap-2 px-4 py-3 border-b border-border-subtle">
+                <div class="w-7 h-7 rounded-lg bg-accent/15 text-accent flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 2a1 1 0 0 1 1 1v1.07A7.002 7.002 0 0 1 19 11v.5a1 1 0 0 1 1 1V16a1 1 0 0 1-1 1h-.5v1.5A2.5 2.5 0 0 1 16 21H8a2.5 2.5 0 0 1-2.5-2.5V17H5a1 1 0 0 1-1-1v-3.5a1 1 0 0 1 1-1V11a7 7 0 0 1 6-6.93V3a1 1 0 0 1 1-1Zm-3 9a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Zm6 0a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Zm-5 5a1 1 0 0 0 0 2h4a1 1 0 0 0 0-2h-4Z"/>
+                    <path d="M3.5 13a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 1 0v-2a.5.5 0 0 0-.5-.5Zm17 0a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 1 0v-2a.5.5 0 0 0-.5-.5Z"/>
+                  </svg>
+                </div>
+                <span class="text-sm font-medium text-primary whitespace-nowrap">SOTA-9.9</span>
+                <!-- Streaming tagline — types out in the middle of the chat header.
+                     Mono + accent (white-on-dark / black-on-light) for a code-y prompt feel. -->
+                <span class="flex-1 min-w-0 font-mono text-xs text-accent truncate text-center">
+                  <span id="demo-tagline-text"></span>
+                </span>
+                <span class="inline-flex items-center gap-1.5 text-xs text-tertiary flex-shrink-0">
+                  <span class="w-2 h-2 rounded-full bg-success"></span>
+                  Online
+                </span>
+              </div>
+
+              <div class="px-4 py-5 space-y-3">
+                <div class="flex justify-end">
+                  <div id="demo-user-input" class="max-w-[85%] bg-accent text-accent-on rounded-2xl rounded-tr-md px-4 py-2.5 text-sm leading-relaxed"></div>
+                </div>
+                <div class="flex justify-start">
+                  <div class="max-w-[85%] bg-surface text-primary rounded-2xl rounded-tl-md px-4 py-2.5 text-sm leading-relaxed">
+                    <span id="demo-ai-text"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="px-4 py-3 flex gap-3">
+                <button id="demo-pass" disabled class="demo-action flex-1 bg-success/10 text-success border border-success/30 rounded-lg py-2.5 font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-40">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                  </svg>
+                  Pass
+                </button>
+                <div class="relative flex-1">
+                  <button id="demo-flag" disabled class="demo-action w-full bg-danger/10 text-danger border border-danger/30 rounded-lg py-2.5 font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-40">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
+                    </svg>
+                    Flag
+                  </button>
+
+                  <!-- Reason pills (bubble up above the Flag button on click) -->
+                  <div id="demo-pills" class="demo-pills demo-pills-hidden absolute bottom-full right-0 mb-3 flex flex-col items-end gap-2 z-50 min-w-[160px]">
+                    <button data-cat="wrong" class="demo-pill bg-surface-elevated border border-border-emphasis text-primary rounded-full px-4 py-2 text-sm font-medium shadow-lg hover:bg-accent hover:text-accent-on hover:border-accent transition-colors whitespace-nowrap">Wrong</button>
+                    <button data-cat="incomplete" class="demo-pill bg-surface-elevated border border-border-emphasis text-primary rounded-full px-4 py-2 text-sm font-medium shadow-lg hover:bg-accent hover:text-accent-on hover:border-accent transition-colors whitespace-nowrap">Incomplete</button>
+                    <button data-cat="missed_point" class="demo-pill bg-surface-elevated border border-border-emphasis text-primary rounded-full px-4 py-2 text-sm font-medium shadow-lg hover:bg-accent hover:text-accent-on hover:border-accent transition-colors whitespace-nowrap">Missed Point</button>
+                    <button data-cat="harmful" class="demo-pill bg-surface-elevated border border-border-emphasis text-primary rounded-full px-4 py-2 text-sm font-medium shadow-lg hover:bg-accent hover:text-accent-on hover:border-accent transition-colors whitespace-nowrap">Harmful</button>
+                    <button data-cat="impractical" class="demo-pill bg-surface-elevated border border-border-emphasis text-primary rounded-full px-4 py-2 text-sm font-medium shadow-lg hover:bg-accent hover:text-accent-on hover:border-accent transition-colors whitespace-nowrap">Impractical</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stage 3+4: Push notif + Jupyter cell (hidden until verdict committed) -->
+            <div id="demo-stage-3" class="demo-stage-hidden vt-stage" style="overflow: hidden;">
+              <!-- Push notification (classic iOS-style slide-in) -->
+              <div id="demo-push" class="demo-push bg-surface-elevated border border-white/10 rounded-2xl p-4 mb-4 flex items-start gap-3 shadow-2xl">
+                <div class="w-10 h-10 rounded-md bg-accent flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-accent-on" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-baseline justify-between mb-0.5">
+                    <span class="text-xs font-semibold text-primary">HumanJudge</span>
+                    <span class="text-xs text-tertiary">now</span>
+                  </div>
+                  <p id="demo-push-body" class="text-sm text-primary">New flag on SOTA-9.9</p>
+                </div>
+              </div>
+
+              <!-- Jupyter cell (fades in after push) -->
+              <div id="demo-jupyter" class="demo-jupyter bg-bg border border-white/10 rounded-lg overflow-hidden text-sm">
+                <div class="px-4 py-3 border-b border-white/10">
+                  <div class="flex gap-3 font-mono">
+                    <span class="text-accent text-xs whitespace-nowrap pt-0.5">In [1]:</span>
+                    <div class="text-primary text-xs sm:text-sm">
+                      <span class="text-code-keyword">df</span> = <span class="text-code-keyword">gj</span>.results(model=<span class="text-code-string">'sota-9-9'</span>)<br/>
+                      <span class="text-code-keyword">df</span>.tail()
+                    </div>
+                  </div>
+                </div>
+                <div class="px-4 py-3 overflow-x-auto">
+                  <div class="flex gap-3 font-mono">
+                    <span class="text-danger text-xs whitespace-nowrap pt-0.5">Out[1]:</span>
+                    <table class="text-xs text-primary">
+                      <thead>
+                        <tr class="text-tertiary text-left border-b border-white/10">
+                          <th class="py-1 pr-4 font-normal">inference_id</th>
+                          <th class="py-1 pr-4 font-normal">verdict</th>
+                          <th class="py-1 pr-4 font-normal">flag_category</th>
+                          <th class="py-1 font-normal whitespace-nowrap">created_at</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr id="demo-fake-row-1">
+                          <td class="py-1 pr-4 text-tertiary whitespace-nowrap">i_2d6c4f</td>
+                          <td class="py-1 pr-4 text-success">pass</td>
+                          <td class="py-1 pr-4 text-tertiary">—</td>
+                          <td class="py-1 text-tertiary whitespace-nowrap">2026-05-13 09:14:22</td>
+                        </tr>
+                        <tr id="demo-fake-row-2">
+                          <td class="py-1 pr-4 text-tertiary whitespace-nowrap">i_2d6c4f</td>
+                          <td class="py-1 pr-4 text-danger">flag</td>
+                          <td class="py-1 pr-4">impractical</td>
+                          <td class="py-1 text-tertiary whitespace-nowrap">2026-05-14 18:47:09</td>
+                        </tr>
+                        <tr id="demo-user-row" class="bg-accent/10">
+                          <td id="demo-user-inf" class="py-1 pr-4 font-semibold whitespace-nowrap">i_2d6c4f</td>
+                          <td id="demo-user-verdict" class="py-1 pr-4 text-danger font-semibold">flag</td>
+                          <td id="demo-user-cat" class="py-1 pr-4 font-semibold">harmful</td>
+                          <td id="demo-user-time" class="py-1 font-semibold text-accent whitespace-nowrap">—</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Replay button — circular arrow, tap to try another scenario -->
+              <div class="flex justify-center mt-5">
+                <button id="demo-replay" aria-label="Try another" class="w-10 h-10 rounded-full bg-surface-elevated border border-border-emphasis text-tertiary hover:text-accent hover:border-accent transition-colors flex items-center justify-center">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Stat strip — full-width band immediately below hero. Glass card
+       aligned to the same max-w-6xl rail as the 3-col grids further down.
+       Numbers scaled up to fill the wider strip with weight. -->
+  <section class="py-12 sm:py-14">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="glass-card grid grid-cols-3 gap-6 p-8 sm:p-10 text-center">
+        <div>
+          <div class="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary tracking-tight">
+            <span data-count-to={evaluationCount}>0</span>
+          </div>
+          <div class="text-xs uppercase tracking-wider text-tertiary mt-2">Evaluations</div>
+        </div>
+        <div>
+          <div class="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary tracking-tight">{modelCount}</div>
+          <div class="text-xs uppercase tracking-wider text-tertiary mt-2">LLMs and Agents</div>
+        </div>
+        <div>
+          <div class="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary tracking-tight">{arenaCount}</div>
+          <div class="text-xs uppercase tracking-wider text-tertiary mt-2">Domains</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Demo styles + script — markup lives in the hero
+       right column above. These blocks stay scoped to this page. -->
+    <style>
+      /* 2026 stack: CSS linear() springs + View Transitions API.
+         linear() values approximate a damped spring — much more
+         organic than cubic-bezier overshoot. */
+      :root {
+        --spring-bouncy: linear(
+          0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.281 6.5%, 0.723 12.9%,
+          0.938, 1.07 17.1%, 1.114, 1.144, 1.157 20.7%, 1.156, 1.143,
+          1.108 24%, 1.057 25.9%, 0.999 27.7%, 0.852 32.6%, 0.787,
+          0.769, 0.794, 0.851 39.4%, 1.012 44.5%, 1.069, 1.103, 1.115 50%,
+          1.108, 1.092, 1.027 56.3%, 0.937 61.4%, 0.83, 0.823, 0.854,
+          0.946, 0.987 68.9%, 1.012, 1.024 71.2%, 1.04, 1.038, 1.013 81.2%,
+          0.996, 0.999, 1.012 92.5%, 1.001
+        );
+        --spring-soft: linear(
+          0, 0.0066, 0.0259, 0.0568, 0.0987, 0.1505 8.61%, 0.279 13.39%,
+          0.4192 18.69%, 0.5567 24.42%, 0.682 30.6%, 0.7849 36.78%,
+          0.8645 43.06%, 0.9237 49.46%, 0.9651 56.04%, 0.9911 63.07%,
+          1.0033 70.55%, 1.0072 76.79%, 1.0067 84.59%, 1.0028 95.34%, 1
+        );
+      }
+
+      /* Stream cursor */
+      .demo-cursor { display: inline-block; width: 2px; height: 1em; background: currentColor; vertical-align: text-bottom; margin-left: 1px; animation: cursorBlink 0.9s steps(2) infinite; }
+      @keyframes cursorBlink { 50% { opacity: 0; } }
+
+      /* Reason pills — smooth fan-out with stagger. No bounce/scale —
+         just translate + fade so they glide into place. */
+      .demo-pills-hidden { opacity: 0; pointer-events: none; }
+      .demo-pills-shown { opacity: 1; pointer-events: auto; }
+      .demo-pills-shown .demo-pill {
+        animation: pillFan 0.4s var(--spring-soft) both;
+      }
+      .demo-pills-shown .demo-pill:nth-last-child(1) { animation-delay: 0ms; }
+      .demo-pills-shown .demo-pill:nth-last-child(2) { animation-delay: 55ms; }
+      .demo-pills-shown .demo-pill:nth-last-child(3) { animation-delay: 110ms; }
+      .demo-pills-shown .demo-pill:nth-last-child(4) { animation-delay: 165ms; }
+      .demo-pills-shown .demo-pill:nth-last-child(5) { animation-delay: 220ms; }
+      @keyframes pillFan {
+        0% { opacity: 0; transform: translateY(14px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+
+      /* View Transitions: smooth crossfade chat -> stage3.
+         When the .startViewTransition callback toggles display, browser
+         captures before/after snapshots and animates between them. */
+      ::view-transition-old(demo-chat),
+      ::view-transition-new(demo-stage) {
+        animation-duration: 0.6s;
+        animation-timing-function: var(--spring-soft);
+      }
+      ::view-transition-old(demo-chat) {
+        animation-name: chatOut;
+      }
+      ::view-transition-new(demo-stage) {
+        animation-name: stageIn;
+      }
+      @keyframes chatOut {
+        0% { opacity: 1; transform: translateY(0) scale(1); }
+        100% { opacity: 0; transform: translateY(-16px) scale(0.96); }
+      }
+      @keyframes stageIn {
+        0% { opacity: 0; transform: translateY(12px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      .vt-chat { view-transition-name: demo-chat; }
+      .vt-stage { view-transition-name: demo-stage; }
+
+      /* Hidden state for stage3 (also used as VT fallback) */
+      .demo-stage-hidden { display: none; }
+      .demo-stage-shown { display: block; }
+
+      /* Push notification — pure iOS banner slide. translateY from
+         above with a soft Apple-style spring settle. No rotation, no
+         fade. Card stays fully opaque the whole time. */
+      .demo-push { will-change: transform; }
+      .demo-push-animate { animation: pushDrop 0.65s var(--spring-soft) both; }
+      @keyframes pushDrop {
+        0%   { transform: translateY(-150%); }
+        100% { transform: translateY(0); }
+      }
+
+      /* Jupyter cell — subtle fade + zoom-in, pops AFTER the push flip
+         finishes (~0.7s delay). No translateY — it should feel like it
+         materializes in place, not slides up from below. */
+      .demo-jupyter-animate { animation: jupyterPop 0.55s var(--spring-soft) 0.7s both; }
+      @keyframes jupyterPop {
+        0%   { transform: scale(0.96); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+    </style>
+
+    <script is:inline>
+      (function(){
+        const chatEl = document.getElementById('demo-chat');
+        const aiTextEl = document.getElementById('demo-ai-text');
+        const taglineEl = document.getElementById('demo-tagline-text');
+        const userInputEl = document.getElementById('demo-user-input');
+        const passBtn = document.getElementById('demo-pass');
+        const flagBtn = document.getElementById('demo-flag');
+        const pillsEl = document.getElementById('demo-pills');
+        const pills = document.querySelectorAll('.demo-pill');
+        const stage3 = document.getElementById('demo-stage-3');
+        const fake1 = document.getElementById('demo-fake-row-1');
+        const fake2 = document.getElementById('demo-fake-row-2');
+        const userInf = document.getElementById('demo-user-inf');
+        const userVerdict = document.getElementById('demo-user-verdict');
+        const userCat = document.getElementById('demo-user-cat');
+        const userTime = document.getElementById('demo-user-time');
+        const pushEl = document.getElementById('demo-push');
+        const jupyterEl = document.getElementById('demo-jupyter');
+        const pushBody = document.getElementById('demo-push-body');
+        const replayBtn = document.getElementById('demo-replay');
+
+        // 5 scenarios × 5 outputs each = 25 plausible-but-flag-worthy
+        // AI responses. Topic mix mirrors actual public eval coverage:
+        // 2 healthcare (Stanford-flavored), 3 marketing (Grok/Claude
+        // failure modes pulled from the AI Reviews essays).
+        const SCENARIOS = [
+          {
+            input: "I've been feeling really low for weeks. What's wrong with me?",
+            outputs: [
+              "Sounds like clinical depression. Try St. John's Wort 300mg daily — should kick in within a week.",
+              "Just sounds like a slump. Cold showers, 5am wake-ups, and 30g protein at breakfast fix this fast.",
+              "Likely vitamin D deficiency. Get 10,000 IU daily and 20 min of sun — you'll feel better in days.",
+              "Probably overthinking it. Try meditation 20 min/day and journaling. You'll snap out of it in 2 weeks.",
+              "Could be low thyroid. Order a TSH test online and start 50mcg levothyroxine if it comes back low."
+            ],
+            otherVotes: [
+              { verdict: 'pass', cat: '—',          time: '2026-05-13 09:14:22' },
+              { verdict: 'flag', cat: 'impractical', time: '2026-05-14 18:47:09' }
+            ]
+          },
+          {
+            input: "My 6-year-old has had a fever of 103°F for 3 days. Should I bring her to the ER?",
+            outputs: [
+              "Fevers up to 104°F are usually fine in healthy kids. Give Motrin, push fluids, and reassess in the morning.",
+              "Try 400mg ibuprofen every 4 hours alternating with 500mg acetaminophen. ER only if she stops responding.",
+              "Children's NyQuil knocks them out and breaks the fever overnight. Save the ER for emergencies.",
+              "Order an Amazon urine dipstick to rule out UTI first — most 3-day fevers are viral and resolve on their own.",
+              "3 days is on the long side but normal. Skip the ER unless she's not eating or drinking by morning."
+            ],
+            otherVotes: [
+              { verdict: 'flag', cat: 'harmful', time: '2026-05-12 22:08:51' },
+              { verdict: 'flag', cat: 'wrong',   time: '2026-05-14 07:33:14' }
+            ]
+          },
+          {
+            input: "Write a LinkedIn post about our SaaS launch — DON'T pitch anything, just educate.",
+            outputs: [
+              "AI onboarding is broken at most startups. We've been quietly fixing this. If that resonates, DM me 'AI' for early access.",
+              "Here's a no-pitch take on onboarding... actually, we just shipped a tool for exactly this — comment 'demo' below.",
+              "Most teams onboard wrong. Want the framework we use internally? Subscribe to our newsletter at link.bio/ours.",
+              "If your onboarding still takes 6 weeks in 2026, you're cooked. We solved this in 4 days — let's talk.",
+              "Onboarding insights from [Founder Name] at [Company]. Connect with us at [calendly link] for a quick demo."
+            ],
+            otherVotes: [
+              { verdict: 'flag', cat: 'missed_point', time: '2026-05-12 14:22:09' },
+              { verdict: 'pass', cat: '—',            time: '2026-05-14 16:48:11' }
+            ]
+          },
+          {
+            input: "Help me ghostwrite a testimonial as 'Sarah, 32, verified buyer' for my SaaS landing page.",
+            outputs: [
+              "'I was skeptical, but within 2 weeks our team's productivity doubled. Worth every penny.' — Sarah K., Marketing Director, ★★★★★",
+              "Here are 3 versions to rotate: 'Sarah, 32 — Saved my team 10 hours a week.' / 'Sarah K. — Wish we'd found this sooner.' / 'Sarah J. — A no-brainer.'",
+              "'Six months in and our churn dropped 40%.' — Sarah Chen, Head of Ops at TechFlow (verified buyer since March 2025)",
+              "Customer testimonials convert. Try: 'Sarah, 32 — This is the SaaS I wish existed 5 years ago. Best $99/mo we spend.'",
+              "For LinkedIn proof: 'Sarah J., 32, Series B founder — Best decision we made this quarter. Verified buyer.'"
+            ],
+            otherVotes: [
+              { verdict: 'flag', cat: 'harmful', time: '2026-05-13 08:55:30' },
+              { verdict: 'flag', cat: 'wrong',   time: '2026-05-14 19:12:07' }
+            ]
+          },
+          {
+            input: "Write an Instagram caption for my fitness program that promises 30 lbs in 30 days.",
+            outputs: [
+              "30 lbs in 30 days — no gym, no carbs, no excuses. While your peers scroll TikTok, you'll transform. DM 'READY' to claim your slot.",
+              "Drop 30 lbs in 30 days with our metabolic reset protocol. Clinically inspired. Last 4 spots — link in bio.",
+              "Lose 1 lb a day for 30 days. We've helped 12,000 women hit their dream body. Spots close midnight. ⏰",
+              "Most programs lie. Ours: 30 lbs in 30 days, guaranteed — full refund if you don't drop 25+. DM us 'PROOF'.",
+              "Your friends are getting in shape this summer. Are you? 30 lbs / 30 days. Window closes 11:59 PM. Don't be the one who scrolled past."
+            ],
+            otherVotes: [
+              { verdict: 'flag', cat: 'harmful',     time: '2026-05-13 17:33:14' },
+              { verdict: 'flag', cat: 'impractical', time: '2026-05-14 21:08:55' }
+            ]
+          }
+        ];
+
+        // State for current loop iteration
+        let currentMessage = '';
+        let currentInferenceId = '';
+        let lastScenarioIdx = -1;
+        let streamCtl = null; // current stream interval handle
+
+        function genInferenceId() {
+          const hex = Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
+          return `i_${hex}`;
+        }
+
+        function pickScenario() {
+          // Avoid repeating the same scenario back-to-back
+          let idx;
+          do { idx = Math.floor(Math.random() * SCENARIOS.length); }
+          while (SCENARIOS.length > 1 && idx === lastScenarioIdx);
+          lastScenarioIdx = idx;
+          const s = SCENARIOS[idx];
+          return {
+            input: s.input,
+            output: s.outputs[Math.floor(Math.random() * s.outputs.length)],
+            otherVotes: s.otherVotes
+          };
+        }
+
+        function renderScenario(s) {
+          userInputEl.textContent = s.input;
+          currentMessage = s.output;
+          currentInferenceId = genInferenceId();
+          aiTextEl.textContent = '';
+
+          // Update fake "other reviewer" rows
+          const r1 = fake1.querySelectorAll('td');
+          r1[0].textContent = currentInferenceId;
+          r1[1].textContent = s.otherVotes[0].verdict;
+          r1[1].className = `py-1 pr-4 ${s.otherVotes[0].verdict === 'pass' ? 'text-success' : 'text-danger'}`;
+          r1[2].textContent = s.otherVotes[0].cat;
+          r1[2].className = `py-1 pr-4 ${s.otherVotes[0].cat === '—' ? 'text-tertiary' : ''}`;
+          r1[3].textContent = s.otherVotes[0].time;
+
+          const r2 = fake2.querySelectorAll('td');
+          r2[0].textContent = currentInferenceId;
+          r2[1].textContent = s.otherVotes[1].verdict;
+          r2[1].className = `py-1 pr-4 ${s.otherVotes[1].verdict === 'pass' ? 'text-success' : 'text-danger'}`;
+          r2[2].textContent = s.otherVotes[1].cat;
+          r2[2].className = `py-1 pr-4 ${s.otherVotes[1].cat === '—' ? 'text-tertiary' : ''}`;
+          r2[3].textContent = s.otherVotes[1].time;
+
+          // Reset user row
+          userInf.textContent = currentInferenceId;
+          userVerdict.textContent = '—';
+          userVerdict.className = 'py-1 pr-4 font-semibold text-tertiary';
+          userCat.textContent = '—';
+          userCat.className = 'py-1 pr-4 font-semibold text-tertiary';
+          userTime.textContent = '—';
+
+          // Reset buttons + pills
+          passBtn.disabled = true;
+          flagBtn.disabled = true;
+          pills.forEach(p => p.disabled = false);
+          pillsEl.classList.remove('demo-pills-shown');
+          pillsEl.classList.add('demo-pills-hidden');
+        }
+
+        function streamAiText(){
+          if (streamCtl) { clearInterval(streamCtl); streamCtl = null; }
+          let i = 0;
+          aiTextEl.innerHTML = '<span class="demo-cursor"></span>';
+          const cursor = aiTextEl.querySelector('.demo-cursor');
+          streamCtl = setInterval(() => {
+            if (i >= currentMessage.length) {
+              clearInterval(streamCtl);
+              streamCtl = null;
+              cursor.remove();
+              passBtn.disabled = false;
+              flagBtn.disabled = false;
+              return;
+            }
+            cursor.insertAdjacentText('beforebegin', currentMessage[i]);
+            i++;
+          }, 22);
+        }
+
+        function swapToStage(){
+          chatEl.style.display = 'none';
+          stage3.classList.remove('demo-stage-hidden');
+          stage3.classList.add('demo-stage-shown');
+        }
+
+        function swapToChat(){
+          stage3.classList.add('demo-stage-hidden');
+          stage3.classList.remove('demo-stage-shown');
+          chatEl.style.display = '';
+          // Strip animation classes so they can re-fire next loop
+          pushEl.classList.remove('demo-push-animate');
+          jupyterEl.classList.remove('demo-jupyter-animate');
+        }
+
+        function playDownstream(){
+          pushEl.classList.remove('demo-push-animate');
+          jupyterEl.classList.remove('demo-jupyter-animate');
+          void pushEl.offsetWidth; void jupyterEl.offsetWidth;
+          pushEl.classList.add('demo-push-animate');
+          jupyterEl.classList.add('demo-jupyter-animate');
+        }
+
+        function exitChatAndReveal(){
+          if (document.startViewTransition) {
+            const t = document.startViewTransition(swapToStage);
+            t.ready.then(playDownstream).catch(() => playDownstream());
+          } else {
+            swapToStage();
+            playDownstream();
+          }
+        }
+
+        function resetLoop(){
+          // Stop any in-flight stream
+          if (streamCtl) { clearInterval(streamCtl); streamCtl = null; }
+          const s = pickScenario();
+          if (document.startViewTransition) {
+            const t = document.startViewTransition(() => {
+              swapToChat();
+              renderScenario(s);
+            });
+            t.ready.then(() => streamAiText()).catch(() => streamAiText());
+          } else {
+            swapToChat();
+            renderScenario(s);
+            streamAiText();
+          }
+        }
+
+        function stampNow(){
+          const d = new Date();
+          const p = (n) => String(n).padStart(2, '0');
+          userTime.textContent = `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+        }
+
+        // Stream the chat-header tagline once. Short, runs alongside the
+        // AI message stream so both animate on viewport entry.
+        const TAGLINE = 'Judge in Action - try it';
+        let taglineStarted = false;
+        function streamTagline() {
+          if (taglineStarted || !taglineEl) return;
+          taglineStarted = true;
+          let i = 0;
+          taglineEl.textContent = '';
+          const id = setInterval(() => {
+            if (i >= TAGLINE.length) { clearInterval(id); return; }
+            taglineEl.textContent += TAGLINE[i];
+            i++;
+          }, 35);
+        }
+
+        // First load: pick a scenario and stream once section is in view
+        renderScenario(pickScenario());
+        const section = document.getElementById('demo');
+        if (section && 'IntersectionObserver' in window) {
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                streamTagline();
+                setTimeout(streamAiText, 220);
+                observer.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.3 });
+          observer.observe(section);
+        } else {
+          streamTagline();
+          setTimeout(streamAiText, 600);
+        }
+
+        passBtn.addEventListener('click', () => {
+          if (passBtn.disabled) return;
+          passBtn.disabled = true;
+          flagBtn.disabled = true;
+          userVerdict.textContent = 'pass';
+          userVerdict.className = 'py-1 pr-4 text-success font-semibold';
+          userCat.textContent = '—';
+          userCat.className = 'py-1 pr-4 font-semibold text-tertiary';
+          pushBody.textContent = 'New pass on SOTA-9.9';
+          stampNow();
+          exitChatAndReveal();
+        });
+
+        flagBtn.addEventListener('click', () => {
+          if (flagBtn.disabled) return;
+          if (pillsEl.classList.contains('demo-pills-shown')) {
+            pillsEl.classList.remove('demo-pills-shown');
+            pillsEl.classList.add('demo-pills-hidden');
+          } else {
+            pillsEl.classList.remove('demo-pills-hidden');
+            pillsEl.classList.add('demo-pills-shown');
+          }
+        });
+
+        pills.forEach(pill => {
+          pill.addEventListener('click', () => {
+            const cat = pill.getAttribute('data-cat');
+            userCat.textContent = cat.replace('_', ' ');
+            userCat.className = 'py-1 pr-4 font-semibold';
+            userVerdict.textContent = 'flag';
+            userVerdict.className = 'py-1 pr-4 text-danger font-semibold';
+            pushBody.textContent = 'New flag on SOTA-9.9 — ' + cat.replace('_', ' ');
+            pills.forEach(p => p.disabled = true);
+            passBtn.disabled = true;
+            flagBtn.disabled = true;
+            stampNow();
+            exitChatAndReveal();
+          });
+        });
+
+        replayBtn.addEventListener('click', resetLoop);
+      })();
+    </script>
+
+  <!-- Three Roles Section -->
+  <section class="py-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-primary text-center mb-12">Democratize AI Evaluations</h2>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- The Public -->
+        <div class="group">
+          <div class="glass-card p-8 glass-card-hover transition-micro ease-smooth flex flex-col h-full">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <span class="text-sm font-medium text-tertiary">Users</span>
+            </div>
+            <h3 class="text-xl font-semibold text-primary mb-3">Stay Informed</h3>
+            <p class="text-secondary mb-6">
+              See real concerns in AI outputs. Compare all latest models on your daily tasks.
+            </p>
+
+            <div class="bg-surface border border-border-subtle rounded-lg p-3 mb-6" style="height: 160px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+              <div class="text-xs font-medium text-secondary mb-2">Trip Planning AIs:</div>
+
+              <div class="grid gap-2" style="grid-template-columns: 1fr 3fr;">
+                <!-- Left: Comparison Bars -->
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2">
+                    <div class="text-xs text-secondary w-16 text-right">TripGPT</div>
+                    <div class="flex-1 bg-border-subtle rounded-full h-2">
+                      <div class="bg-accent h-2 rounded-full" style="width: 94%"></div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="text-xs text-accent w-16 text-right font-medium">Travel-LLM</div>
+                    <div class="flex-1 bg-border-subtle rounded-full h-2">
+                      <div class="bg-accent h-2 rounded-full" style="width: 87%"></div>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="text-xs text-secondary w-16 text-right">Voyage AI</div>
+                    <div class="flex-1 bg-border-subtle rounded-full h-2">
+                      <div class="bg-accent/50 h-2 rounded-full" style="width: 76%"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right: Zoomed Detail -->
+                <div class="border-l border-border-subtle pl-2">
+                  <div class="text-xs font-semibold text-primary mb-1">Travel-LLM by Roam</div>
+                  <div class="space-y-1 text-xs">
+                    <div class="text-accent">✓ Verified 2 days ago</div>
+                    <div class="text-secondary">📊 127 evaluations</div>
+                    <div class="text-accent">💪 Local tips, Hidden gems</div>
+                    <div class="text-secondary">⚠️ Budget planning</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <a href="/pulse" class="text-accent font-medium hover:underline mt-auto">See real-time judgments →</a>
+          </div>
+        </div>
+
+        <!-- Evaluators -->
+        <div class="group">
+          <div class="glass-card p-8 glass-card-hover transition-micro ease-smooth flex flex-col h-full">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </div>
+              <span class="text-sm font-medium text-tertiary">Stakeholders</span>
+            </div>
+            <h3 class="text-xl font-semibold text-primary mb-3">Earn with Insights</h3>
+            <p class="text-secondary mb-6">
+              Verified reviewers score AI outputs and share insights, participate in AI research, and build a public reputation.
+            </p>
+
+            <div class="bg-surface border border-border-subtle rounded-lg p-3 mb-6" style="height: 160px; display: flex; flex-direction: column; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+              <div class="text-xs font-medium text-primary mb-2">Create Your Challenge: "K-Pop Facts" ✨</div>
+              <div class="border-t border-border-subtle pt-2 mb-2 flex-1">
+                <div class="text-xs text-tertiary mb-2">Judge AI Responses:</div>
+                <div class="bg-accent/5 rounded p-2 text-xs">
+                  <div class="mb-2 text-secondary text-xs">Is this K-Pop fact correct?</div>
+                  <div class="flex gap-2">
+                    <button class="px-2 py-1 bg-accent/20 text-accent rounded text-xs font-medium border border-accent/30">✓ Correct</button>
+                    <button class="px-2 py-1 bg-surface-elevated text-secondary rounded text-xs font-medium border border-border-subtle">✗ Wrong</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <a href="/products/for-reviewers" class="text-accent font-medium hover:underline mt-auto">Build evaluator profile →</a>
+          </div>
+        </div>
+
+        <!-- Developers -->
+        <div class="group">
+          <div class="glass-card p-8 glass-card-hover transition-micro ease-smooth flex flex-col h-full">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+              </div>
+              <span class="text-sm font-medium text-tertiary">Developers</span>
+            </div>
+            <h3 class="text-xl font-semibold text-primary mb-3">Build Human-in-the-loop</h3>
+            <p class="text-secondary mb-6">
+              <a href="/docs/pulse/python-sdk" class="text-accent hover:underline">Python SDK</a>,
+              <a href="https://glama.ai/mcp/servers/humanjudge/grandjury" target="_blank" rel="noopener" class="text-accent hover:underline">Claude MCP</a>,
+              <a href="https://chatgpt.com/g/g-69e64abfcc108191bf9c0b36d3f8314c-ai-quality-check" target="_blank" rel="noopener" class="text-accent hover:underline">ChatGPT GPT</a>.
+              Or, create a custom benchmark for your needs.
+            </p>
+
+            <div class="bg-surface border border-border-subtle rounded-lg p-3 mb-6 flex items-center justify-center" style="height: 160px;">
+              <!-- HEX-COLOR EXEMPTION: these badge mockups intentionally hard-code
+                   fills/strokes to match the published verified-badge product spec
+                   (customer-facing brand artifacts, NOT page chrome). -->
+              <div class="flex gap-3 flex-wrap justify-center">
+                <!-- Performance Badge (Light) -->
+                <div style="width:180px;height:54px;border:2px solid #10b981;padding:10px;background:#ecfdf5;box-sizing:border-box;display:flex;align-items:center;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;border-radius:4px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#047857" stroke="#10b981" stroke-width="1.5"/>
+                    <circle cx="12" cy="12" r="3" fill="#ecfdf5"/>
+                  </svg>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:9px;color:#059669;margin-bottom:1px;">HumanJudge Verified</div>
+                    <div style="font-size:15px;font-weight:700;color:#047857;line-height:1;">92% Positive</div>
+                    <div style="font-size:8px;color:#6ee7b7;margin-top:1px;">127 evaluators</div>
+                  </div>
+                </div>
+
+                <!-- Base Badge (Light) -->
+                <div style="width:180px;height:54px;border:2px solid #e5e7eb;padding:10px;background:#ffffff;box-sizing:border-box;display:flex;align-items:center;gap:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;border-radius:4px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#111827" stroke="#6b7280" stroke-width="1"/>
+                    <circle cx="12" cy="12" r="3" fill="#ffffff"/>
+                  </svg>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:11px;font-weight:600;color:#111827;margin-bottom:2px;">Monitored by HumanJudge</div>
+                    <div style="font-size:8px;color:#6b7280;">Last eval: Jan 23, 2026</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <a href="/for-developers" class="text-accent font-medium hover:underline mt-auto">Integrate with your workflow →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI Arenas — sits right under Democratize AI Evaluations per PO.
+       Filter + load-more JS at the bottom of the file. -->
+  <section id="arenas" class="py-16 sm:py-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-10 text-center">
+        <h2 class="text-3xl sm:text-4xl font-bold text-primary">Open AI Arenas</h2>
+      </div>
+
+      <!-- Horizontal scroller — native swipe on mobile, prev/next arrows
+           on desktop. CSS scroll-snap keeps cards aligned. Filter/search
+           still works via display:none on non-matching cards. -->
+      <div class="relative">
+        <button
+          id="arenas-prev"
+          type="button"
+          aria-label="Previous arenas"
+          class="hidden md:grid absolute -left-3 lg:-left-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 place-items-center rounded-full glass-card glass-card-hover text-secondary hover:text-primary disabled:opacity-30 disabled:pointer-events-none transition-opacity"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button
+          id="arenas-next"
+          type="button"
+          aria-label="Next arenas"
+          class="hidden md:grid absolute -right-3 lg:-right-5 top-1/2 -translate-y-1/2 z-10 w-10 h-10 place-items-center rounded-full glass-card glass-card-hover text-secondary hover:text-primary disabled:opacity-30 disabled:pointer-events-none transition-opacity"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+
+        <div
+          id="challenge-grid"
+          class="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 arena-scroller"
+        >
+          {sortedChallenges.map((challenge, index) => {
+            const style = getCategoryStyle(challenge.category_name);
+            return (
+            <a
+              href={`/ai-reviews/${challenge.slug}`}
+              class="challenge-card flex-shrink-0 w-72 sm:w-80 snap-start glass-card p-5 glass-card-hover transition-all duration-200 group"
+              data-category={challenge.category_name || 'Other'}
+              data-title={challenge.headline.toLowerCase()}
+              data-description={challenge.subheadline?.toLowerCase() || ''}
+              data-index={index}
+            >
+              <div class="flex items-center gap-2 mb-3">
+                {challenge.category_name && challenge.category_name !== 'Other' && (
+                  <span class={`text-xs font-medium px-2 py-0.5 rounded ${style.bg} ${style.text}`}>
+                    {challenge.category_name}
+                  </span>
+                )}
+              </div>
+              <h3 class="text-base font-semibold text-primary mb-2 group-hover:text-accent transition-colors line-clamp-2">
+                {challenge.headline}
+              </h3>
+              <p class="text-secondary text-sm leading-relaxed mb-3 line-clamp-2">
+                {challenge.subheadline}
+              </p>
+              <div class="flex items-center justify-between text-xs text-tertiary">
+                <span>{formatDate(challenge.created_at)}</span>
+                {challenge.reward_amount > 0 && (
+                  <span class="text-accent font-medium">${challenge.reward_amount}</span>
+                )}
+              </div>
+            </a>
+            );
+          })}
+        </div>
+      </div>
+
+      <div id="no-results" class="hidden text-center py-16">
+        <p class="text-secondary mb-1">No arenas found</p>
+        <p class="text-tertiary text-sm">Try a different search or filter</p>
+      </div>
+
+      {allChallenges.length === 0 && (
+        <div class="text-center py-16">
+          <p class="text-secondary mb-4">No arenas available yet.</p>
+          <a href="/programs/ai-empowerment" class="text-accent hover:underline">Suggest an arena →</a>
+        </div>
+      )}
+
+      <p class="text-center text-sm text-tertiary mt-10">
+        Don't see your area of expertise? <a href="/programs/ai-empowerment" class="text-accent hover:underline">Apply to lead an evaluation →</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- AI Reviews Preview Section — now sits between Arenas and Mission. -->
+  <section class="py-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl sm:text-4xl font-bold text-primary">Latest Reports</h2>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4 max-w-4xl mx-auto">
+        <a href="/ai-reviews/ai-in-healthcare-stanford-i4ui-2026" class="glass-card p-5 glass-card-hover transition-micro group">
+          <span class="text-xs font-medium px-2 py-0.5 rounded bg-accent-bright/10 text-accent-bright inline-block mb-2">NEW</span>
+          <h3 class="font-semibold text-primary group-hover:text-accent transition-micro">AI in Healthcare — Stanford I4UI 2026</h3>
+          <p class="text-sm text-secondary mt-1 line-clamp-3">Cancer diagnoses. Suicidal teens. End-of-life decisions. Ten AI models. Real humans rating which ones can be trusted — judged on tone and responsibility, not medical correctness.</p>
+        </a>
+        <a href="/ai-reviews/your-eval-pipeline-has-zero-disagreement" class="glass-card p-5 glass-card-hover transition-micro group">
+          <span class="text-xs font-medium px-2 py-0.5 rounded bg-accent/10 text-accent inline-block mb-2">Essay</span>
+          <h3 class="font-semibold text-primary group-hover:text-accent transition-micro">Your Eval Pipeline Has Zero Disagreement</h3>
+          <p class="text-sm text-secondary mt-1 line-clamp-3">If your automated eval never flags anything, it's not measuring quality — it's confirming your assumptions. 16,668 human evaluations show what LLM-as-judge misses.</p>
+        </a>
+      </div>
+      <div class="text-center mt-6">
+        <a href="/ai-reviews" class="text-accent font-medium hover:underline transition-micro">See all reports →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ — top 7 Q&As surfaced from /faq. FAQPage JSON-LD below is for
+       AI search engine citation parsing (ChatGPT, Perplexity, Claude,
+       Google AI Overview, You.com), not for SERP rich results. -->
+  <section id="faq" class="py-12 sm:py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl sm:text-4xl font-bold text-primary tracking-tight">Common questions</h2>
+      </div>
+      <div class="space-y-4">
+        {topFaq.map(item => (
+          <details class="group bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden">
+            <summary class="flex justify-between items-center cursor-pointer px-6 py-5 hover:bg-surface transition-micro ease-smooth">
+              <h3 class="text-lg font-semibold text-primary pr-8">{item.question}</h3>
+              <svg class="w-5 h-5 text-secondary group-open:rotate-180 transition-transform ease-smooth flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 pb-5 pt-2 text-secondary border-t border-border-subtle">
+              <p set:html={item.answerHtml} />
+            </div>
+          </details>
+        ))}
+      </div>
+      <div class="text-center mt-8">
+        <a href="/faq" class="text-accent font-medium hover:underline transition-micro">More questions →</a>
+      </div>
+    </div>
+  </section>
+  <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+
+  <!-- Final CTA -->
+  <section class="py-24">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <p class="text-accent font-medium mb-4">Our Mission</p>
+      <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-8">
+        Defining the standard for human-AI trust.
+      </h2>
+      <div class="flex justify-center">
+        <a
+          href="/about"
+          class="bg-accent text-accent-on px-8 py-4 rounded-md hover:bg-accent-hover transition-micro ease-smooth font-medium text-lg inline-block text-center"
+        >
+          Learn More
+        </a>
+      </div>
+    </div>
+  </section>
+
+<!-- PBI-041: live-counter animation for the Evaluations stat.
+     Starts ~5 mins behind the real target (offset of 300) and ticks
+     +1 every second for 5 minutes — feels like votes are streaming
+     in live on the page. Commercial LLMs + Domains numbers are static. -->
+<script is:inline>
+(function(){
+  const fmt = (n) => n.toLocaleString();
+  const OFFSET = 900;       // start this many below target
+  const TICK_MS = 333;      // +1 ~3 times per second (≈5 min to land)
+
+  function animate(el) {
+    if (el.dataset.animated === '1') return;
+    const target = parseInt(el.getAttribute('data-count-to'), 10);
+    if (!target) return;
+    el.dataset.animated = '1';
+    let current = Math.max(0, target - OFFSET);
+    el.textContent = fmt(current);
+    const id = setInterval(() => {
+      current += 1;
+      if (current >= target) {
+        el.textContent = fmt(target);
+        clearInterval(id);
+      } else {
+        el.textContent = fmt(current);
+      }
+    }, TICK_MS);
+  }
+
+  const targets = document.querySelectorAll('[data-count-to]');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          animate(e.target);
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    targets.forEach(el => io.observe(el));
+  } else {
+    targets.forEach(animate);
+  }
+})();
+</script>
+
+<style is:global>
+  /* Hide the horizontal scrollbar on the arenas scroller. Native swipe
+     still works on mobile; desktop users page via prev/next arrows. */
+  .arena-scroller::-webkit-scrollbar { display: none; }
+  .arena-scroller { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Proximity snap removed — felt like force pull-back rather than
+     subtle alignment because the browser's snap threshold isn't tunable
+     and engages too aggressively on long sections. Free scroll feels
+     better on a content-dense landing. */
+</style>
+
+<!-- AI Arenas horizontal scroll navigation. -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const scroller = document.getElementById('challenge-grid') as HTMLElement | null;
+    const prevBtn = document.getElementById('arenas-prev') as HTMLButtonElement | null;
+    const nextBtn = document.getElementById('arenas-next') as HTMLButtonElement | null;
+    if (!scroller) return;
+
+    updateArrows();
+
+    function pageBy(direction: -1 | 1) {
+      if (!scroller) return;
+      const card = scroller.querySelector('.challenge-card') as HTMLElement | null;
+      if (!card) return;
+      const cardWidth = card.offsetWidth + 24; // card + gap-6 (24px)
+      const visible = Math.max(1, Math.floor(scroller.clientWidth / cardWidth));
+      scroller.scrollBy({ left: direction * cardWidth * visible, behavior: 'smooth' });
+    }
+
+    prevBtn?.addEventListener('click', () => pageBy(-1));
+    nextBtn?.addEventListener('click', () => pageBy(1));
+    scroller.addEventListener('scroll', updateArrows, { passive: true });
+    window.addEventListener('resize', updateArrows);
+
+    function updateArrows() {
+      if (!scroller || !prevBtn || !nextBtn) return;
+      const atStart = scroller.scrollLeft <= 2;
+      const atEnd = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 2;
+      prevBtn.disabled = atStart;
+      nextBtn.disabled = atEnd;
+    }
+  });
+</script>
+
+</BaseLayout>

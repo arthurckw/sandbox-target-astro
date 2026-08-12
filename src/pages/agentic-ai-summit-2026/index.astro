@@ -1,0 +1,67 @@
+---
+export const prerender = true;
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="HumanJudge at Agentic AI Summit 2026 | Independent Human-Judged AI Benchmarks"
+  description="HumanJudge's contribution to the Berkeley RDI Agentic AI Summit 2026: an independent, human-in-the-loop benchmark comparing foundation LLMs and vertical AI agents on commercial tasks."
+  currentPath="/agentic-ai-summit-2026"
+>
+  <link slot="head" rel="canonical" href="https://humanjudge.com/agentic-ai-summit-2026" />
+
+  <!-- Hero -->
+  <section class="py-16 sm:py-24">
+    <div class="max-w-lg mx-auto px-5 sm:px-6">
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center px-3 py-1 rounded-full bg-accent/10 text-accent text-xs sm:text-sm font-medium">
+          Berkeley RDI · Agentic AI Summit 2026
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <a
+          href="/agentic-ai-summit-2026/report"
+          class="bg-accent text-accent-on px-10 py-5 rounded-md hover:bg-accent-hover transition-micro ease-smooth font-semibold text-lg text-center"
+        >
+          Read the Full Report →
+        </a>
+        <a
+          href="/pulse"
+          class="border border-accent text-accent px-10 py-5 rounded-md hover:bg-accent/10 transition-micro ease-smooth font-medium text-lg text-center"
+        >
+          Live AI Reviews
+        </a>
+        <a
+          href="/docs/get-started"
+          class="border border-accent text-accent px-10 py-5 rounded-md hover:bg-accent/10 transition-micro ease-smooth font-medium text-lg text-center"
+        >
+          Build with HumanJudge
+        </a>
+        <a
+          href="https://discord.gg/vw43ufYmDH"
+          target="_blank"
+          rel="noopener"
+          class="border border-accent text-accent px-10 py-5 rounded-md hover:bg-accent/10 transition-micro ease-smooth font-medium text-lg text-center"
+        >
+          Join Discord
+        </a>
+        <a
+          href="mailto:hello@memoirji.com"
+          class="border border-accent text-accent px-10 py-5 rounded-md hover:bg-accent/10 transition-micro ease-smooth font-medium text-lg text-center"
+        >
+          Get in Touch
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Attribution footer -->
+  <section class="py-10 border-t border-border-subtle">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <p class="text-sm text-tertiary">
+        Prepared for the Berkeley RDI Agentic AI Summit 2026
+      </p>
+    </div>
+  </section>
+</BaseLayout>

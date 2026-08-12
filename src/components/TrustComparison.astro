@@ -1,0 +1,107 @@
+---
+/**
+ * Visual comparison: Without HITL vs With HITL
+ * Shows the trust gap and how HumanJudge closes it
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<div class={`trust-comparison grid md:grid-cols-2 gap-6 ${className}`}>
+  <!-- Without HumanJudge -->
+  <div class="comparison-card comparison-without bg-surface border border-border-subtle rounded-lg p-6 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-24 h-24 bg-danger/5 rounded-bl-full"></div>
+
+    <div class="flex items-center gap-2 mb-4">
+      <span class="text-danger text-xl">✗</span>
+      <h3 class="text-lg font-semibold text-primary">Without HumanJudge</h3>
+    </div>
+
+    <div class="space-y-4">
+      <!-- Visual representation -->
+      <div class="flex items-center gap-4 py-3 border-b border-border-subtle">
+        <div class="w-10 h-10 bg-surface-elevated rounded-lg flex items-center justify-center text-xl">🤖</div>
+        <div class="flex-1">
+          <div class="h-2 bg-surface-elevated rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-green-500 to-yellow-500 w-3/4"></div>
+          </div>
+          <p class="text-xs text-secondary mt-1">95% accuracy before deployment + irrelevant LLM benchmarks</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 py-3 border-b border-border-subtle opacity-50">
+        <div class="w-10 h-10 bg-surface-elevated rounded-lg flex items-center justify-center text-xl">👤</div>
+        <div class="flex-1">
+          <div class="h-2 bg-surface-elevated rounded-full"></div>
+          <p class="text-xs text-secondary mt-1">Human validation: Blackboxed, model deployment driven</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 py-3">
+        <div class="w-10 h-10 bg-surface-elevated rounded-lg flex items-center justify-center text-xl">👥</div>
+        <div class="flex-1">
+          <p class="text-sm text-secondary">"How do I know this works?"</p>
+          <p class="text-xs text-danger mt-1">Trust gap: Users see only claims</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- With HumanJudge -->
+  <div class="comparison-card comparison-with bg-surface border border-accent/30 rounded-lg p-6 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-bl-full"></div>
+
+    <div class="flex items-center gap-2 mb-4">
+      <span class="text-accent text-xl">✓</span>
+      <h3 class="text-lg font-semibold text-primary">With HumanJudge</h3>
+    </div>
+
+    <div class="space-y-4">
+      <!-- Visual representation -->
+      <div class="flex items-center gap-4 py-3 border-b border-border-subtle">
+        <div class="w-10 h-10 bg-surface-elevated rounded-lg flex items-center justify-center text-xl">🤖</div>
+        <div class="flex-1">
+          <div class="h-2 bg-surface-elevated rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-green-500 to-yellow-500 w-3/4"></div>
+          </div>
+          <p class="text-xs text-secondary mt-1">95% accuracy</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 py-3 border-b border-border-subtle">
+        <div class="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center text-xl">👨‍⚕️</div>
+        <div class="flex-1">
+          <div class="h-2 bg-surface-elevated rounded-full overflow-hidden">
+            <div class="h-full bg-accent w-[92%]"></div>
+          </div>
+          <p class="text-xs text-accent mt-1">AI Reviewers: "100% correct"</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 py-3">
+        <div class="w-10 h-10 bg-surface-elevated rounded-lg flex items-center justify-center text-xl">👥</div>
+        <div class="flex-1">
+          <p class="text-sm text-primary font-medium">"Real Human verified this."</p>
+          <p class="text-xs text-accent mt-1">Trust built: Public proof</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .comparison-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .comparison-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .comparison-with:hover {
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+  }
+</style>

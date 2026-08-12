@@ -1,0 +1,92 @@
+---
+/**
+ * Simple 3-circle flow diagram in triangle shape
+ * HumanJudge at top, arced connecting lines
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<div class={`simple-flow-circles ${className}`}>
+  <svg viewBox="0 0 300 260" class="w-full h-auto max-w-md mx-auto" aria-label="HumanJudge Flow">
+    <defs>
+      <!-- Gradient for the beam glow effect -->
+      <linearGradient id="beamGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0" />
+        <stop offset="50%" stop-color="var(--color-accent)" stop-opacity="1" />
+        <stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0" />
+      </linearGradient>
+    </defs>
+
+    <!-- Animated beam: AI App → Reviewers → HumanJudge → back -->
+    <path class="beam-path"
+      d="M 65 197 L 235 197 L 150 50 Z"
+      stroke="var(--color-accent)"
+      stroke-width="3"
+      fill="none"
+      stroke-linecap="round"
+      stroke-linejoin="round" />
+
+    <!-- Circle 1: HumanJudge (top center) -->
+    <g class="flow-node node-1">
+      <circle cx="150" cy="50" r="40"
+        fill="var(--bg-surface-elevated)"
+        stroke="var(--color-accent)"
+        stroke-width="2.5" />
+      <text x="150" y="46" text-anchor="middle" fill="var(--color-accent)" font-size="11" font-weight="700">Human</text>
+      <text x="150" y="60" text-anchor="middle" fill="var(--color-accent)" font-size="11" font-weight="700">Judge</text>
+    </g>
+
+    <!-- Circle 2: AI App (bottom-left) -->
+    <g class="flow-node node-2">
+      <circle cx="65" cy="197" r="40"
+        fill="var(--bg-surface-elevated)"
+        stroke="var(--border-subtle)"
+        stroke-width="2" />
+      <text x="65" y="202" text-anchor="middle" fill="var(--text-primary)" font-size="13" font-weight="600">AI App</text>
+    </g>
+
+    <!-- Circle 3: Human Reviewers (bottom-right) -->
+    <g class="flow-node node-3">
+      <circle cx="235" cy="197" r="40"
+        fill="var(--bg-surface-elevated)"
+        stroke="var(--border-subtle)"
+        stroke-width="2" />
+      <text x="235" y="193" text-anchor="middle" fill="var(--text-primary)" font-size="11" font-weight="600">Human</text>
+      <text x="235" y="207" text-anchor="middle" fill="var(--text-primary)" font-size="11" font-weight="600">Reviewers</text>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .simple-flow-circles {
+    padding: 1rem 0;
+  }
+
+
+  /* Animated beam traveling triangle path
+     Total path length ~510px, beam length 60px */
+  .beam-path {
+    stroke-dasharray: 60 450;
+    animation: beamTravel 3s linear infinite;
+  }
+
+  @keyframes beamTravel {
+    from { stroke-dashoffset: 0; }
+    to { stroke-dashoffset: -510; }
+  }
+
+  /* Subtle pulse on HumanJudge circle */
+  .node-1 circle {
+    animation: pulseBorder 3s ease-in-out infinite;
+    animation-delay: 0.7s;
+  }
+
+  @keyframes pulseBorder {
+    0%, 100% { stroke-opacity: 1; }
+    50% { stroke-opacity: 0.5; }
+  }
+</style>

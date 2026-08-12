@@ -1,0 +1,49 @@
+---
+export const prerender = true;
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FAQ from '../components/FAQ.astro';
+import { FAQ_CATEGORIES, getAllFAQ, buildFaqPageJsonLd } from '../data/faq';
+
+// PBI-042 — full 50-Q&A library. FAQPage JSON-LD bundles every Q&A so
+// AI search engines (ChatGPT, Perplexity, Claude search, Google AI
+// Overview, You.com) can extract clean Question→Answer pairs as
+// citation units. The 60/30/10 mix lives in src/data/faq.ts.
+const allItems = getAllFAQ();
+const jsonLd = buildFaqPageJsonLd(allItems, 'https://humanjudge.com/faq');
+---
+
+<BaseLayout
+  title="AI Evaluation FAQ — 50 Q&As on LLMs, benchmarks, HumanJudge | HumanJudge"
+  description="Plain-English answers to 50 questions about AI evaluation, LLM-as-judge, human-in-the-loop, AI red teaming, model comparisons, and HumanJudge — including specific data on Grok, Claude, GPT, and Gemini."
+  currentPath="/faq"
+  jsonLd={jsonLd}
+>
+  <link slot="head" rel="canonical" href="https://humanjudge.com/faq" />
+
+  <!-- Header -->
+  <section class="py-12 sm:py-16">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary leading-tight mb-4 tracking-tight">
+        AI Evaluation FAQ
+      </h1>
+      <p class="text-lg text-secondary">
+        Fifty questions about AI evaluation, LLMs, benchmarks, and HumanJudge — answered by humans, structured for AI search engines.
+      </p>
+    </div>
+  </section>
+
+  <!-- One <FAQ> block per category. Each renders <details>/<summary>
+       accordions. The page itself is wrapped in a single FAQPage JSON-LD
+       above so all 50 Q&As are machine-extractable as one schema. -->
+  {FAQ_CATEGORIES.map(category => (
+    <FAQ title={category.name} items={category.items.map(i => ({ question: i.question, answer: i.answerHtml }))} />
+  ))}
+
+  <!-- Foot CTA -->
+  <section class="py-12 sm:py-16 border-t border-border-subtle">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <p class="text-secondary mb-4">Question not answered here?</p>
+      <a href="/for-developers" class="text-accent font-medium hover:underline">Reach out via the developer hub →</a>
+    </div>
+  </section>
+</BaseLayout>

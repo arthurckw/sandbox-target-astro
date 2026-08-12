@@ -1,0 +1,61 @@
+---
+interface Props {
+  currentPath: string;
+}
+const { currentPath } = Astro.props;
+
+const sections = [
+  {
+    title: 'Getting Started',
+    items: [
+      { label: 'Overview', href: '/docs' },
+      { label: 'Track your model', href: '/docs/get-started' },
+      { label: 'Authentication', href: '/docs/authentication' },
+    ]
+  },
+  {
+    title: 'Pulse — Data Access',
+    items: [
+      { label: 'ChatGPT', href: '/docs/pulse/chatgpt' },
+      { label: 'Claude Desktop', href: '/docs/pulse/claude-desktop' },
+      { label: 'Claude Code', href: '/docs/pulse/claude-code' },
+      { label: 'Python SDK', href: '/docs/pulse/python-sdk' },
+    ]
+  },
+  {
+    title: 'Evaluate',
+    items: [
+      { label: 'Chrome Extension', href: '/docs/evaluate/chrome-extension' },
+      { label: 'Arenas', href: '/docs/evaluate/arenas' },
+    ]
+  },
+  {
+    title: 'Concepts',
+    items: [
+      { label: 'Scoring Algorithm', href: '/docs/scoring' },
+    ]
+  },
+];
+---
+
+<nav class="md:sticky md:top-24 space-y-6">
+  {sections.map(section => (
+    <div>
+      <h3 class="text-sm font-semibold text-secondary uppercase tracking-wider mb-3">{section.title}</h3>
+      <ul class="space-y-2">
+        {section.items.map(item => (
+          <li>
+            <a
+              href={item.href}
+              class={currentPath === item.href
+                ? 'text-accent font-medium'
+                : 'text-secondary hover:text-primary transition-colors'}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</nav>

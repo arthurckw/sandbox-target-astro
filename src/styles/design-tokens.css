@@ -1,0 +1,431 @@
+/* =============================================================================
+   HumanJudge — Design Tokens
+   Source of truth for the astro public site (humanjudge.com)
+   =============================================================================
+
+   THIS FILE GOVERNS THE ENTIRE ASTRO SITE.
+
+   - Imported once in BaseLayout.astro (via @import in the global <style>).
+   - tailwind.config.mjs reads its color/shadow/radius/transition keys from
+     these CSS variables. Every utility class (bg-surface, text-primary,
+     bg-accent, etc.) resolves through here.
+   - Pages and components consume the values via Tailwind utilities OR via
+     inline `var(--token)` references — never via hardcoded hex/rgb.
+
+   THEMING
+   -------
+   - Dark mode is the default. :root and :root.dark hold the dark palette.
+   - Light mode is opt-in via :root.light. The theme toggle script (in
+     BaseLayout) flips the class and persists to localStorage.
+
+   COLOR DIRECTION
+   ---------------
+   - Brand: --color-logo (#14B8A6, the favicon teal). Used ONLY on the
+     logo box, favicon, and nowhere else.
+   - --color-accent is the *monochrome* highlight (white-on-dark / black-on-
+     light). Primary CTAs, links, active states, hovers all flow through
+     this token. It is NOT teal.
+   - Functional status (--color-success / --color-danger / --color-warning
+     / --color-info) preserved for clarity.
+
+   PREVIEWS / PLAYGROUND
+   ---------------------
+   - /sandbox/theme-kawaguchiko — full preview with all components in both
+     modes, plus a logo color tuner for exploring the brand hex.
+   - /sandbox/theme-fuji        — deprecated warm-orange palette.
+
+   ============================================================================= */
+
+
+/* ============================================================================
+   1. COLOR TOKENS
+   ============================================================================ */
+
+/* Default (dark). Also active when :root has no theme class.
+
+   Each chromatic token is paired with a `-rgb` triplet (e.g. --color-danger-rgb)
+   so Tailwind's <alpha-value> placeholder can compose any opacity at compile
+   time (border-danger/30, bg-logo/15, etc). Hex/rgba forms remain for direct
+   `var(--token)` references in CSS/style attrs. */
+:root,
+:root.dark {
+
+  /* Surfaces */
+  --bg-primary:           #0E0F12;
+  --bg-primary-rgb:       14 15 18;
+  --bg-gradient:          linear-gradient(180deg, #0E0F12 0%, #15171b 50%, #0E0F12 100%);
+  --bg-surface:           #121419;
+  --bg-surface-rgb:       18 20 25;
+  --bg-surface-elevated:  #151922;
+  --bg-surface-elevated-rgb: 21 25 34;
+
+  /* Text */
+  --text-primary:         #E7EAEE;
+  --text-primary-rgb:     231 234 238;
+  --text-secondary:       #A5ADBA;
+  --text-secondary-rgb:   165 173 186;
+  --text-tertiary:        #6B7280;
+  --text-tertiary-rgb:    107 114 128;
+
+  /* Borders (hairlines — kept as rgba for now; opacity is part of the token) */
+  --border-subtle:        rgba(255, 255, 255, 0.08);
+  --border-emphasis:      rgba(255, 255, 255, 0.12);
+  --border-bright:        rgba(255, 255, 255, 0.18);
+
+  /* "Accent" = monochrome highlight (NOT the brand color).
+     Resolves to white in dark mode; --color-accent-on is the inverse
+     foreground so primary buttons read white-on-dark. */
+  --color-accent:         #ffffff;
+  --color-accent-rgb:     255 255 255;
+  --color-accent-hover:   #d4d4d9;
+  --color-accent-soft:    rgba(255, 255, 255, 0.07);
+  --color-accent-on:      #0E0F12;
+
+  /* The ONLY chromatic moment. Reserved for the logo mark.
+     Do not use elsewhere. */
+  --color-logo:           #14B8A6;
+  --color-logo-rgb:       20 184 166;
+  --color-logo-on:        #ffffff;
+
+  /* Functional status */
+  --color-success:        #3ED1B2;
+  --color-success-rgb:    62 209 178;
+  --color-success-soft:   rgba(62, 209, 178, 0.12);
+  --color-danger:         #FF7A7A;
+  --color-danger-rgb:     255 122 122;
+  --color-danger-soft:    rgba(255, 122, 122, 0.12);
+  --color-warning:        #F59E0B;
+  --color-warning-rgb:    245 158 11;
+  --color-warning-soft:   rgba(245, 158, 11, 0.12);
+  --color-info:           #60A5FA;
+  --color-info-rgb:       96 165 250;
+  --color-info-soft:      rgba(96, 165, 250, 0.12);
+
+  /* Code surface — Jupyter / IDE convention (kept dark in both modes).
+     These are GitHub Dark theme values; intentionally don't follow the
+     light/dark page theme since code blocks are an editor surface. */
+  --code-bg:              #0d1117;
+  --code-text:            #e7eaee;
+  --code-keyword:         #79c0ff;
+  --code-string:          #a5d6ff;
+  --code-comment:         #6e7681;
+
+  /* Glass card recipe */
+  --glass-bg:             rgba(18, 20, 25, 0.55);
+  --glass-bg-hover:       rgba(24, 27, 34, 0.78);
+  --glass-border:         rgba(255, 255, 255, 0.06);
+  --glass-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* Island nav recipe — opacity bumped to 0.92 so feed cards passing
+     behind get concealed (avoids 'ghost card' ghosting through glass). */
+  --island-bg:            rgba(18, 20, 25, 0.92);
+  --island-border:        rgba(255, 255, 255, 0.08);
+  --island-shadow:        0 4px 30px rgba(0, 0, 0, 0.5);
+
+  /* Standalone shadows */
+  --shadow-soft:          0 10px 20px rgba(0, 0, 0, 0.25);
+  --shadow-elevated:      0 20px 40px rgba(0, 0, 0, 0.34);
+}
+
+/* Light mode (opt-in). */
+:root.light {
+
+  --bg-primary:           #fafafb;
+  --bg-primary-rgb:       250 250 251;
+  --bg-gradient:          linear-gradient(180deg, #ffffff 0%, #f0f0f3 50%, #ffffff 100%);
+  --bg-surface:           #ffffff;
+  --bg-surface-rgb:       255 255 255;
+  --bg-surface-elevated:  #f5f5f7;
+  --bg-surface-elevated-rgb: 245 245 247;
+
+  --text-primary:         #15171a;
+  --text-primary-rgb:     21 23 26;
+  --text-secondary:       #4a4d57;
+  --text-secondary-rgb:   74 77 87;
+  --text-tertiary:        #8a8e98;
+  --text-tertiary-rgb:    138 142 152;
+
+  --border-subtle:        rgba(15, 17, 23, 0.06);
+  --border-emphasis:      rgba(15, 17, 23, 0.1);
+  --border-bright:        rgba(15, 17, 23, 0.18);
+
+  --color-accent:         #15171a;
+  --color-accent-rgb:     21 23 26;
+  --color-accent-hover:   #3a3d42;
+  --color-accent-soft:    rgba(15, 17, 23, 0.06);
+  --color-accent-on:      #ffffff;
+
+  --color-logo:           #14B8A6;
+  --color-logo-rgb:       20 184 166;
+  --color-logo-on:        #ffffff;
+
+  --color-success:        #16a34a;
+  --color-success-rgb:    22 163 74;
+  --color-success-soft:   rgba(22, 163, 74, 0.1);
+  --color-danger:         #dc2626;
+  --color-danger-rgb:     220 38 38;
+  --color-danger-soft:    rgba(220, 38, 38, 0.1);
+  --color-warning:        #d97706;
+  --color-warning-rgb:    217 119 6;
+  --color-warning-soft:   rgba(217, 119, 6, 0.1);
+  --color-info:           #2563eb;
+  --color-info-rgb:       37 99 235;
+  --color-info-soft:      rgba(37, 99, 235, 0.1);
+
+  --glass-bg:             rgba(255, 255, 255, 0.7);
+  --glass-bg-hover:       rgba(255, 255, 255, 0.92);
+  --glass-border:         rgba(255, 255, 255, 0.9);
+  --glass-shadow:
+    0 8px 32px rgba(15, 17, 23, 0.05),
+    0 2px 8px rgba(15, 17, 23, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  --island-bg:            rgba(255, 255, 255, 0.92);
+  --island-border:        rgba(15, 17, 23, 0.08);
+  --island-shadow:        0 4px 30px rgba(15, 17, 23, 0.06);
+
+  --shadow-soft:          0 10px 20px rgba(15, 17, 23, 0.08);
+  --shadow-elevated:      0 20px 40px rgba(15, 17, 23, 0.12);
+}
+
+
+/* ============================================================================
+   2. TYPOGRAPHY TOKENS
+   ============================================================================ */
+
+:root {
+  --font-display:
+    'Space Grotesk',
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-body:
+    'Inter',
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono:
+    'JetBrains Mono',
+    ui-monospace, 'SF Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+
+  /* Size ramp (rem so html.large-font 125% lifts everything). */
+  --text-xs:    0.6875rem;
+  --text-sm:    0.8125rem;
+  --text-base:  0.9375rem;
+  --text-md:    1rem;
+  --text-lg:    1.125rem;
+  --text-xl:    1.25rem;
+  --text-2xl:   1.5rem;
+  --text-3xl:   2rem;
+  --text-4xl:   2.5rem;
+  --text-hero:  clamp(2.5rem, 6vw, 4.5rem);
+
+  --weight-regular:    400;
+  --weight-medium:     500;
+  --weight-semibold:   600;
+  --weight-bold:       700;
+  --weight-extrabold:  800;
+
+  --leading-tight:     1.1;
+  --leading-snug:      1.3;
+  --leading-normal:    1.5;
+  --leading-relaxed:   1.6;
+
+  --tracking-tighter: -0.03em;
+  --tracking-tight:   -0.02em;
+  --tracking-snug:    -0.01em;
+  --tracking-normal:   0;
+  --tracking-wide:     0.05em;
+}
+
+
+/* ============================================================================
+   3. RADIUS + MOTION
+   ============================================================================ */
+
+:root {
+  --radius-sm:    8px;
+  --radius-md:    12px;
+  --radius-lg:    14px;
+  --radius-xl:    20px;
+  --radius-2xl:   24px;
+  --radius-pill:  9999px;
+
+  /* Easings */
+  --ease-smooth:        cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-out-quart:     cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-spring-soft: linear(
+    0, 0.0066, 0.0259, 0.0568, 0.0987, 0.1505 8.61%, 0.279 13.39%,
+    0.4192 18.69%, 0.5567 24.42%, 0.682 30.6%, 0.7849 36.78%,
+    0.8645 43.06%, 0.9237 49.46%, 0.9651 56.04%, 0.9911 63.07%,
+    1.0033 70.55%, 1.0072 76.79%, 1.0067 84.59%, 1.0028 95.34%, 1
+  );
+  --ease-spring-bouncy: linear(
+    0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.281 6.5%, 0.723 12.9%,
+    0.938, 1.07 17.1%, 1.114, 1.144, 1.157 20.7%, 1.156, 1.143,
+    1.108 24%, 1.057 25.9%, 0.999 27.7%, 0.852 32.6%, 0.787,
+    0.769, 0.794, 0.851 39.4%, 1.012 44.5%, 1.069, 1.103, 1.115 50%,
+    1.108, 1.092, 1.027 56.3%, 0.937 61.4%, 0.83, 0.823, 0.854,
+    0.946, 0.987 68.9%, 1.012, 1.024 71.2%, 1.04, 1.038, 1.013 81.2%,
+    0.996, 0.999, 1.012 92.5%, 1.001
+  );
+
+  /* Durations */
+  --duration-micro:    180ms;
+  --duration-overlay:  220ms;
+  --duration-fast:     150ms;
+  --duration-base:     250ms;
+  --duration-slow:     450ms;
+}
+
+
+/* ============================================================================
+   4. ACCESSIBILITY
+   ============================================================================ */
+
+/* Global text-size up-scale, toggled by A+ button in the nav. */
+html.large-font {
+  font-size: 125%;
+}
+
+/* Respect prefers-reduced-motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ============================================================================
+   5. BASELINE BODY STYLES
+   ============================================================================ */
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  transition: background-color var(--duration-base) var(--ease-smooth),
+              color var(--duration-base) var(--ease-smooth);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+}
+
+code, kbd, pre, samp {
+  font-family: var(--font-mono);
+}
+
+
+/* ============================================================================
+   6. COMPONENT UTILITIES
+   ----------------------------------------------------------------------------
+   Reusable surface recipes. Apply via plain class names — no Tailwind layer
+   needed since these compose CSS vars directly.
+   ============================================================================ */
+
+/* Glass card — used for hero stats, headline persona cards, "moment" surfaces.
+   GPU cost is non-trivial; use sparingly. For dense lists, use .surface-card. */
+.glass-card {
+  border-radius: var(--radius-2xl);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+}
+
+/* .glass-card-hover — apply alongside .glass-card on interactive cards
+   to get a subtle fill bump on hover instead of a border change. */
+.glass-card-hover {
+  transition: background var(--duration-fast) var(--ease-smooth);
+}
+.glass-card-hover:hover {
+  background: var(--glass-bg-hover);
+}
+
+/* Plain surface card — hairline outline, no blur. Default card recipe for
+   dense lists (pulse feed, claims rows, docs sidebar, etc.). */
+.surface-card {
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Pulse "new claim arriving" — slide in from top with an accent-soft
+   glow that fades. Reserved for Realtime-injected feed items. */
+@keyframes pulse-glow-in {
+  0%   { transform: translateY(-10px); opacity: 0;
+         box-shadow: 0 0 0 0 var(--color-accent-soft); }
+  60%  { opacity: 1;
+         box-shadow: 0 0 16px 4px var(--color-accent-soft); }
+  100% { transform: translateY(0); opacity: 1;
+         box-shadow: 0 0 0 0 transparent; }
+}
+.pulse-glow-in {
+  animation: pulse-glow-in 0.7s var(--ease-spring-soft) both;
+}
+
+
+/* ============================================================================
+   USAGE NOTES
+   ============================================================================
+
+   COLOR GOVERNANCE
+   - --color-logo is the brand mark color. Logo box, favicon. NOTHING ELSE.
+   - --color-accent is the *monochrome* highlight (white in dark, black in
+     light). Pair with --color-accent-on for inverted text on accent bg.
+   - --color-accent-soft is the tinted-bg variant for hover states and
+     focus rings.
+   - Status (--color-success / --color-danger / --color-warning) are
+     reserved for functional meaning (pass/flag/alert).
+
+   TAILWIND BRIDGE
+   tailwind.config.mjs maps utility class names to these vars:
+     bg-background          -> var(--bg-primary)
+     bg-surface             -> var(--bg-surface)
+     bg-surface-elevated    -> var(--bg-surface-elevated)
+     text-primary           -> var(--text-primary)
+     text-secondary         -> var(--text-secondary)
+     text-tertiary          -> var(--text-tertiary)
+     bg-accent / text-accent-> var(--color-accent)   [now mono]
+     bg-logo                -> var(--color-logo)     [new — brand only]
+     bg-success / text-success-> var(--color-success)
+     bg-danger / text-danger-> var(--color-danger)
+
+   GLASS CARD RECIPE
+   .glass-card {
+     border-radius: var(--radius-2xl);
+     padding: 28px;
+     background: var(--glass-bg);
+     backdrop-filter: blur(24px) saturate(1.6);
+     border: 1px solid var(--glass-border);
+     box-shadow: var(--glass-shadow);
+   }
+
+   ISLAND NAV RECIPE
+   .island {
+     position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+     z-index: 50;
+     padding: 8px;
+     border-radius: var(--radius-pill);
+     background: var(--island-bg);
+     backdrop-filter: blur(40px) saturate(1.8);
+     border: 1px solid var(--island-border);
+     box-shadow: var(--island-shadow);
+   }
+   .island .brand .logo {
+     background: var(--color-logo);
+     color: var(--color-logo-on);
+   }
+
+   PRIMARY BUTTON RECIPE
+   .btn-primary {
+     background: var(--color-accent);
+     color: var(--color-accent-on);
+     border-radius: var(--radius-md);
+   }
+   .btn-primary:hover { background: var(--color-accent-hover); }
+
+   ============================================================================ */

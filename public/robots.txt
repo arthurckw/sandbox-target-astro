@@ -1,0 +1,33 @@
+# robots.txt for humanjudge.com
+
+# AI Crawlers - ALLOW (for AI search citation)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# General
+User-agent: *
+Allow: /
+
+# Authenticated pages (app platform)
+Disallow: /platform/
+Disallow: /dashboard/
+
+# Sitemaps
+Sitemap: https://humanjudge.com/sitemap-index.xml
+Sitemap: https://humanjudge.com/claims-sitemap.xml
+Sitemap: https://humanjudge.com/ai-sitemap.xml

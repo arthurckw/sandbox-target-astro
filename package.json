@@ -1,0 +1,23 @@
+{
+  "name": "grandjury-public-site",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/netlify": "^6.6.5",
+    "@astrojs/react": "^5.0.3",
+    "@astrojs/sitemap": "^3.6.0",
+    "@astrojs/tailwind": "^5.0.0",
+    "@supabase/supabase-js": "^2.93.3",
+    "astro": "^5.0.0",
+    "lucide-react": "^1.27.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "tailwindcss": "^3.4.1"
+  }
+}

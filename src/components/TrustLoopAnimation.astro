@@ -1,0 +1,197 @@
+---
+/**
+ * Animated Trust Loop - 5 steps showing how HumanJudge works
+ * Submit → Engage → Verdict → Consensus → Trust Signal
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+
+const steps = [
+  { num: "1", label: "Submit", desc: "AI developers submit their AI for evaluation" },
+  { num: "2", label: "Engage", desc: "Domain experts interact with AI" },
+  { num: "3", label: "Verdict", desc: "Pass or Flag with reasoning" },
+  { num: "4", label: "Consensus", desc: "Time-weighted aggregation" },
+  { num: "✓", label: "Trust", desc: "Living, verifiable signal" },
+];
+---
+
+<div class={`trust-loop-animation ${className}`}>
+  <div class="loop-container">
+    {steps.map((step, i) => (
+      <div class={`step step-${i + 1}`}>
+        <div class="step-circle">
+          <span class="step-num">{step.num}</span>
+        </div>
+        <div class="step-content">
+          <span class="step-label">{step.label}</span>
+          <span class="step-desc">{step.desc}</span>
+        </div>
+        {i < steps.length - 1 && (
+          <div class="connector">
+            <svg viewBox="0 0 40 24" class="arrow-svg">
+              <path d="M 0 12 L 30 12 M 24 6 L 30 12 L 24 18"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="arrow-path" />
+            </svg>
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .trust-loop-animation {
+    padding: 2rem 0;
+  }
+
+  .loop-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: fadeInStep 0.5s ease forwards;
+  }
+
+  .step-1 { animation-delay: 0.1s; }
+  .step-2 { animation-delay: 0.3s; }
+  .step-3 { animation-delay: 0.5s; }
+  .step-4 { animation-delay: 0.7s; }
+  .step-5 { animation-delay: 0.9s; }
+
+  @keyframes fadeInStep {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    animation: pulseGlow 3s ease-in-out infinite;
+  }
+
+  .step-5 .step-circle {
+    background: linear-gradient(135deg, var(--color-accent), var(--color-success));
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgb(var(--color-accent-rgb) / 0.4); }
+    50% { box-shadow: 0 0 0 8px rgb(var(--color-accent-rgb) / 0); }
+  }
+
+  .step-num {
+    color: white;
+    font-weight: 700;
+    font-size: 1.125rem;
+  }
+
+  .step-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .step-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+  }
+
+  .step-desc {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    max-width: 120px;
+    line-height: 1.3;
+  }
+
+  .connector {
+    width: 40px;
+    height: 24px;
+    color: var(--color-accent);
+    flex-shrink: 0;
+    margin: 0 0.25rem;
+  }
+
+  .arrow-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .arrow-path {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    animation: drawArrow 0.5s ease forwards;
+  }
+
+  .step-1 + .step .arrow-path,
+  .step-1 .connector .arrow-path { animation-delay: 0.2s; }
+  .step-2 + .step .arrow-path,
+  .step-2 .connector .arrow-path { animation-delay: 0.4s; }
+  .step-3 + .step .arrow-path,
+  .step-3 .connector .arrow-path { animation-delay: 0.6s; }
+  .step-4 + .step .arrow-path,
+  .step-4 .connector .arrow-path { animation-delay: 0.8s; }
+
+  @keyframes drawArrow {
+    to { stroke-dashoffset: 0; }
+  }
+
+  /* Mobile: Stack vertically */
+  @media (max-width: 768px) {
+    .loop-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .step {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .step-content {
+      align-items: center;
+    }
+
+    .step-desc {
+      max-width: 200px;
+    }
+
+    .connector {
+      transform: rotate(90deg);
+      margin: 0.5rem 0;
+    }
+  }
+
+  /* Tablet: 2 rows */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .loop-container {
+      gap: 1rem;
+    }
+
+    .step-desc {
+      display: none;
+    }
+  }
+</style>

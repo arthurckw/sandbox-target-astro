@@ -1,0 +1,164 @@
+---
+// Hero component - Reusable hero section for landing pages
+interface Props {
+  headline: string;
+  subheadline?: string;
+  description?: string;
+  primaryCTA?: {
+    text: string;
+    href: string;
+  };
+  secondaryCTA?: {
+    text: string;
+    href: string;
+  };
+  badge?: string;
+}
+
+const { headline, subheadline, description, primaryCTA, secondaryCTA, badge } = Astro.props;
+---
+
+<section class="py-20 sm:py-32 relative overflow-hidden">
+  <!-- Animated Network Background -->
+  <canvas id="network-canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="text-center max-w-4xl mx-auto">
+      <!-- Optional Badge -->
+      {badge && (
+        <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-accent/10 text-accent border border-accent/20 mb-8">
+          <span>{badge}</span>
+        </div>
+      )}
+
+      <!-- Headline -->
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary leading-snug mb-6" set:html={headline} />
+
+      <!-- Subheadline -->
+      {subheadline && (
+        <p class="text-xl sm:text-2xl text-accent leading-relaxed mb-6">
+          {subheadline}
+        </p>
+      )}
+
+      <!-- Description -->
+      {description && (
+        <p class="text-xl text-secondary max-w-3xl mx-auto mb-12">
+          {description}
+        </p>
+      )}
+
+      <!-- CTAs -->
+      {(primaryCTA || secondaryCTA) && (
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          {primaryCTA && (
+            <a
+              href={primaryCTA.href}
+              class="bg-accent text-accent-on px-8 py-4 rounded-md hover:bg-accent-hover transition-micro ease-smooth font-medium text-lg inline-block"
+            >
+              {primaryCTA.text}
+            </a>
+          )}
+          {secondaryCTA && (
+            <a
+              href={secondaryCTA.href}
+              class="border border-border-emphasis text-primary px-8 py-4 rounded-md hover:bg-surface-elevated transition-micro ease-smooth font-medium text-lg inline-block"
+            >
+              {secondaryCTA.text}
+            </a>
+          )}
+        </div>
+      )}
+
+      <!-- Slot for additional content -->
+      <slot />
+    </div>
+  </div>
+</section>
+
+<script>
+  // Interactive diagonal wave - grey/silver tones
+  const canvas = document.getElementById('network-canvas') as HTMLCanvasElement;
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      let animationId: number;
+      let mouseX = 0.5;
+      let mouseY = 0.5;
+      let targetMouseX = 0.5;
+      let targetMouseY = 0.5;
+      let time = 0;
+
+      const resize = () => {
+        const section = canvas.parentElement;
+        if (section) {
+          canvas.width = section.offsetWidth;
+          canvas.height = section.offsetHeight;
+        }
+      };
+
+      const draw = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        time += 0.008;
+
+        // Smooth mouse following
+        mouseX += (targetMouseX - mouseX) * 0.05;
+        mouseY += (targetMouseY - mouseY) * 0.05;
+
+        // Calculate diagonal wave position based on mouse
+        const waveOffset = (mouseX + mouseY) * 0.5;
+
+        // First wave - silver/grey
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        const wavePos = 0.3 + waveOffset * 0.4 + Math.sin(time) * 0.05;
+        const waveWidth = 0.28;
+
+        gradient.addColorStop(0, 'rgba(156, 163, 175, 0)');
+        gradient.addColorStop(Math.max(0, wavePos - waveWidth), 'rgba(156, 163, 175, 0)');
+        gradient.addColorStop(wavePos, 'rgba(156, 163, 175, 0.12)');
+        gradient.addColorStop(Math.min(1, wavePos + waveWidth), 'rgba(156, 163, 175, 0)');
+        gradient.addColorStop(1, 'rgba(156, 163, 175, 0)');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Second wave - slightly darker grey, opposite diagonal
+        const gradient2 = ctx.createLinearGradient(canvas.width, 0, 0, canvas.height);
+        const wavePos2 = 0.5 + (1 - waveOffset) * 0.3 + Math.cos(time * 0.7) * 0.05;
+
+        gradient2.addColorStop(0, 'rgba(107, 114, 128, 0)');
+        gradient2.addColorStop(Math.max(0, wavePos2 - waveWidth * 0.7), 'rgba(107, 114, 128, 0)');
+        gradient2.addColorStop(wavePos2, 'rgba(107, 114, 128, 0.08)');
+        gradient2.addColorStop(Math.min(1, wavePos2 + waveWidth * 0.7), 'rgba(107, 114, 128, 0)');
+        gradient2.addColorStop(1, 'rgba(107, 114, 128, 0)');
+
+        ctx.fillStyle = gradient2;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      };
+
+      const animate = () => {
+        draw();
+        animationId = requestAnimationFrame(animate);
+      };
+
+      const handleMouseMove = (e: MouseEvent) => {
+        const rect = canvas.getBoundingClientRect();
+        targetMouseX = (e.clientX - rect.left) / rect.width;
+        targetMouseY = (e.clientY - rect.top) / rect.height;
+      };
+
+      // Initialize
+      resize();
+      animate();
+
+      // Event listeners
+      canvas.parentElement?.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('resize', resize);
+
+      // Cleanup
+      document.addEventListener('astro:before-swap', () => {
+        cancelAnimationFrame(animationId);
+        canvas.parentElement?.removeEventListener('mousemove', handleMouseMove);
+      });
+    }
+  }
+</script>

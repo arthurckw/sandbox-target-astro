@@ -1,0 +1,76 @@
+---
+interface Props {
+  targetNumber: number;
+  label: string;
+  duration?: number;
+  prefix?: string;
+  suffix?: string;
+}
+
+const {
+  targetNumber,
+  label,
+  duration = 500,
+  prefix = '',
+  suffix = ''
+} = Astro.props;
+---
+
+<div class="animated-counter text-center" data-target={targetNumber} data-duration={duration}>
+  <div class="text-4xl sm:text-5xl font-bold text-accent mb-2">
+    <span class="counter-prefix">{prefix}</span>
+    <span class="counter-value">0</span>
+    <span class="counter-suffix">{suffix}</span>
+  </div>
+  <div class="text-secondary text-lg">{label}</div>
+</div>
+
+<script>
+  function animateCounters() {
+    const counters = document.querySelectorAll('.animated-counter');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const counter = entry.target as HTMLElement;
+          const target = parseInt(counter.dataset.target || '0');
+          const duration = parseInt(counter.dataset.duration || '2000');
+          const valueEl = counter.querySelector('.counter-value');
+
+          if (valueEl && !counter.classList.contains('counted')) {
+            counter.classList.add('counted');
+            animateValue(valueEl, 0, target, duration);
+          }
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(counter => observer.observe(counter));
+  }
+
+  function animateValue(el: Element, start: number, end: number, duration: number) {
+    const startTime = performance.now();
+
+    function update(currentTime: number) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Easing function (ease-out)
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const current = Math.floor(start + (end - start) * easeOut);
+
+      el.textContent = current.toLocaleString();
+
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      }
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  // Run on page load
+  document.addEventListener('DOMContentLoaded', animateCounters);
+  // Also run on Astro page transitions
+  document.addEventListener('astro:page-load', animateCounters);
+</script>

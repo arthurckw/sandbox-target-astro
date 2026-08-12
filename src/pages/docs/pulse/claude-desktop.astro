@@ -1,0 +1,264 @@
+---
+export const prerender = true;
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import DocsSidebar from '../../../components/DocsSidebar.astro';
+
+// Auto-updates on every deploy
+const lastUpdated = new Date().toISOString().split('T')[0];
+
+const faqs = [
+  { q: "What is the HumanJudge MCP server?",
+    a: "A free MCP (Model Context Protocol) server that lets Claude Desktop query 16,668+ blind human evaluations of AI models. Add it as a custom connector — Claude gets 5 native tools to compare models, see flag patterns, and check content quality." },
+  { q: "How do I install it?",
+    a: "Settings → Connectors → Add custom connector → paste https://api.humanjudge.com/mcp → click Connect → sign in with your HumanJudge account in the browser. Total setup time: about 30 seconds." },
+  { q: "Do I need Claude Pro or Max?",
+    a: "Yes. Custom connectors require a Claude Pro or higher plan from Anthropic. The HumanJudge MCP server itself is free." },
+  { q: "Why turn off web search?",
+    a: "Claude may prefer web search over MCP tools when both are enabled. Turning off web search forces Claude to use the HumanJudge connector for AI quality questions, which gives you real human review data instead of secondhand web summaries." },
+  { q: "What models can I get data on?",
+    a: "GPT-5.4, GPT-5.2, Claude Opus 4.6, Claude Sonnet 4.6, Gemini 3.1 Pro, Gemini 3 Flash, Grok 4, Grok 4.1 Fast, Qwen3 VL 235B, gpt-oss-120b, Marketeam.ai, Palmyra Creative, Jasper, Kimi K2.6 — 15 models in the marketing benchmark, more across other arenas." },
+  { q: "Is the data real-time?",
+    a: "Yes. Each tool call hits the live HumanJudge API. New reviews submitted today show up in your queries today." },
+  { q: "What if the OAuth sign-in fails?",
+    a: "Make sure popups aren't blocked, you have a HumanJudge account, and the URL is exactly https://api.humanjudge.com/mcp (no trailing slash, https not http)." }
+];
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "name": "HumanJudge MCP Server for Claude Desktop — Compare AI Models with Human Reviews",
+    "url": "https://humanjudge.com/docs/pulse/claude-desktop",
+    "description": "Free MCP server for Claude Desktop. Query 16,668+ blind human evaluations of AI models — compare GPT, Claude, Grok, Gemini directly in Claude. Setup in 30 seconds.",
+    "datePublished": "2026-04-23",
+    "dateModified": lastUpdated,
+    "author": { "@type": "Organization", "name": "HumanJudge", "url": "https://humanjudge.com" },
+    "publisher": { "@type": "Organization", "name": "HumanJudge", "url": "https://humanjudge.com" },
+    "mainEntityOfPage": "https://humanjudge.com/docs/pulse/claude-desktop"
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to add HumanJudge as a Claude Desktop MCP server",
+    "description": "Install the HumanJudge MCP server as a custom connector in Claude Desktop and start querying real human AI evaluation data.",
+    "totalTime": "PT1M",
+    "step": [
+      { "@type": "HowToStep", "name": "Open Connectors settings", "text": "In Claude Desktop, go to Settings → Connectors." },
+      { "@type": "HowToStep", "name": "Add custom connector", "text": "Click 'Add custom connector'. Set name to 'HumanJudge' and URL to https://api.humanjudge.com/mcp." },
+      { "@type": "HowToStep", "name": "Sign in via OAuth", "text": "Click Connect — your browser opens. Sign in with your HumanJudge account and click Allow." },
+      { "@type": "HowToStep", "name": "Enable tools", "text": "Make sure the connector is enabled and tools are allowed under Tool permissions. Optionally turn off web search for cleaner answers." }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(f => ({
+      "@type": "Question",
+      "name": f.q,
+      "acceptedAnswer": { "@type": "Answer", "text": f.a }
+    }))
+  }
+];
+---
+
+<BaseLayout
+  title="HumanJudge MCP Server for Claude Desktop — Compare AI with Human Reviews | HumanJudge"
+  description="Free MCP server for Claude Desktop. Query 16,668+ blind human evaluations of GPT, Claude, Grok, Gemini and more. 30-second setup as a custom connector."
+  currentPath="/docs"
+  jsonLd={jsonLd}
+>
+  <div class="min-h-screen bg-surface">
+    <div class="bg-surface-elevated border-b border-border-subtle">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <nav class="text-sm text-secondary mb-4">
+          <a href="/docs" class="hover:text-primary">Docs</a>
+          <span class="mx-2">/</span>
+          <a href="/docs" class="hover:text-primary">Pulse</a>
+          <span class="mx-2">/</span>
+          <span class="text-primary">Claude Desktop</span>
+        </nav>
+        <h1 class="text-4xl font-bold text-primary mb-4">Use HumanJudge in Claude Desktop — compare AI models with real human reviews</h1>
+        <p class="text-xl text-secondary max-w-3xl">
+          Add HumanJudge as a free MCP server in Claude Desktop. Ask Claude to compare AI models, surface flag patterns, or check content quality — backed by 16,668+ blind human reviews. Setup in 30 seconds.
+        </p>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid md:grid-cols-3 gap-8">
+        <DocsSidebar currentPath="/docs/pulse/claude-desktop" />
+
+        <div class="md:col-span-2 prose prose-invert max-w-none">
+
+          <!-- Hook -->
+          <section class="mb-10">
+            <p class="text-secondary text-lg mb-4">
+              If you use Claude Desktop for research, analysis, or decision-making about AI tools, you're probably running into the same wall: Claude can summarize what's on the web, but it can't tell you what real humans actually think of GPT-5.4's marketing copy versus Grok's.
+            </p>
+            <p class="text-secondary mb-4">
+              The HumanJudge MCP server fixes that. Add one URL as a connector and Claude gets <strong class="text-primary">5 native tools</strong> backed by <strong class="text-primary">16,668 blind human reviews of 15 AI models</strong>. Ask the comparison question — Claude answers with real review data, not a web summary.
+            </p>
+          </section>
+
+          <!-- Who this is for -->
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold text-primary mb-4">Who this is for</h2>
+            <ul class="text-secondary space-y-1">
+              <li>• <strong class="text-primary">Researchers and analysts</strong> evaluating AI tools for adoption decisions</li>
+              <li>• <strong class="text-primary">PMs and CTOs</strong> picking models for production deployments</li>
+              <li>• <strong class="text-primary">Consultants</strong> advising clients on AI tool selection</li>
+              <li>• <strong class="text-primary">Anyone</strong> who already lives in Claude Desktop and wants quality data without leaving</li>
+            </ul>
+          </section>
+
+          <!-- What you can ask -->
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold text-primary mb-4">What you can ask Claude after connecting</h2>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-border-subtle">
+                    <th class="text-left py-2 pr-4 text-primary font-medium">Question pattern</th>
+                    <th class="text-left py-2 text-primary font-medium">What Claude returns (via MCP tools)</th>
+                  </tr>
+                </thead>
+                <tbody class="text-secondary">
+                  <tr class="border-b border-border-subtle/50"><td class="py-3 pr-4">"Which AI is best at marketing content?"</td><td class="py-3">Ranked leaderboard from 16K+ reviews</td></tr>
+                  <tr class="border-b border-border-subtle/50"><td class="py-3 pr-4">"Compare Claude Opus and GPT-5.4 head to head"</td><td class="py-3">Side-by-side scores + reviewer quotes</td></tr>
+                  <tr class="border-b border-border-subtle/50"><td class="py-3 pr-4">"What flag patterns appear most in Grok's outputs?"</td><td class="py-3">Top flag categories with examples</td></tr>
+                  <tr class="border-b border-border-subtle/50"><td class="py-3 pr-4">"Check this draft against real human reviews"</td><td class="py-3">Semantic match against 913 evaluated outputs</td></tr>
+                  <tr><td class="py-3 pr-4">"What's the latest human verdict on each major model?"</td><td class="py-3">Live feed of recent reviews</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Setup -->
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold text-primary mb-4">Setup (30 seconds)</h2>
+            <ol class="space-y-4 mb-6">
+              <li class="flex items-start gap-3">
+                <span class="bg-accent/10 text-accent rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0 mt-0.5">1</span>
+                <div>
+                  <p class="text-primary font-medium">Open Settings → Connectors</p>
+                  <p class="text-secondary text-sm">In Claude Desktop, go to Settings → Connectors.</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="bg-accent/10 text-accent rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0 mt-0.5">2</span>
+                <div>
+                  <p class="text-primary font-medium">Add custom connector</p>
+                  <p class="text-secondary text-sm">Click "Add custom connector" and fill in:</p>
+                  <div class="mt-2 space-y-1">
+                    <p class="text-secondary text-sm">Name: <code class="text-accent bg-surface-elevated px-1.5 py-0.5 rounded">HumanJudge</code></p>
+                    <p class="text-secondary text-sm">URL:</p>
+                  </div>
+                  <div class="bg-surface-elevated border border-border-subtle rounded-lg px-3 py-2 font-mono text-sm text-accent mt-2">
+                    https://api.humanjudge.com/mcp
+                  </div>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="bg-accent/10 text-accent rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0 mt-0.5">3</span>
+                <div>
+                  <p class="text-primary font-medium">Click Connect and sign in</p>
+                  <p class="text-secondary text-sm">Your browser will open. Sign in with your HumanJudge account and click Allow. Free account, takes 30 seconds.</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="bg-accent/10 text-accent rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0 mt-0.5">4</span>
+                <div>
+                  <p class="text-primary font-medium">Enable tools</p>
+                  <p class="text-secondary text-sm">Make sure the connector is enabled and tools are allowed under Tool permissions.</p>
+                </div>
+              </li>
+            </ol>
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+              <p class="text-secondary text-sm">🔔 Turn off <strong class="text-primary">Web search</strong> for cleaner answers. Claude may prefer web search over the HumanJudge tools if both are enabled.</p>
+            </div>
+          </section>
+
+          <!-- Example questions -->
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold text-primary mb-4">Example questions to try right now</h2>
+            <div class="space-y-3">
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                <p class="text-accent font-mono text-sm">"Which AI is best at marketing content writing?"</p>
+                <p class="text-secondary text-xs mt-1">Ranked leaderboard with pass rates and flag counts.</p>
+              </div>
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                <p class="text-accent font-mono text-sm">"Compare GPT-5.4 vs Claude Opus 4.6 for blog content"</p>
+                <p class="text-secondary text-xs mt-1">Side-by-side scores with where they differ and reviewer quotes.</p>
+              </div>
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                <p class="text-accent font-mono text-sm">"What patterns do humans flag most in Grok's outputs?"</p>
+                <p class="text-secondary text-xs mt-1">Flag categories with frequency and examples.</p>
+              </div>
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                <p class="text-accent font-mono text-sm">"Check this draft: [paste your AI's output]"</p>
+                <p class="text-secondary text-xs mt-1">Semantic match against 913 evaluated outputs.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- FAQ -->
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold text-primary mb-4">FAQ</h2>
+            <div class="space-y-3">
+              {faqs.map((f) => (
+                <details class="bg-surface-elevated border border-border-subtle rounded-lg p-4 group">
+                  <summary class="cursor-pointer text-primary font-medium list-none flex items-center justify-between">
+                    <span>{f.q}</span>
+                    <span class="text-tertiary group-open:rotate-180 transition-transform">▾</span>
+                  </summary>
+                  <p class="text-secondary text-sm mt-3">{f.a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+
+          <!-- Available tools -->
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold text-primary mb-4">The 5 tools Claude gets</h2>
+            <p class="text-secondary mb-4">Once connected, Claude has these native MCP tools available:</p>
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden">
+              <div class="p-4 text-sm text-secondary space-y-2">
+                <p><code class="text-accent">get_model_scores</code> — Leaderboard with pass rates and flag counts</p>
+                <p><code class="text-accent">compare_models</code> — Head-to-head comparison of 2–3 models</p>
+                <p><code class="text-accent">get_flags</code> — Flag patterns and categories per model</p>
+                <p><code class="text-accent">check_content</code> — Match text against evaluated AI outputs</p>
+                <p><code class="text-accent">get_latest</code> — Most recent human verdicts</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Cross-links -->
+          <section class="mb-10">
+            <h2 class="text-2xl font-bold text-primary mb-4">Want this in your other tools?</h2>
+            <div class="grid sm:grid-cols-2 gap-3">
+              <a href="/docs/pulse/chatgpt" class="bg-surface-elevated border border-border-subtle rounded-lg p-4 hover:border-accent/50 transition-colors group block">
+                <h3 class="font-semibold text-primary group-hover:text-accent">ChatGPT →</h3>
+                <p class="text-secondary text-sm">Free GPT in the GPT Store. No setup.</p>
+              </a>
+              <a href="/docs/pulse/claude-code" class="bg-surface-elevated border border-border-subtle rounded-lg p-4 hover:border-accent/50 transition-colors group block">
+                <h3 class="font-semibold text-primary group-hover:text-accent">Claude Code →</h3>
+                <p class="text-secondary text-sm">Same MCP, inside VS Code or the CLI.</p>
+              </a>
+              <a href="/docs/pulse/python-sdk" class="bg-surface-elevated border border-border-subtle rounded-lg p-4 hover:border-accent/50 transition-colors group block">
+                <h3 class="font-semibold text-primary group-hover:text-accent">Python SDK →</h3>
+                <p class="text-secondary text-sm">For Jupyter notebooks and pandas analysis.</p>
+              </a>
+              <a href="/pulse" class="bg-surface-elevated border border-border-subtle rounded-lg p-4 hover:border-accent/50 transition-colors group block">
+                <h3 class="font-semibold text-primary group-hover:text-accent">Browse the live feed →</h3>
+                <p class="text-secondary text-sm">See new reviewer verdicts as they happen.</p>
+              </a>
+            </div>
+          </section>
+
+          <p class="text-xs text-tertiary mt-12 pt-6 border-t border-border-subtle">Last updated: {lastUpdated} · Data refreshes live from humanjudge.com</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

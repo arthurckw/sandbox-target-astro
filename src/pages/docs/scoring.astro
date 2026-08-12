@@ -1,0 +1,241 @@
+---
+export const prerender = true;
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DocsSidebar from '../../components/DocsSidebar.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "name": "HumanJudge Scoring Algorithm",
+  "url": "https://humanjudge.com/docs/scoring",
+  "description": "How HumanJudge calculates AI quality scores. Time-weighted decay scoring, freshness metrics, karma system, pass rate calculation, and reviewer reputation weighting.",
+  "publisher": { "@type": "Organization", "name": "HumanJudge", "url": "https://humanjudge.com" }
+};
+---
+
+<BaseLayout
+  title="AI Quality Scoring Algorithm | Time-Decay, Karma, Pass Rate | HumanJudge"
+  description="How HumanJudge calculates AI quality scores: time-weighted decay, freshness metrics, karma system, pass rate, reviewer reputation weighting. Transparent methodology."
+  currentPath="/docs/scoring"
+  jsonLd={jsonLd}
+>
+  <div class="min-h-screen bg-surface">
+    <!-- Docs Header -->
+    <div class="bg-surface-elevated border-b border-border-subtle">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 class="text-4xl font-bold text-primary mb-4">Scoring Algorithm</h1>
+        <p class="text-xl text-secondary max-w-3xl">
+          How HumanJudge calculates time-weighted quality scores and freshness metrics for your AI evaluation reports.
+        </p>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid md:grid-cols-3 gap-8">
+        <DocsSidebar currentPath="/docs/scoring" />
+
+        <!-- Content -->
+        <div class="md:col-span-2 prose prose-invert max-w-none">
+          <h2 class="text-2xl font-bold text-primary mb-6">Time-Weighted Quality Score</h2>
+
+          <p class="text-secondary mb-6">
+            The quality score represents a time-weighted average of human evaluations. Recent votes have more influence than older ones, ensuring the score reflects the current state of your AI's performance.
+          </p>
+
+          <!-- Formula Box -->
+          <div class="bg-surface-elevated border border-border-subtle rounded-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-primary mb-4">The Formula</h3>
+            <div class="space-y-4">
+              <div class="bg-surface rounded-lg p-4 font-mono text-sm">
+                <div class="text-accent mb-2">// Decay factor (how much old scores are weighted)</div>
+                <div class="text-primary">α = e<sup>-λ × Δt</sup></div>
+                <div class="text-secondary text-xs mt-1">where λ = 0.01, Δt = seconds since last evaluation</div>
+              </div>
+              <div class="bg-surface rounded-lg p-4 font-mono text-sm">
+                <div class="text-accent mb-2">// Updated score</div>
+                <div class="text-primary">new_score = α × prev_score + (1 - α) × mean_vote</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- How it works -->
+          <h3 class="text-xl font-bold text-primary mb-4">How It Works</h3>
+
+          <div class="space-y-4 mb-8">
+            <div class="flex items-start gap-3">
+              <span class="bg-accent/20 text-accent rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">1</span>
+              <div>
+                <h4 class="font-semibold text-primary">Calculate Time Decay</h4>
+                <p class="text-secondary text-sm">The decay factor α ranges from 0 to 1. When Δt is small (recent evaluation), α is close to 1, meaning the previous score carries more weight. As time passes, α decreases.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="bg-accent/20 text-accent rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">2</span>
+              <div>
+                <h4 class="font-semibold text-primary">Weight New Votes</h4>
+                <p class="text-secondary text-sm">Each evaluator's vote is weighted by their reputation score. The mean_vote is the reputation-weighted average of all new votes (Pass = 1.0, Flag = 0.0).</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="bg-accent/20 text-accent rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shrink-0">3</span>
+              <div>
+                <h4 class="font-semibold text-primary">Blend Old and New</h4>
+                <p class="text-secondary text-sm">The new score blends the decayed previous score with the new vote average. This ensures smooth transitions while giving recent evaluations appropriate influence.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Example -->
+          <div class="bg-surface-elevated border border-border-subtle rounded-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-primary mb-4">Example Calculation</h3>
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between border-b border-border-subtle pb-2">
+                <span class="text-secondary">Previous score:</span>
+                <span class="text-primary font-mono">0.50</span>
+              </div>
+              <div class="flex justify-between border-b border-border-subtle pb-2">
+                <span class="text-secondary">Time since last eval:</span>
+                <span class="text-primary font-mono">7 seconds</span>
+              </div>
+              <div class="flex justify-between border-b border-border-subtle pb-2">
+                <span class="text-secondary">New vote:</span>
+                <span class="text-primary font-mono">Flag (0.0)</span>
+              </div>
+              <div class="flex justify-between border-b border-border-subtle pb-2">
+                <span class="text-secondary">Decay (α = e<sup>-0.01×7</sup>):</span>
+                <span class="text-primary font-mono">≈ 0.93</span>
+              </div>
+              <div class="flex justify-between pt-2">
+                <span class="text-secondary font-semibold">New score:</span>
+                <span class="text-accent font-mono font-bold">0.93 × 0.5 + 0.07 × 0.0 = 0.465 (47%)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Freshness Section -->
+          <h2 class="text-2xl font-bold text-primary mb-6 mt-12">Vote Freshness</h2>
+
+          <p class="text-secondary mb-6">
+            Freshness indicates how recent the evaluations are. It's the inverse of the decay factor, showing how much influence new votes had on the current score.
+          </p>
+
+          <div class="bg-surface-elevated border border-border-subtle rounded-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-primary mb-4">Freshness Formula</h3>
+            <div class="bg-surface rounded-lg p-4 font-mono text-sm">
+              <div class="text-primary">freshness = 1 - α</div>
+              <div class="text-secondary text-xs mt-2">When α ≈ 0.93, freshness = 7%</div>
+            </div>
+          </div>
+
+          <div class="space-y-4 mb-8">
+            <div class="flex items-start gap-3">
+              <span class="text-success text-lg">↑</span>
+              <div>
+                <h4 class="font-semibold text-primary">High Freshness (e.g., 80%)</h4>
+                <p class="text-secondary text-sm">Evaluations are recent or there's been a long gap since the last score update. The current score heavily reflects the latest votes.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="text-warning text-lg">→</span>
+              <div>
+                <h4 class="font-semibold text-primary">Low Freshness (e.g., 7%)</h4>
+                <p class="text-secondary text-sm">Evaluations came shortly after previous ones. The score is a blend of historical and recent data, providing stability.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Why This Matters -->
+          <h2 class="text-2xl font-bold text-primary mb-6 mt-12">Why Time-Weighted Scoring?</h2>
+
+          <div class="space-y-4 mb-8">
+            <div class="flex items-start gap-3">
+              <span class="text-accent text-lg">✓</span>
+              <div>
+                <h4 class="font-semibold text-primary">Reflects Current Performance</h4>
+                <p class="text-secondary text-sm">AI systems improve over time. Time-weighting ensures old evaluations don't unfairly drag down scores after improvements are made.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="text-accent text-lg">✓</span>
+              <div>
+                <h4 class="font-semibold text-primary">Prevents Gaming</h4>
+                <p class="text-secondary text-sm">You can't boost your score with a burst of positive reviews and ignore it. The score naturally decays, requiring consistent quality.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="text-accent text-lg">✓</span>
+              <div>
+                <h4 class="font-semibold text-primary">Smooth Transitions</h4>
+                <p class="text-secondary text-sm">Exponential decay creates gradual score changes rather than jarring jumps, giving you time to identify and address issues.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Technical Details -->
+          <h2 class="text-2xl font-bold text-primary mb-6 mt-12">Technical Details</h2>
+
+          <div class="bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden mb-8">
+            <table class="w-full text-sm">
+              <thead class="bg-surface">
+                <tr>
+                  <th class="px-4 py-3 text-left text-secondary font-semibold">Parameter</th>
+                  <th class="px-4 py-3 text-left text-secondary font-semibold">Value</th>
+                  <th class="px-4 py-3 text-left text-secondary font-semibold">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-border-subtle">
+                <tr>
+                  <td class="px-4 py-3 font-mono text-primary">λ (decay_lambda)</td>
+                  <td class="px-4 py-3 font-mono text-accent">0.01</td>
+                  <td class="px-4 py-3 text-secondary">Decay rate constant</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 font-mono text-primary">Pass vote</td>
+                  <td class="px-4 py-3 font-mono text-accent">1.0</td>
+                  <td class="px-4 py-3 text-secondary">Vote value for approval</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 font-mono text-primary">Flag vote</td>
+                  <td class="px-4 py-3 font-mono text-accent">0.0</td>
+                  <td class="px-4 py-3 text-secondary">Vote value for flagging</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 font-mono text-primary">Initial score</td>
+                  <td class="px-4 py-3 font-mono text-accent">0.5</td>
+                  <td class="px-4 py-3 text-secondary">Starting score for new projects</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Open Source -->
+          <div class="bg-accent/10 border border-accent/30 rounded-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-primary mb-2">Open Source</h3>
+            <p class="text-secondary text-sm mb-3">
+              The scoring algorithm is available as an open-source Python package. Install it via pip to use the same algorithms in your own analysis.
+            </p>
+            <div class="bg-surface rounded-lg p-3 font-mono text-sm">
+              <span class="text-secondary">$</span> <span class="text-primary">pip install grandjury</span>
+            </div>
+            <a href="https://pypi.org/project/grandjury/" target="_blank" class="inline-block mt-3 text-accent hover:text-accent-hover text-sm">
+              View on PyPI →
+            </a>
+          </div>
+
+          <!-- Support -->
+          <h2 class="text-2xl font-bold text-primary mb-6">Questions?</h2>
+
+          <p class="text-secondary">
+            Have questions about how scores are calculated? Email <a href="mailto:support@humanjudge.com" class="text-accent hover:text-accent-hover">support@humanjudge.com</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

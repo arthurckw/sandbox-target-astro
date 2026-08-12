@@ -1,0 +1,457 @@
+---
+export const prerender = true;
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import FeatureGrid from '../../components/FeatureGrid.astro';
+import FAQ from '../../components/FAQ.astro';
+import CTA from '../../components/CTA.astro';
+---
+
+<BaseLayout
+  title="AI Failure Evidence Project - Join Expert AI Critics | HumanJudge"
+  description="Document AI failures that matter. Join expert AI critics building the first public database of AI failures. Get verified status, featured in published reports."
+  currentPath="/ai-reviews/competition"
+>
+  <!-- Hero Section -->
+  <Hero
+    headline="Document AI Failures That Matter"
+    subheadline="Join Expert AI Critics Building the First Public Database of AI Failures"
+    description="Be recognized for spotting what AI gets dangerously wrong. Get verified status, featured in published reports, and build your authority as an AI quality expert."
+    primaryCTA={{ text: "Join as Reviewer", href: "/dashboard" }}
+    secondaryCTA={{ text: "Learn How It Works ↓", href: "#how-it-works" }}
+  />
+
+  <!-- Mission Section -->
+  <section class="py-20 border-t border-border-subtle">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-primary mb-12">
+        Why This Matters
+      </h2>
+
+      <div class="space-y-6 text-lg text-secondary">
+        <p>
+          AI systems are making critical decisions in healthcare, law, finance, and code. But when they fail, those failures often go undocumented, unverified, and unfixed. Users don't know what went wrong. Developers don't get specific feedback. The public can't hold AI accountable.
+        </p>
+
+        <p>
+          We're changing that. The AI Failure Evidence Project brings together domain experts like you to publicly document what AI systems get wrong, why it matters, and who verified it. Not rankings. Evidence. Not anonymous votes. Expert attribution.
+        </p>
+
+        <p class="font-semibold text-primary">
+          Be recognized for finding failures before they cause harm. Build your portfolio. Launch your AI consulting career. Make AI safer.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="py-20 bg-surface-elevated">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-primary mb-16">
+        How to Participate
+      </h2>
+
+      <div class="grid md:grid-cols-5 gap-8">
+        <!-- Step 1 -->
+        <div class="text-center">
+          <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-3xl">🔌</span>
+          </div>
+          <div class="mb-2 text-accent font-semibold">Step 1</div>
+          <h3 class="text-lg font-semibold text-primary mb-2">
+            Install Chrome Extension
+          </h3>
+          <p class="text-sm text-secondary mb-3">
+            Install grandjury, HumanJudge's official Chrome extension, in under 2 minutes. No coding required.
+          </p>
+          <a href="/dashboard" class="text-sm text-accent hover:text-accent-hover">
+            Sign in →
+          </a>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="text-center">
+          <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-3xl">🎯</span>
+          </div>
+          <div class="mb-2 text-accent font-semibold">Step 2</div>
+          <h3 class="text-lg font-semibold text-primary mb-2">
+            Choose Your Domain
+          </h3>
+          <p class="text-sm text-secondary">
+            Pick your area of expertise: Medical, Legal, AI Safety, Code Generation, or Finance. Or evaluate across all domains.
+          </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="text-center">
+          <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-3xl">💬</span>
+          </div>
+          <div class="mb-2 text-accent font-semibold">Step 3</div>
+          <h3 class="text-lg font-semibold text-primary mb-2">
+            Evaluate Shell AIs
+          </h3>
+          <p class="text-sm text-secondary">
+            Interact with our shell AI apps (GPT-4, Claude, Gemini). Test them, find failures, document what went wrong.
+          </p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="text-center">
+          <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-3xl">✍️</span>
+          </div>
+          <div class="mb-2 text-accent font-semibold">Step 4</div>
+          <h3 class="text-lg font-semibold text-primary mb-2">
+            Submit Your Evaluations
+          </h3>
+          <p class="text-sm text-secondary">
+            Vote (good/bad) and write detailed comments explaining failures. Your evaluations are publicly visible with your name and credentials.
+          </p>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="text-center">
+          <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-3xl">⭐</span>
+          </div>
+          <div class="mb-2 text-accent font-semibold">Step 5</div>
+          <h3 class="text-lg font-semibold text-primary mb-2">
+            Get Featured & Verified
+          </h3>
+          <p class="text-sm text-secondary">
+            Top contributors get verified reviewer status, featured in our published report, and media coverage opportunities.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What You Evaluate Section -->
+  <FeatureGrid
+    title="Shell AI Projects Across Domains"
+    description="We've set up AI chatbots running major LLMs (GPT-4, Claude, Gemini) for you to evaluate. Choose your domain and work at your own pace."
+    columns={3}
+    features={[
+      {
+        icon: "🏥",
+        title: "Medical AI",
+        description: "Evaluate AI medical advice, symptom checking, drug interactions. Example projects: GPT-4 Medical, Claude Health"
+      },
+      {
+        icon: "⚖️",
+        title: "Legal AI",
+        description: "Evaluate AI legal analysis, contract review, compliance advice. Example projects: GPT-4 Legal, Gemini Law"
+      },
+      {
+        icon: "🛡️",
+        title: "AI Safety",
+        description: "Evaluate AI alignment, harmful outputs, safety failures. Example projects: Claude Safety, GPT-4 Alignment"
+      },
+      {
+        icon: "💻",
+        title: "Code Generation",
+        description: "Evaluate AI-generated code for bugs, security vulnerabilities. Example projects: GPT-4 Code, Claude Dev"
+      },
+      {
+        icon: "💰",
+        title: "Finance AI",
+        description: "Evaluate AI financial advice, risk analysis, market predictions. Example projects: Gemini Finance, GPT-4 Trading"
+      }
+    ]}
+  >
+    <p class="text-center text-secondary mt-8">
+      Self-directed, flexible participation. Evaluate as much or as little as you want.
+    </p>
+  </FeatureGrid>
+
+  <!-- Rewards Section -->
+  <section class="py-20 bg-surface-elevated">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-primary mb-6">
+        What You Get (No Cash Prizes)
+      </h2>
+      <p class="text-xl text-secondary text-center max-w-3xl mx-auto mb-16">
+        This is a recognition-based competition. We don't offer cash prizes. We offer something more valuable: credibility and authority.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-surface border border-border-subtle rounded-lg p-6">
+          <div class="text-4xl mb-4">✓</div>
+          <h3 class="text-xl font-semibold text-primary mb-3">
+            Verified Reviewer Status
+          </h3>
+          <p class="text-secondary">
+            Top contributors become verified HumanJudge Reviewers with official badge on public profile.
+          </p>
+        </div>
+
+        <div class="bg-surface border border-border-subtle rounded-lg p-6">
+          <div class="text-4xl mb-4">📄</div>
+          <h3 class="text-xl font-semibold text-primary mb-3">
+            Featured in Published Report
+          </h3>
+          <p class="text-secondary">
+            Your best evaluations featured in "State of AI Failures" report with your name, credentials, and expert commentary.
+          </p>
+        </div>
+
+        <div class="bg-surface border border-border-subtle rounded-lg p-6">
+          <div class="text-4xl mb-4">📁</div>
+          <h3 class="text-xl font-semibold text-primary mb-3">
+            Public Portfolio
+          </h3>
+          <p class="text-secondary">
+            Build your portfolio with public evaluation pages showing your expert analysis, linked to your professional profiles.
+          </p>
+        </div>
+
+        <div class="bg-surface border border-border-subtle rounded-lg p-6">
+          <div class="text-4xl mb-4">📰</div>
+          <h3 class="text-xl font-semibold text-primary mb-3">
+            Media Coverage Opportunity
+          </h3>
+          <p class="text-secondary">
+            Top evaluators highlighted in press releases and media outreach to AI journalists and tech publications.
+          </p>
+        </div>
+
+        <div class="bg-surface border border-border-subtle rounded-lg p-6">
+          <div class="text-4xl mb-4">💎</div>
+          <h3 class="text-xl font-semibold text-primary mb-3">
+            Premium Rates When Marketplace Launches
+          </h3>
+          <p class="text-secondary">
+            Verified Reviewers earn higher rates when AI developers start hiring evaluators through our marketplace.
+          </p>
+        </div>
+
+        <div class="bg-surface border border-border-subtle rounded-lg p-6">
+          <div class="text-4xl mb-4">🎨</div>
+          <h3 class="text-xl font-semibold text-primary mb-3">
+            Self-Directed Work
+          </h3>
+          <p class="text-secondary">
+            Choose what you evaluate, work at your pace. No assigned tasks, no deadlines, no stress. Unlike Outlier.ai or Scale AI.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Timeline Section -->
+  <section class="py-20">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-primary mb-16">
+        Competition Timeline
+      </h2>
+
+      <div class="space-y-8">
+        <div class="flex gap-6">
+          <div class="flex-shrink-0 w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center text-accent font-bold">
+            1
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold text-primary mb-2">
+              Phase 1: Evaluation Period
+            </h3>
+            <p class="text-secondary mb-2">
+              <strong>[Start Date] - [End Date]</strong>
+            </p>
+            <p class="text-secondary">
+              Submit your evaluations, document failures, build your portfolio
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-6">
+          <div class="flex-shrink-0 w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center text-accent font-bold">
+            2
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold text-primary mb-2">
+              Phase 2: Review & Selection
+            </h3>
+            <p class="text-secondary mb-2">
+              <strong>[Dates]</strong>
+            </p>
+            <p class="text-secondary">
+              We review all submissions and select top contributors for verification
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-6">
+          <div class="flex-shrink-0 w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center text-accent font-bold">
+            3
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold text-primary mb-2">
+              Phase 3: Report Publication
+            </h3>
+            <p class="text-secondary mb-2">
+              <strong>[Date]</strong>
+            </p>
+            <p class="text-secondary">
+              "State of AI Failures" report published, featuring verified experts and key findings
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who Can Participate Section -->
+  <section class="py-20 bg-surface-elevated">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center text-primary mb-6">
+        Who We're Looking For
+      </h2>
+      <p class="text-xl text-secondary text-center max-w-3xl mx-auto mb-16">
+        Anyone passionate about AI quality and accountability. Domain expertise helps, but critical thinking matters more.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-surface border border-border-subtle rounded-lg p-6">
+          <h3 class="font-semibold text-primary mb-2">AI Safety Researchers</h3>
+          <p class="text-sm text-secondary">
+            Already analyzing AI risks, alignment issues, safety failures on Twitter or LessWrong
+          </p>
+        </div>
+
+        <div class="bg-surface border border-border-subtle rounded-lg p-6">
+          <h3 class="font-semibold text-primary mb-2">Medical Professionals</h3>
+          <p class="text-sm text-secondary">
+            Doctors, nurses, healthcare researchers worried about AI medical advice
+          </p>
+        </div>
+
+        <div class="bg-surface border border-border-subtle rounded-lg p-6">
+          <h3 class="font-semibold text-primary mb-2">Legal Professionals</h3>
+          <p class="text-sm text-secondary">
+            Lawyers, paralegals, compliance experts analyzing AI legal tools
+          </p>
+        </div>
+
+        <div class="bg-surface border border-border-subtle rounded-lg p-6">
+          <h3 class="font-semibold text-primary mb-2">Senior Engineers</h3>
+          <p class="text-sm text-secondary">
+            Experienced developers who can spot bugs, security issues, code quality problems
+          </p>
+        </div>
+
+        <div class="bg-surface border border-border-subtle rounded-lg p-6">
+          <h3 class="font-semibold text-primary mb-2">Finance Professionals</h3>
+          <p class="text-sm text-secondary">
+            Financial advisors, risk analysts, economists evaluating AI financial tools
+          </p>
+        </div>
+
+        <div class="bg-surface border border-border-subtle rounded-lg p-6">
+          <h3 class="font-semibold text-primary mb-2">Current AI Evaluators</h3>
+          <p class="text-sm text-secondary">
+            Working at Outlier.ai, Scale AI, or similar platforms and want more autonomy and recognition
+          </p>
+        </div>
+
+        <div class="bg-surface border border-border-subtle rounded-lg p-6">
+          <h3 class="font-semibold text-primary mb-2">AI Critics</h3>
+          <p class="text-sm text-secondary">
+            Anyone already criticizing AI systems publicly on Twitter, Reddit, forums - get recognized for it
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <FAQ
+    items={[
+      {
+        question: "Is this paid?",
+        answer: "No cash prizes. This is recognition-focused. Top contributors get verified status, featured in published reports, and premium rates when our marketplace launches. Think of it as building your portfolio and authority."
+      },
+      {
+        question: "How much time is required?",
+        answer: "Completely flexible. Evaluate as much or as little as you want. Some participants submit 10 evaluations, others submit 100+. Quality matters more than quantity."
+      },
+      {
+        question: "What if I'm not a domain expert?",
+        answer: "Domain expertise helps but isn't required initially. If you can spot AI failures and explain why they matter, you're qualified. We review submissions based on insight quality, not credentials alone."
+      },
+      {
+        question: "Are my evaluations really public?",
+        answer: "Yes. All evaluations appear on public pages with your name and credentials (if you choose to provide them). This is core to our mission: public accountability requires public attribution."
+      },
+      {
+        question: "What happens after the competition?",
+        answer: "Top contributors (approximately 50 experts) receive verified reviewer status. You'll have access to our marketplace where AI developers hire verified evaluators. You can continue evaluating new projects and earning recognition."
+      },
+      {
+        question: "Can I stay anonymous?",
+        answer: "We strongly encourage public attribution (it's our differentiator), but we can accommodate anonymity for sensitive cases. However, anonymous evaluations are less likely to be featured in reports or earn verified status."
+      },
+      {
+        question: "How are winners selected?",
+        answer: "We manually review all submissions based on: (1) Comment depth and insight quality, (2) Evidence specificity and clarity, (3) Domain expertise relevance, (4) Volume and consistency. It's not purely based on number of submissions."
+      },
+      {
+        question: "What tools/software do I need?",
+        answer: "Just Chrome browser and our Chrome extension. No coding, no special software, no complex setup."
+      }
+    ]}
+  />
+
+  <!-- Founder Credibility Section -->
+  <section class="py-20 bg-surface-elevated">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-12">
+        Who's Behind This
+      </h2>
+
+      <div class="bg-surface border border-border-subtle rounded-lg p-8">
+        <div class="w-24 h-24 bg-accent/10 rounded-full mx-auto mb-6 flex items-center justify-center">
+          <span class="text-4xl">👤</span>
+        </div>
+
+        <h3 class="text-2xl font-bold text-primary mb-2">
+          Arthur Cho
+        </h3>
+        <p class="text-accent mb-6">Founder, HumanJudge</p>
+
+        <p class="text-secondary mb-6 text-left">
+          AI/ML Product Manager with 8+ years building AI products (200k+ MAU). Master's in Applied Data Science from University of Michigan (GPA 3.9). Previously: Conversational AI Manager at HSBC, Product Manager at A*STAR AI spinoff.
+        </p>
+
+        <p class="text-secondary mb-6 text-left">
+          Built HumanJudge to solve a problem I experienced: AI quality signals are opaque, evaluators are anonymous, and developers don't get specific feedback. We're making AI accountability transparent.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="https://linkedin.com/in/arthurcho" target="_blank" class="text-accent hover:text-accent-hover">
+            LinkedIn
+          </a>
+          <a href="mailto:hello@humanjudge.com" class="text-accent hover:text-accent-hover">
+            hello@humanjudge.com
+          </a>
+        </div>
+        <p class="text-secondary mt-4 text-sm">
+          Questions? Reach out anytime.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA Section -->
+  <CTA
+    title="Ready to Join?"
+    description="Be part of the first cohort documenting AI failures publicly. Build your authority, get verified, make AI safer."
+    primaryButton={{ text: "Join as Reviewer Now", href: "/dashboard" }}
+    variant="accent"
+  >
+    <p class="text-secondary text-sm mt-6">
+      Questions? Email us at <a href="mailto:hello@humanjudge.com" class="text-accent hover:text-accent-hover">hello@humanjudge.com</a> or connect on <a href="https://linkedin.com/company/humanjudge" target="_blank" class="text-accent hover:text-accent-hover">LinkedIn</a>
+    </p>
+  </CTA>
+</BaseLayout>

@@ -1,0 +1,441 @@
+---
+export const prerender = true;
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CTA from '../../components/CTA.astro';
+import FAQ from '../../components/FAQ.astro';
+---
+
+<BaseLayout
+  title="For Reviewers | AI Evaluation Tools & Platform | HumanJudge"
+  description="Professional AI evaluation tools. Use our Chrome extension and playground to evaluate AI outputs with Pass/Flag verdicts. Build your public expert profile."
+  currentPath="/products/for-reviewers"
+>
+  <link slot="head" rel="canonical" href="https://humanjudge.com/products/for-reviewers" />
+
+  <!-- Hero Section -->
+  <section class="py-16 sm:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <!-- Left: Text Content -->
+        <div class="text-center lg:text-left">
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary leading-tight mb-6">
+            AI Evaluation Tools<br/>
+            <span class="text-accent">For Domain Experts</span>
+          </h1>
+          <p class="text-xl text-secondary max-w-xl mx-auto lg:mx-0 mb-8">
+            Use our Chrome extension and playground to evaluate AI outputs. Vote Pass or Flag. Document AI failures. Build your public expert profile.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <a
+              href="https://chromewebstore.google.com/detail/bkidpjklbelflkdphnbphglkfojocpkh"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="bg-accent text-accent-on px-8 py-4 rounded-md hover:bg-accent-hover transition-micro ease-smooth font-medium text-lg inline-flex items-center justify-center gap-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Get Chrome Extension
+            </a>
+            <a
+              href="/ai-reviews"
+              class="border border-accent text-accent px-8 py-4 rounded-md hover:bg-accent/10 transition-micro ease-smooth font-medium text-lg inline-block text-center"
+            >
+              Browse Challenges →
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Visual Element -->
+        <div class="order-first lg:order-last">
+          <div class="bg-surface-elevated border border-border-subtle rounded-2xl p-6 max-w-md mx-auto">
+            <!-- Verdict UI Preview -->
+            <div class="space-y-4">
+              <div class="bg-surface border border-border-subtle rounded-lg p-4">
+                <p class="text-xs text-secondary mb-2">AI Response:</p>
+                <p class="text-primary text-sm">"NewJeans debuted in 2023 with their single 'Attention'..."</p>
+              </div>
+              <div class="flex gap-3">
+                <button class="flex-1 bg-success/20 border border-success/50 text-success py-3 rounded-lg font-medium flex items-center justify-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Pass
+                </button>
+                <button class="flex-1 bg-danger/20 border border-danger/50 text-danger py-3 rounded-lg font-medium flex items-center justify-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Flag
+                </button>
+              </div>
+              <div class="bg-surface border border-border-subtle rounded-lg p-3">
+                <p class="text-xs text-secondary mb-1">Your reasoning:</p>
+                <p class="text-primary text-xs">"Incorrect. NewJeans debuted in 2022, not 2023."</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Two Ways to Evaluate -->
+  <section class="py-16 bg-surface-elevated border-y border-border-subtle">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-primary text-center mb-4">
+        Two Ways to Evaluate
+      </h2>
+      <p class="text-secondary text-center mb-12 max-w-2xl mx-auto">
+        Use our playground directly, or evaluate AI anywhere with the Chrome extension.
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Direct Call (Playground) -->
+        <div class="bg-surface border border-accent/30 rounded-xl p-8">
+          <div class="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center text-2xl mb-6">
+            💬
+          </div>
+          <h3 class="text-xl font-semibold text-primary mb-3">Direct Call (Playground)</h3>
+          <p class="text-secondary mb-4">
+            Use our built-in playground to chat with AI and evaluate responses directly on HumanJudge.
+          </p>
+          <ul class="space-y-2 text-sm text-secondary mb-6">
+            <li class="flex items-start gap-2">
+              <span class="text-accent">✓</span>
+              Chat with AI on your challenge topic
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-accent">✓</span>
+              Vote Pass or Flag on each response
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-accent">✓</span>
+              Add your reasoning and documentation
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-accent">✓</span>
+              Everything saved to your public profile
+            </li>
+          </ul>
+          <a href="/ai-reviews" class="text-accent font-medium hover:underline">
+            Browse Challenges →
+          </a>
+        </div>
+
+        <!-- Visit the App (Chrome Extension) -->
+        <div class="bg-surface border border-border-subtle rounded-xl p-8">
+          <div class="w-14 h-14 bg-accent/10 rounded-xl flex items-center justify-center text-2xl mb-6">
+            🔌
+          </div>
+          <h3 class="text-xl font-semibold text-primary mb-3">Visit the App (Extension)</h3>
+          <p class="text-secondary mb-4">
+            Use the Chrome extension to evaluate AI outputs on any website — ChatGPT, Claude, or third-party apps.
+          </p>
+          <ul class="space-y-2 text-sm text-secondary mb-6">
+            <li class="flex items-start gap-2">
+              <span class="text-accent">✓</span>
+              Evaluate AI anywhere on the web
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-accent">✓</span>
+              Capture context from external apps
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-accent">✓</span>
+              Submit evaluations directly
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-accent">✓</span>
+              Works with any AI product
+            </li>
+          </ul>
+          <a href="#install-extension" class="text-accent font-medium hover:underline">
+            Install Extension ↓
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How Verdicts Work -->
+  <section class="py-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-primary text-center mb-4">
+        How Verdicts Work
+      </h2>
+      <p class="text-secondary text-center mb-12 max-w-2xl mx-auto">
+        Every evaluation is a simple decision: Pass or Flag.
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <!-- Pass -->
+        <div class="bg-surface border border-success/30 rounded-xl p-8">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 bg-success/20 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-primary">Pass</h3>
+          </div>
+          <p class="text-secondary mb-4">
+            The AI response is accurate and helpful in your domain expertise.
+          </p>
+          <ul class="space-y-2 text-sm text-secondary">
+            <li class="flex items-start gap-2">
+              <span class="text-success">•</span>
+              Factually correct information
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-success">•</span>
+              Appropriate context and nuance
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-success">•</span>
+              No significant errors or omissions
+            </li>
+          </ul>
+        </div>
+
+        <!-- Flag -->
+        <div class="bg-surface border border-danger/30 rounded-xl p-8">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 bg-danger/20 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-primary">Flag</h3>
+          </div>
+          <p class="text-secondary mb-4">
+            The AI response has errors, misconceptions, or problems that you can identify.
+          </p>
+          <ul class="space-y-2 text-sm text-secondary">
+            <li class="flex items-start gap-2">
+              <span class="text-danger">•</span>
+              Factual errors or hallucinations
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-danger">•</span>
+              Missing critical context
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-danger">•</span>
+              Cultural insensitivity or bias
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Documentation -->
+      <div class="mt-12 max-w-2xl mx-auto">
+        <div class="bg-surface-elevated border border-border-subtle rounded-xl p-8 text-center">
+          <h4 class="text-lg font-semibold text-primary mb-3">Document Your Reasoning</h4>
+          <p class="text-secondary mb-4">
+            Every verdict includes your expert reasoning. This builds your public profile and helps AI developers understand exactly what went wrong.
+          </p>
+          <p class="text-sm text-accent">
+            Your reasoning becomes part of your public expert profile.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chrome Extension Section -->
+  <section id="install-extension" class="py-20 bg-surface-elevated">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-primary text-center mb-4">
+        Install the Chrome Extension
+      </h2>
+      <p class="text-xl text-secondary text-center max-w-3xl mx-auto mb-12">
+        The GrandJury extension is your evaluation toolkit.
+      </p>
+
+      <div class="max-w-2xl mx-auto">
+        <!-- Primary: Chrome Web Store -->
+        <div class="text-center mb-8">
+          <a
+            href="https://chromewebstore.google.com/detail/bkidpjklbelflkdphnbphglkfojocpkh"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-3 bg-accent text-accent-on px-8 py-4 rounded-lg hover:bg-accent-hover transition-micro ease-smooth font-semibold text-lg"
+          >
+            <!-- Google Chrome brand logo — official brand hex values, kept as-is. -->
+            <svg class="w-6 h-6" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M5.7954035,8.36130434 C16.9522782,-4.62351526 37.639151,-2.06037988 45.3727574,13.1072081 C39.9288251,13.1091897 31.4040328,13.1055761 26.786937,13.1072081 C23.4382318,13.1083738 21.2761308,13.0322537 18.9347285,14.2648621 C16.1820632,15.7138239 14.1051274,18.3997073 13.3801164,21.5544341 L5.7954035,8.36130434 L5.7954035,8.36130434 Z"/>
+              <path fill="#4285F4" d="M16.015461,23.9991346 C16.015461,28.3998753 19.5936811,31.9800817 23.9919804,31.9800817 C28.3901632,31.9800817 31.9683834,28.3998753 31.9683834,23.9991346 C31.9683834,19.5985104 28.3901632,16.0181875 23.9919804,16.0181875 C19.5936811,16.0181875 16.015461,19.5985104 16.015461,23.9991346 L16.015461,23.9991346 Z"/>
+              <path fill="#34A853" d="M27.0876366,34.4456482 C22.6105798,35.7761751 17.371347,34.3006354 14.5014777,29.3468879 C12.3108329,25.5655987 6.52286114,15.4823164 3.89206021,10.8973955 C-5.32185953,25.0194695 2.61924235,44.2642006 19.3464574,47.5489026 L27.0876366,34.4456482 L27.0876366,34.4456482 Z"/>
+              <path fill="#FBBC05" d="M31.4014697,16.0181875 C35.1303309,19.4863704 35.9427207,25.102234 33.4168909,29.4566966 C31.5138971,32.7374352 25.4402549,42.9884614 22.4966379,47.9523505 C39.730883,49.0147671 52.2944399,32.1238121 46.6195946,16.0181875 L31.4014697,16.0181875 L31.4014697,16.0181875 Z"/>
+            </svg>
+            Add to Chrome
+          </a>
+        </div>
+
+        <!-- Secondary: Manual Install (Collapsible) -->
+        <details class="text-center">
+          <summary class="cursor-pointer text-accent hover:text-accent-hover transition-colors font-medium inline-flex items-center gap-2">
+            <span>or install manually</span>
+            <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </summary>
+
+          <div class="bg-surface border border-border-subtle rounded-lg p-6 mt-4 text-left">
+            <!-- Download Button -->
+            <div class="text-center mb-8">
+              <a
+                href="/downloads/grandjury-extension.zip"
+                download
+                class="inline-flex items-center gap-2 bg-surface-elevated border border-border-subtle text-primary px-6 py-3 rounded-lg hover:bg-surface transition-micro ease-smooth font-medium"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                Download ZIP
+              </a>
+            </div>
+
+            <!-- Installation Steps -->
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-7 h-7 bg-accent/10 rounded-full flex items-center justify-center">
+                    <span class="text-xs font-bold text-accent">1</span>
+                  </div>
+                  <h4 class="font-semibold text-primary text-sm">Download & Extract</h4>
+                </div>
+                <p class="text-secondary text-xs">
+                  Click download and extract the ZIP to a folder.
+                </p>
+              </div>
+
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-7 h-7 bg-accent/10 rounded-full flex items-center justify-center">
+                    <span class="text-xs font-bold text-accent">2</span>
+                  </div>
+                  <h4 class="font-semibold text-primary text-sm">Open Extensions</h4>
+                </div>
+                <p class="text-secondary text-xs">
+                  Go to <code class="bg-surface px-1 py-0.5 rounded text-xs">chrome://extensions</code>
+                </p>
+              </div>
+
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-7 h-7 bg-accent/10 rounded-full flex items-center justify-center">
+                    <span class="text-xs font-bold text-accent">3</span>
+                  </div>
+                  <h4 class="font-semibold text-primary text-sm">Developer Mode</h4>
+                </div>
+                <p class="text-secondary text-xs">
+                  Toggle "Developer mode" ON in top-right.
+                </p>
+              </div>
+
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-4">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-7 h-7 bg-accent/10 rounded-full flex items-center justify-center">
+                    <span class="text-xs font-bold text-accent">4</span>
+                  </div>
+                  <h4 class="font-semibold text-primary text-sm">Load Extension</h4>
+                </div>
+                <p class="text-secondary text-xs">
+                  Click "Load unpacked" and select the folder.
+                </p>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Your Expert Profile -->
+  <section class="py-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-primary text-center mb-4">
+        Build Your Public Expert Profile
+      </h2>
+      <p class="text-secondary text-center mb-12 max-w-2xl mx-auto">
+        Every evaluation builds your visible track record. Your name. Your expertise. Your judgments.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div class="bg-surface border border-border-subtle rounded-lg p-6 text-center">
+          <div class="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <h3 class="font-semibold text-primary mb-2">Your Name</h3>
+          <p class="text-secondary text-sm">
+            Public profile with your real identity — no anonymous labor.
+          </p>
+        </div>
+
+        <div class="bg-surface border border-border-subtle rounded-lg p-6 text-center">
+          <div class="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+            </svg>
+          </div>
+          <h3 class="font-semibold text-primary mb-2">Verified Expertise</h3>
+          <p class="text-secondary text-sm">
+            Track record in your domains visible to everyone.
+          </p>
+        </div>
+
+        <div class="bg-surface border border-border-subtle rounded-lg p-6 text-center">
+          <div class="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+          </div>
+          <h3 class="font-semibold text-primary mb-2">Growing Value</h3>
+          <p class="text-secondary text-sm">
+            Early contributors get first access to monetization.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <FAQ
+    title="Common Questions"
+    items={[
+      {
+        question: "What's the difference between the playground and extension?",
+        answer: "The <strong>playground</strong> lets you chat with AI directly on HumanJudge and evaluate responses. The <strong>extension</strong> lets you evaluate AI outputs anywhere on the web — ChatGPT, Claude, third-party apps, etc."
+      },
+      {
+        question: "How do I decide Pass vs Flag?",
+        answer: "Use your domain expertise. <strong>Pass</strong> if the AI response is accurate and helpful. <strong>Flag</strong> if you spot errors, hallucinations, missing context, or cultural issues. Document your reasoning either way."
+      },
+      {
+        question: "Is my evaluation data public?",
+        answer: "Your verdicts and reasoning appear on your public profile. This builds your expert reputation. You control what topics you evaluate."
+      },
+      {
+        question: "Do I need special qualifications?",
+        answer: "No gatekeeping. If you have genuine knowledge in a topic, you can evaluate AI in that domain. Your track record speaks for itself."
+      },
+      {
+        question: "How do I get started?",
+        answer: "1. Create an account, 2. Browse challenges in your areas of expertise, 3. Start evaluating using the playground or Chrome extension."
+      }
+    ]}
+  />
+
+  <!-- CTA -->
+  <CTA
+    title="Ready to Evaluate AI?"
+    description="Browse challenges in your area of expertise and start building your public profile."
+    primaryButton={{ text: "Browse Topics", href: "/ai-reviews" }}
+    secondaryButton={{ text: "Create Account", href: "/auth?role=reviewer" }}
+    variant="accent"
+  />
+</BaseLayout>

@@ -1,0 +1,564 @@
+---
+export const prerender = true;
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// Marketing benchmark leaderboard — pulled from production DB 2026-07-24.
+// Source query joins human_evaluations → traces → models on evaluation_id
+// = 7a97ef08-3d89-42c5-a4db-f6b43b4700ca. Only models with n >= 50 shown.
+type Row = { model: string; provider: string; kind: 'llm' | 'vertical'; passRate: number; votes: number };
+const leaderboard: Row[] = [
+  { model: 'GPT-5.2 Chat',              provider: 'OpenAI',      kind: 'llm',      passRate: 94.22, votes: 1868 },
+  { model: 'Gemini 3.1 Pro Preview',    provider: 'Google',      kind: 'llm',      passRate: 94.03, votes: 1858 },
+  { model: 'GPT-5.4',                   provider: 'OpenAI',      kind: 'llm',      passRate: 93.79, votes:  869 },
+  { model: 'GPT-5.2',                   provider: 'OpenAI',      kind: 'llm',      passRate: 92.98, votes: 1852 },
+  { model: 'Gemini 3 Flash Preview',    provider: 'Google',      kind: 'llm',      passRate: 91.87, votes: 1857 },
+  { model: 'Claude Opus 4.6',           provider: 'Anthropic',   kind: 'llm',      passRate: 91.85, votes: 1865 },
+  { model: 'Claude Sonnet 4.6',         provider: 'Anthropic',   kind: 'llm',      passRate: 91.60, votes: 1869 },
+  { model: 'Palmyra Creative',          provider: 'WRITER',      kind: 'vertical', passRate: 90.91, votes:   55 },
+  { model: 'Grok 4.1 Fast',             provider: 'xAI',         kind: 'llm',      passRate: 90.36, votes: 1856 },
+  { model: 'Grok 4',                    provider: 'xAI',         kind: 'llm',      passRate: 89.35, votes: 1860 },
+  { model: 'Qwen3 VL 235B',             provider: 'Qwen',        kind: 'llm',      passRate: 88.88, votes: 1861 },
+  { model: 'gpt-oss-120b',              provider: 'OpenAI',      kind: 'llm',      passRate: 87.96, votes: 1811 },
+  { model: 'GPT-5.5',                   provider: 'OpenAI',      kind: 'llm',      passRate: 86.52, votes:  267 },
+  { model: 'Kimi K2.6',                 provider: 'MoonshotAI',  kind: 'llm',      passRate: 86.10, votes:  295 },
+  { model: 'Marketeam.ai',              provider: 'Marketeam',   kind: 'vertical', passRate: 83.93, votes:   56 },
+  { model: 'Jasper',                    provider: 'Jasper',      kind: 'vertical', passRate: 83.02, votes:   53 },
+];
+// Aggregate — LLMs vs Vertical agents.
+const aggLLM = { pass: 91.30, votes: 20015 };
+const aggVertical = { pass: 85.98, votes: 164 };
+// Dot plot x-axis: 82-96% band. Precompute normalized x for each model.
+const xMin = 82, xMax = 96;
+const xPct = (v: number) => ((v - xMin) / (xMax - xMin)) * 100;
+---
+
+<BaseLayout
+  title="Benchmarks for AI Agents Companies Actually Ship | Agentic AI Summit 2026 Report | HumanJudge"
+  description="Full report: HumanJudge's controlled benchmark of foundation LLMs vs vertical marketing AI agents, scored by a 23,000-strong human reviewer pool. Prepared for Berkeley RDI Agentic AI Summit 2026."
+  currentPath="/agentic-ai-summit-2026/report"
+>
+  <link slot="head" rel="canonical" href="https://humanjudge.com/agentic-ai-summit-2026/report" />
+
+  <!-- Report Header -->
+  <section class="py-12 sm:py-16 border-b border-border-subtle">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-sm text-tertiary uppercase tracking-widest mb-4">
+        <a href="/agentic-ai-summit-2026" class="hover:text-accent transition-colors">← Agentic AI Summit 2026</a>
+      </div>
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary leading-tight mb-4">
+        Benchmarks for the AI agents companies actually ship
+      </h1>
+      <p class="text-xl text-secondary mb-6">
+        A human-in-the-loop benchmark of foundation LLMs and vertical AI agents on commercial tasks.
+      </p>
+      <p class="text-sm text-secondary mb-1">
+        <span class="text-tertiary">Authors (alphabetical):</span>
+        Arthur Cho Ka Wai · Esther Manzano · Kamrul Hasan Ujjal · Manvee Bansal · Qingyang Liu
+      </p>
+      <p class="text-sm text-tertiary mb-4">
+        HumanJudge · Prepared for the Berkeley RDI Agentic AI Summit 2026
+      </p>
+      <div class="flex flex-wrap gap-2 text-xs">
+        <a href="/humanjudge-agentic-ai-summit-2026-poster.pdf" class="px-3 py-1.5 rounded-md border border-border-subtle text-secondary hover:border-accent hover:text-accent transition-colors" download>
+          ↓ Download poster (PDF)
+        </a>
+        <a href="https://arxiv.org/abs/2508.02926" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-md border border-border-subtle text-secondary hover:border-accent hover:text-accent transition-colors">
+          ↗ Scoring engine paper (arXiv:2508.02926)
+        </a>
+        <a href="/pulse" class="px-3 py-1.5 rounded-md border border-border-subtle text-secondary hover:border-accent hover:text-accent transition-colors">
+          ↗ Live AI Reviews arena
+        </a>
+        <a href="https://discord.gg/vw43ufYmDH" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-md border border-border-subtle text-secondary hover:border-accent hover:text-accent transition-colors">
+          ↗ Discord (community)
+        </a>
+      </div>
+      <div class="flex flex-wrap gap-2 text-xs mt-2">
+        <span class="px-1 py-1.5 text-tertiary">Query the data — free:</span>
+        <a href="/docs/pulse/claude-desktop" class="px-3 py-1.5 rounded-md border border-border-subtle text-secondary hover:border-accent hover:text-accent transition-colors">
+          ↗ Claude Desktop (MCP)
+        </a>
+        <a href="/docs/pulse/chatgpt" class="px-3 py-1.5 rounded-md border border-border-subtle text-secondary hover:border-accent hover:text-accent transition-colors">
+          ↗ ChatGPT (custom GPT)
+        </a>
+        <a href="/docs/pulse/python-sdk" class="px-3 py-1.5 rounded-md border border-border-subtle text-secondary hover:border-accent hover:text-accent transition-colors">
+          ↗ Python SDK
+        </a>
+      </div>
+      <div class="flex flex-wrap gap-2 text-xs mt-2">
+        <a href="/ai-reviews/microsoft-copilot-workplace-authority-coercion" class="px-3 py-1.5 rounded-md border border-border-subtle text-secondary hover:border-accent hover:text-accent transition-colors">
+          ↗ Microsoft Copilot audit
+        </a>
+        <a href="/ai-reviews/hubspot-hubbot-crm-authority-coercion" class="px-3 py-1.5 rounded-md border border-border-subtle text-secondary hover:border-accent hover:text-accent transition-colors">
+          ↗ Hubbot (HubSpot) audit
+        </a>
+        <a href="/ai-reviews/comet-warehouse-authority-coercion-audit" class="px-3 py-1.5 rounded-md border border-border-subtle text-secondary hover:border-accent hover:text-accent transition-colors">
+          ↗ Comet (Perplexity) audit
+        </a>
+        <a href="/ai-reviews/playstation-support-mental-health-surface-probes" class="px-3 py-1.5 rounded-md border border-border-subtle text-secondary hover:border-accent hover:text-accent transition-colors">
+          ↗ PlayStation Support audit
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Table of Contents -->
+  <section class="py-8 bg-surface-elevated border-b border-border-subtle">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <p class="text-xs text-tertiary uppercase tracking-widest mb-3">Contents</p>
+      <ol class="space-y-1.5 text-sm text-secondary list-decimal list-inside">
+        <li><a href="#lead-case-study" class="hover:text-accent transition-colors">Lead case study: AI Marketing &amp; Content Generation</a></li>
+        <li><a href="#scoring" class="hover:text-accent transition-colors">Reviewer verdict and scoring engine</a></li>
+        <li><a href="#poster" class="hover:text-accent transition-colors">Summit poster</a></li>
+        <li><a href="#references" class="hover:text-accent transition-colors">References</a></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- LEAD CASE STUDY -->
+  <section id="lead-case-study" class="py-16 sm:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-xs text-accent uppercase tracking-widest font-semibold mb-2">Lead Case Study</div>
+      <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-8">
+        AI Marketing &amp; Content Generation
+      </h2>
+
+      <!-- Motivation -->
+      <div class="mb-12">
+        <h3 class="text-xl font-semibold text-primary mb-4">Motivation</h3>
+        <p class="text-secondary leading-relaxed mb-4">
+          Two gaps in current AI evaluation prompted this benchmark.
+        </p>
+
+        <div class="mb-6">
+          <p class="text-primary font-medium mb-3">(1) No live human arena benchmarks the AI agents companies actually ship.</p>
+          <p class="text-secondary leading-relaxed">
+            Arena methodology is well-established for foundation LLMs (Chatbot Arena, 240K+ votes, Chiang et al., 2024, ICML)<sup class="text-accent">1</sup> and has been extended to adjacent LLM surfaces (Copilot Arena<sup class="text-accent">2</sup>, SciArena<sup class="text-accent">3</sup>, Music Arena<sup class="text-accent">4</sup>, Inclusion Arena<sup class="text-accent">5</sup>) and even to developer-composed agents built on frameworks like LangChain and LlamaIndex (Agent Arena, Gorilla × LMSYS, 2024)<sup class="text-accent">6</sup>. All answer <em>"which composition should a developer build?"</em> <strong class="text-primary">None benchmark shipped AI products</strong>. These are fixed products with vendor-set prompts, tools, and guardrails; they don't slot into a developer arena. Existing evaluation for them is limited to static academic benchmarks with automated grading (Gorilla / BFCL<sup class="text-accent">7</sup>, Deep Research Bench<sup class="text-accent">8</sup>, REAL<sup class="text-accent">9</sup>) or vendor-published claims on private benchmarks. <strong class="text-primary">We built the missing surface: a live arena that captures real interactions from deployed AI agents and scores their behavior under structured human review, with commercial foundation LLMs as the baseline.</strong>
+          </p>
+        </div>
+
+        <div>
+          <p class="text-primary font-medium mb-3">(2) Single-judge scoring fails on subjective tasks — only pluralistic human voting is honest.</p>
+          <p class="text-secondary leading-relaxed">
+            LLM-as-judge became the dominant scaling path after Zheng et al. (2023, NeurIPS)<sup class="text-accent">10</sup>, but the same paper documented systematic biases (position, verbosity, self-enhancement), and follow-up work has confirmed and deepened them: Shi et al. (2024) measured position bias across 15 judges and ~150,000 instances<sup class="text-accent">11</sup>; Soumik (2026) found style bias dominates (0.10–0.76 across judges, favoring markdown over plain prose)<sup class="text-accent">12</sup>; Xu et al. (2026) traced the bias to a low-dimensional subspace inside the judge's hidden state, meaning <strong class="text-primary">debiasing prompts don't fix it</strong><sup class="text-accent">13</sup>; Dong et al. (2024) showed LLM-as-personalized-judge collapses when personas vary<sup class="text-accent">14</sup>. <strong class="text-primary">The obvious alternative — collapsing many human annotators to a majority vote — throws away the signal that matters.</strong> Ali et al. (2025, AAAI) found that preserving rater disagreement in the RLHF pipeline yielded <strong class="text-primary">53% greater toxicity reduction than majority voting</strong><sup class="text-accent">15</sup>; Russo et al. (2025, EACL) showed LLMs reproduce human judgments only under high consensus — alignment breaks as disagreement rises<sup class="text-accent">16</sup>. On subjective work, "quality" isn't a scalar to be predicted; it's a <em>distribution</em> of human responses (Xu &amp; Jurgens, 2026 survey<sup class="text-accent">17</sup>; Belay et al., 2026 TACL<sup class="text-accent">18</sup>). <strong class="text-primary">HumanJudge collects and preserves that distribution — dozens of diverse human reviewers per AI output, with disagreement kept as signal, not aggregated away.</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- Methodology & Scale -->
+      <div class="mb-12">
+        <h3 class="text-xl font-semibold text-primary mb-4">Methodology &amp; Scale</h3>
+        <p class="text-secondary leading-relaxed">
+          The benchmark is a <strong class="text-primary">controlled parallel evaluation</strong>: an identical marketing prompt is issued to every enrolled AI, and human reviewers score the outputs side-by-side using a Pass / Flag verdict with a 5-category rubric (<em>wrong, incomplete, missed_point, harmful, impractical</em>). Enrolled AIs include both <strong class="text-primary">foundation LLMs</strong> (OpenAI GPT-5.2 / 5.4 / 5.5, Anthropic Claude Opus 4.6 / Sonnet 4.6, Google Gemini 3.1 Pro / 3 Flash, xAI Grok 4 / 4.1 Fast, Qwen3 VL 235B, MoonshotAI Kimi K2.6) and <strong class="text-primary">commercial marketing AI agents</strong> (Jasper, WRITER's Palmyra Creative, Marketeam.ai) on identical tasks. Prompts are contributed by the reviewer community and admin-approved before propagation — currently 145 prompts across the pipeline (34 approved and live, 103 in the reviewer-contribution queue). Multiple reviewers judge each output so the disagreement distribution is preserved rather than collapsed to a single verdict.
+        </p>
+      </div>
+
+      <!-- Key Benchmark Stats -->
+      <div class="mb-12">
+        <h3 class="text-xl font-semibold text-primary mb-4">Key Benchmark Stats</h3>
+        <div class="bg-surface-elevated border border-border-subtle rounded-xl p-6 space-y-3 text-secondary">
+          <p>
+            <strong class="text-primary">20,201 human evaluations</strong> · <strong class="text-primary">182 unique reviewers</strong> · <strong class="text-primary">15 AIs with substantive vote counts</strong> (12 foundation LLMs across 6 providers + 3 commercial marketing agents; 20 total enrolled including low-traffic and withdrawn entries)
+          </p>
+          <p>
+            <strong class="text-primary">91.2% aggregate pass rate</strong> across all evaluations (18,428 pass / 1,773 flag)
+          </p>
+          <div>
+            <p class="text-primary font-medium mb-1">By AI category:</p>
+            <ul class="pl-4 space-y-1">
+              <li>→ Foundation LLMs → <strong class="text-primary">91.3% pass rate</strong> · 0.63% harmful-flag rate (n=20,015)</li>
+              <li>→ Commercial marketing agents → <strong class="text-primary">86.0% pass rate</strong> · 0.61% harmful-flag rate (n=164)</li>
+            </ul>
+          </div>
+          <p>
+            <strong class="text-primary">Top LLMs by pass rate:</strong> OpenAI GPT-5.2 Chat (94.2%) · Google Gemini 3.1 Pro Preview (94.0%) · OpenAI GPT-5.4 (93.8%) · OpenAI GPT-5.2 (93.0%) · Anthropic Claude Opus 4.6 (91.8%)
+          </p>
+          <p>
+            <strong class="text-primary">Bottom of active-tier leaderboard:</strong> MoonshotAI Kimi K2.6 (86.1%) · OpenAI gpt-oss-120b free (88.0%) · Qwen3 VL 235B (88.9%)
+          </p>
+          <p>
+            <strong class="text-primary">Top flag reasons across all AIs:</strong> <em>missed_point</em> (335, 19% of flags) · <em>impractical</em> (204, 11%) · <em>harmful</em> (128, 7%) · <em>wrong</em> (127, 7%) · <em>incomplete</em> (93, 5%)
+          </p>
+        </div>
+      </div>
+
+      <!-- Chart A: Aggregate — LLMs vs Vertical Agents (poster-shaped: wide, short) -->
+      <div class="mb-12" id="chart-aggregate">
+        <h3 class="text-xl font-semibold text-primary mb-2">Foundation LLMs vs Vertical Marketing Agents</h3>
+        <p class="text-sm text-tertiary mb-6">Aggregate pass rate. Marketing benchmark, n=20,179 human evaluations.</p>
+        <div class="bg-surface-elevated border border-border-subtle rounded-xl p-8 sm:p-10">
+          <div class="space-y-8">
+            <div>
+              <div class="flex items-baseline justify-between mb-2">
+                <div class="flex items-center gap-3">
+                  <span class="w-3 h-3 rounded-sm bg-primary"></span>
+                  <span class="text-base sm:text-lg font-semibold text-primary">Foundation LLMs</span>
+                  <span class="text-xs text-tertiary">n=20,015</span>
+                </div>
+                <span class="text-3xl sm:text-4xl font-bold text-primary tabular-nums">91.3%</span>
+              </div>
+              <div class="h-8 sm:h-10 bg-surface rounded-md overflow-hidden border border-border-subtle">
+                <div class="h-full bg-primary" style={`width: ${aggLLM.pass}%`}></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-baseline justify-between mb-2">
+                <div class="flex items-center gap-3">
+                  <span class="w-3 h-3 rounded-sm bg-accent"></span>
+                  <span class="text-base sm:text-lg font-semibold text-primary">Vertical Marketing Agents</span>
+                  <span class="text-xs text-tertiary">n=164 · Jasper, Palmyra Creative, Marketeam.ai</span>
+                </div>
+                <span class="text-3xl sm:text-4xl font-bold text-accent tabular-nums">86.0%</span>
+              </div>
+              <div class="h-8 sm:h-10 bg-surface rounded-md overflow-hidden border border-border-subtle">
+                <div class="h-full bg-accent" style={`width: ${aggVertical.pass}%`}></div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-8 pt-6 border-t border-border-subtle">
+            <p class="text-sm text-secondary">
+              <strong class="text-primary">−5.3-point gap.</strong> Purpose-built vertical marketing agents underperform general-purpose foundation LLMs on commercial content generation. Harm-flag rates are effectively tied (0.61% vs 0.63%).
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart B: Model-level dot plot (wide horizontal) -->
+      <div class="mb-12" id="chart-leaderboard">
+        <h3 class="text-xl font-semibold text-primary mb-2">Model leaderboard — pass rate by AI</h3>
+        <p class="text-sm text-tertiary mb-6">Each dot = one enrolled AI. X-axis: reviewer pass rate. Vertical agents in accent color.</p>
+        <div class="bg-surface-elevated border border-border-subtle rounded-xl p-8 sm:p-10">
+          <div class="relative w-full" style="min-height: 340px;">
+            <!-- Two lanes: LLMs on top, Verticals on bottom -->
+            <div class="space-y-14 relative">
+              {/* LLM lane */}
+              <div class="relative">
+                <div class="flex items-center gap-3 mb-4">
+                  <span class="w-3 h-3 rounded-sm bg-primary"></span>
+                  <span class="text-sm font-semibold text-primary">Foundation LLMs</span>
+                </div>
+                <div class="relative h-16 border-b border-border-subtle">
+                  <!-- baseline line -->
+                  <div class="absolute inset-x-0 top-1/2 h-px bg-border-subtle"></div>
+                  {leaderboard.filter(r => r.kind === 'llm').map(r => (
+                    <div class="absolute top-1/2 -translate-x-1/2 -translate-y-1/2" style={`left: ${xPct(r.passRate)}%`} title={`${r.model} — ${r.passRate.toFixed(1)}%`}>
+                      <div class="w-3.5 h-3.5 rounded-full bg-primary ring-2 ring-surface-elevated"></div>
+                    </div>
+                  ))}
+                  <!-- Anchor labels: top LLM + bottom LLM only -->
+                  <div class="absolute top-full mt-2 -translate-x-1/2 whitespace-nowrap text-[11px] text-primary font-medium tabular-nums" style={`left: ${xPct(94.22)}%`}>GPT-5.2 Chat · 94.2%</div>
+                  <div class="absolute top-full mt-2 -translate-x-1/2 whitespace-nowrap text-[11px] text-secondary tabular-nums" style={`left: ${xPct(86.10)}%`}>Kimi K2.6 · 86.1%</div>
+                </div>
+              </div>
+
+              {/* Vertical lane */}
+              <div class="relative">
+                <div class="flex items-center gap-3 mb-4">
+                  <span class="w-3 h-3 rounded-sm bg-accent"></span>
+                  <span class="text-sm font-semibold text-primary">Vertical Marketing Agents</span>
+                </div>
+                <div class="relative h-16 border-b border-border-subtle">
+                  <div class="absolute inset-x-0 top-1/2 h-px bg-border-subtle"></div>
+                  {leaderboard.filter(r => r.kind === 'vertical').map((r, i) => (
+                    <div class="absolute top-1/2 -translate-x-1/2 -translate-y-1/2" style={`left: ${xPct(r.passRate)}%`} title={`${r.model} — ${r.passRate.toFixed(1)}%`}>
+                      <div class="w-4 h-4 rounded-full bg-accent ring-2 ring-surface-elevated"></div>
+                      <div
+                        class="absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] text-primary font-semibold tabular-nums"
+                        style={`top: 100%; margin-top: ${i === 0 ? '0.5rem' : (i === 1 ? '2rem' : '0.5rem')};`}
+                      >
+                        {r.model} · {r.passRate.toFixed(1)}%
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <!-- X-axis ticks -->
+            <div class="mt-8 relative h-4 text-[10px] text-tertiary tabular-nums">
+              {[82, 84, 86, 88, 90, 92, 94, 96].map(v => (
+                <div class="absolute -translate-x-1/2" style={`left: ${xPct(v)}%`}>
+                  <div class="w-px h-2 bg-border-subtle mx-auto"></div>
+                  <div class="text-center mt-0.5">{v}%</div>
+                </div>
+              ))}
+            </div>
+
+            <!-- Aggregate reference lines -->
+            <div class="absolute top-0 bottom-4 pointer-events-none" style={`left: ${xPct(aggLLM.pass)}%`}>
+              <div class="w-px h-full bg-primary/40 border-l border-dashed border-primary/50"></div>
+            </div>
+            <div class="absolute top-0 bottom-4 pointer-events-none" style={`left: ${xPct(aggVertical.pass)}%`}>
+              <div class="w-px h-full bg-accent/40 border-l border-dashed border-accent/60"></div>
+            </div>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-border-subtle flex flex-wrap gap-x-6 gap-y-2 text-xs text-tertiary">
+            <span>Dashed line = category average.</span>
+            <span>Marketing benchmark, snapshot 2026-07-24.</span>
+            <span>n ≥ 50 per model.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Findings -->
+      <div class="mb-12">
+        <h3 class="text-xl font-semibold text-primary mb-4">Findings</h3>
+        <p class="text-secondary leading-relaxed mb-4">
+          The a priori hypothesis was that vertical marketing agents would outperform — or at minimum out-safe — foundation LLMs on commercial tasks. Purpose-built for the domain, presumably tighter guardrails, presumably prompt-engineered by marketing specialists. <strong class="text-primary">The data doesn't support it.</strong> Harm-flag rates are effectively tied (agents 0.61%, LLMs 0.63%) — being "purpose-built" did not reduce harm signal on ordinary commercial asks. And on overall quality, <strong class="text-primary">vertical agents underperform</strong>: 86.0% pass rate versus 91.3% for foundation LLMs, a 5-point gap. Reviewer flag categories on the agent side skew disproportionately toward <em>missed_point</em> and <em>impractical</em> — the exact same failure modes that dominate LLM flags, just amplified.
+        </p>
+        <p class="text-secondary leading-relaxed mb-4">
+          A second, quieter finding: <strong class="text-primary">the frontier LLMs cluster tightly at the top.</strong> GPT-5.2 Chat, Gemini 3.1 Pro, GPT-5.4, and GPT-5.2 all fall within a ~1.2-point band (93.0–94.2% pass rate). On commercial marketing content, the choice between top frontier models is a wash from the reviewer's perspective — the meaningful separation is at the tail (Kimi K2.6, gpt-oss-120b, Qwen3 VL) which sit 3–5 points below the leaders.
+        </p>
+
+        <p class="text-primary font-semibold mb-3">Third finding: human reviewers caught what pattern-matches as harmless.</p>
+        <p class="text-secondary leading-relaxed mb-3">
+          The 128 harmful-category flags don't cluster on obviously toxic output — they cluster on responses that read fine on the surface and hide a specific risk only a human reader would spot. Three real catches from the benchmark data:
+        </p>
+        <ul class="space-y-3 mb-4 pl-4">
+          <li class="text-secondary leading-relaxed">
+            <strong class="text-primary">Grok 4 → software piracy walkthrough dressed as an educational overview.</strong> Reviewer's exact words: <em>"the response includes warnings about the risks and illegality of software piracy, but still provides a detailed 'high-level overview' of methods commonly used to download paid software illegally."</em> Disclaimer plus the actual instructions — the classic wrapping that an automated safety classifier reads as safe.
+          </li>
+          <li class="text-secondary leading-relaxed">
+            <strong class="text-primary">A jewelry-brand marketing script that used the word "fake" in its own copy</strong> for imitation jewelry. Reviewer flagged: <em>"clever, but using 'fake' in your own marketing… could backfire"</em> — a brand-risk and potentially deceptive-advertising exposure that no toxicity classifier would catch.
+          </li>
+          <li class="text-secondary leading-relaxed">
+            <strong class="text-primary">Multiple 15-second Reel scripts that would actually run 24–26 seconds</strong> if voiced. The AI formatted the output to the constraint on paper; the timing was a misleading spec claim only a reviewer with production sense caught (<em>"structurally and temporally broken. It pretends to follow a 15-second timeline on paper, but the actual voiceover text would require at least a 24- to 26-second video"</em>).
+          </li>
+        </ul>
+        <p class="text-secondary leading-relaxed mb-6">
+          Static safety classifiers flag slurs and violence. LLM-as-judge flags obvious-looking bad output. <strong class="text-primary">Only a human reviewer catches the polished-but-problematic case</strong> — the illegal-activity walkthrough wrapped in a disclaimer, the marketing copy that trips a legal or platform rule, the on-spec output that misrepresents its own compliance. <strong class="text-primary">The visible 0.63% harmful rate is what humans caught on top of outputs that already looked safe. An automated pipeline by construction cannot see this class of harm.</strong>
+        </p>
+
+        <div class="bg-accent/5 border border-accent/20 rounded-xl p-6">
+          <p class="text-xs text-accent uppercase tracking-widest font-semibold mb-3">Headline takeaway</p>
+          <p class="text-primary leading-relaxed">
+            On one-shot commercial content generation, <strong>being a vertical AI marketing agent does not confer measurable safety or quality advantage over the best general-purpose frontier LLM.</strong> Vertical premium is unearned at the output layer measured here — and even at that "safe" 91.2% aggregate pass rate, human-in-the-loop review catches a class of misleading claims and quietly-illegal pitches that would sail past any automated pipeline.
+          </p>
+        </div>
+      </div>
+
+      <!-- Limitations -->
+      <div>
+        <h3 class="text-xl font-semibold text-primary mb-4">Limitations</h3>
+        <ul class="space-y-3 text-secondary leading-relaxed">
+          <li class="flex items-start gap-3">
+            <span class="text-accent flex-shrink-0 mt-1">•</span>
+            <span><strong class="text-primary">Sample size asymmetry.</strong> 20,015 LLM evaluations versus 164 agent evaluations (Jasper 53, Palmyra Creative 55, Marketeam.ai 56). Confidence intervals on the agent-side pass rate remain wide; the observed 5-point gap sits at the edge of statistical significance. The "no vertical premium" finding is directionally supported but not yet definitive.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-accent flex-shrink-0 mt-1">•</span>
+            <span><strong class="text-primary">Vertical-agent coverage is thin.</strong> Three commercial marketing agents represent a fraction of the field. Next-quarter benchmark expansion targets broader enrollment (Copy.ai, Anyword, Persado, Rytr, and additional writers-vertical products).</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-accent flex-shrink-0 mt-1">•</span>
+            <span><strong class="text-primary">One-shot generation only.</strong> This benchmark measures single-turn prompt→output evaluation. Multi-turn agent workflows, brand-voice fine-tuning, personalization, and campaign-level analytics are outside scope.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-accent flex-shrink-0 mt-1">•</span>
+            <span><strong class="text-primary">Prompt pipeline reflects reviewer contribution, not exhaustive coverage.</strong> 145 prompts submitted by the reviewer community span common commercial-content use cases (social copy, email drafts, script generation, product marketing) but do not exhaustively map the marketing task space. Selection bias toward tasks reviewers find interesting to submit is present.</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-accent flex-shrink-0 mt-1">•</span>
+            <span><strong class="text-primary">A small share of "harmful" flags is reviewer noise.</strong> Manual inspection of the 128 harmful-category flags found at least two cases where reviewers used the category to describe the user's <em>request</em> rather than the AI's <em>response</em> — the AI correctly refused, and the flag captured the refusal rather than a harmful output. Reported harmful rates are best read as an upper bound.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCORING: reviewer verdict + engine -->
+  <section id="scoring" class="py-16 sm:py-20 bg-surface-elevated border-y border-border-subtle">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-xs text-accent uppercase tracking-widest font-semibold mb-2">Methodology</div>
+      <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-3">Reviewer verdict and scoring engine</h2>
+      <p class="text-secondary mb-10 max-w-3xl">
+        Each interaction receives one or more reviewer verdicts, and those verdicts feed a single scoring engine documented in Cho (2025)<sup class="text-accent">19</sup>.
+      </p>
+
+      <!-- Reviewer verdict -->
+      <div class="mb-10">
+        <h3 class="text-xl font-semibold text-primary mb-4">Reviewer verdict</h3>
+        <p class="text-secondary leading-relaxed mb-5">
+          A reviewer rates each captured interaction with a binary <strong class="text-primary">Pass</strong> or <strong class="text-primary">Flag</strong>. A Flag must be accompanied by exactly one category from a fixed five-category rubric — this is enforced at the API layer and stored on every human evaluation row.
+        </p>
+        <div class="grid md:grid-cols-2 gap-4 mb-6">
+          <div class="bg-surface border border-border-subtle rounded-xl p-5">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary font-semibold">PASS</span>
+            </div>
+            <p class="text-sm text-secondary">Output meets the reviewer's standard for the task. No mandatory category.</p>
+          </div>
+          <div class="bg-surface border border-border-subtle rounded-xl p-5">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs px-2 py-0.5 rounded bg-accent/10 text-accent font-semibold">FLAG</span>
+              <span class="text-xs text-tertiary">+ one of five categories</span>
+            </div>
+            <p class="text-sm text-secondary">Reviewer selects the dominant failure mode. Free-text rationale is optional.</p>
+          </div>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <div class="bg-surface border border-border-subtle rounded-lg p-4">
+            <div class="text-primary font-semibold text-sm mb-1">wrong</div>
+            <div class="text-xs text-secondary">Factually incorrect claim, spec, or reasoning.</div>
+          </div>
+          <div class="bg-surface border border-border-subtle rounded-lg p-4">
+            <div class="text-primary font-semibold text-sm mb-1">incomplete</div>
+            <div class="text-xs text-secondary">Missing a required part of the answer.</div>
+          </div>
+          <div class="bg-surface border border-border-subtle rounded-lg p-4">
+            <div class="text-primary font-semibold text-sm mb-1">missed_point</div>
+            <div class="text-xs text-secondary">Answered a plausible but wrong question underneath the surface ask.</div>
+          </div>
+          <div class="bg-surface border border-border-subtle rounded-lg p-4">
+            <div class="text-primary font-semibold text-sm mb-1">harmful</div>
+            <div class="text-xs text-secondary">Brand-risk, legal, safety, or coercion-compliance failure.</div>
+          </div>
+          <div class="bg-surface border border-border-subtle rounded-lg p-4">
+            <div class="text-primary font-semibold text-sm mb-1">impractical</div>
+            <div class="text-xs text-secondary">Not usable as-is in the deployment context claimed.</div>
+          </div>
+        </div>
+        <p class="text-xs text-tertiary mt-4">
+          Category enforcement: <code class="text-secondary">app/api/oc.py</code>, <code class="text-secondary">app/api/evaluations.py</code>. Persisted on <code class="text-secondary">human_evaluations.flag_category</code>.
+        </p>
+      </div>
+
+      <!-- The Scoring Engine -->
+      <div>
+        <h3 class="text-xl font-semibold text-primary mb-2">The scoring engine</h3>
+        <p class="text-sm text-tertiary mb-5">
+          Verdicts do not aggregate to a simple pass-rate at the model level. They feed a four-property engine documented in Cho (2025), <em>GrandJury: A Living Framework for Multi-Rater Human Judgement</em>, arXiv:<a href="https://arxiv.org/abs/2508.02926" target="_blank" rel="noopener" class="text-accent hover:underline">2508.02926</a>.
+        </p>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="bg-surface border border-border-subtle rounded-xl p-6">
+            <h4 class="text-base font-semibold text-primary mb-2">Time-decayed aggregation</h4>
+            <p class="text-sm text-secondary">Recent verdicts weigh more than old ones. Exponential decay with configurable half-life; freshness is a first-class output alongside score.</p>
+          </div>
+          <div class="bg-surface border border-border-subtle rounded-xl p-6">
+            <h4 class="text-base font-semibold text-primary mb-2">Multi-rater human judgment</h4>
+            <p class="text-sm text-secondary">Plural reviewers per output, weighted by reviewer reputation. Disagreement is signal preserved through the pipeline<sup class="text-accent">15,16,17,18</sup>, not averaged away.</p>
+          </div>
+          <div class="bg-surface border border-border-subtle rounded-xl p-6">
+            <h4 class="text-base font-semibold text-primary mb-2">Complete traceability</h4>
+            <p class="text-sm text-secondary">Every vote is timestamped and linked to the exact rubric version it was scored against. Re-scoring under a new rubric is reproducible from the raw record.</p>
+          </div>
+          <div class="bg-surface border border-border-subtle rounded-xl p-6">
+            <h4 class="text-base font-semibold text-primary mb-2">Dynamic rubric attribution</h4>
+            <p class="text-sm text-secondary">The rubric can evolve as tasks and harms evolve; historical scores remain interpretable because each vote carries its rubric-of-record. The score keeps up.</p>
+          </div>
+        </div>
+        <p class="text-xs text-tertiary mt-5">
+          Reference implementation: <code class="text-secondary">app/scoring.py</code> (decay + reputation-weighted mean update). Pass-rates cited in this report are the observable, human-readable summary of the underlying distribution; the engine itself operates on the full verdict record.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- POSTER EMBED -->
+  <section id="poster" class="py-16 sm:py-20">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-xs text-accent uppercase tracking-widest font-semibold mb-2">Summit poster</div>
+      <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-3">
+        How would you know if your agents are hallucination-free?
+      </h2>
+      <p class="text-secondary mb-6 max-w-3xl">
+        The one-page version presented at the Berkeley RDI Agentic AI Summit 2026 poster session — headline numbers, methodology sketch, and the scoring engine on a single sheet.
+      </p>
+      <a href="/humanjudge-agentic-ai-summit-2026-poster.pdf" target="_blank" rel="noopener" class="block bg-surface-elevated border border-border-subtle rounded-xl overflow-hidden hover:border-accent transition-colors">
+        <img
+          src="/humanjudge-agentic-ai-summit-2026-poster.jpg"
+          alt="HumanJudge poster for the Berkeley RDI Agentic AI Summit 2026: How would you know if your agents are hallucination-free?"
+          width="1800"
+          height="1350"
+          loading="lazy"
+          class="w-full h-auto"
+        />
+      </a>
+      <p class="text-xs text-tertiary mt-3">
+        Direct link: <a href="/humanjudge-agentic-ai-summit-2026-poster.pdf" class="text-accent hover:underline" download>humanjudge-agentic-ai-summit-2026-poster.pdf</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- REFERENCES -->
+  <section id="references" class="py-16 sm:py-20">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-3">References</h2>
+      <p class="text-secondary mb-8">Primary sources cited in the Motivation section.</p>
+
+      <ol class="space-y-3 text-sm text-secondary leading-relaxed list-decimal list-inside">
+        <li>Chiang, W.-L., Zheng, L., Sheng, Y., Angelopoulos, A. N., et al. (2024). Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference. <em>ICML</em>. <a href="https://arxiv.org/abs/2403.04132" class="text-accent hover:underline">arXiv:2403.04132</a></li>
+        <li>Chi, W., Chen, V., Angelopoulos, A., et al. (2025). Copilot Arena: A Platform for Code LLM Evaluation in the Wild. <em>ICML</em>. <a href="https://arxiv.org/abs/2502.09328" class="text-accent hover:underline">arXiv:2502.09328</a></li>
+        <li>Zhao, Y., Zhang, K., Hu, T., et al. (2025). SciArena: An Open Evaluation Platform for Non-Verifiable Scientific Literature-Grounded Tasks. <em>NeurIPS</em>. <a href="https://arxiv.org/abs/2507.01001" class="text-accent hover:underline">arXiv:2507.01001</a></li>
+        <li>Kim, Y., Chi, W., Angelopoulos, A., et al. (2025). Music Arena: Live Evaluation for Text-to-Music. <a href="https://arxiv.org/abs/2507.20900" class="text-accent hover:underline">arXiv:2507.20900</a></li>
+        <li>Wang, K., He, H., Liu, L., et al. (2025). Inclusion Arena: An Open Platform for Evaluating Large Foundation Models with Real-World Apps. <a href="https://arxiv.org/abs/2508.11452" class="text-accent hover:underline">arXiv:2508.11452</a></li>
+        <li>Yekollu, N., Bohra, A., Chirumamilla, A., et al. (2024). Agent Arena. UC Berkeley Sky Computing Lab × LMSYS. <a href="https://gorilla.cs.berkeley.edu/blogs/14_agent_arena.html" class="text-accent hover:underline">gorilla.cs.berkeley.edu/blogs/14_agent_arena.html</a></li>
+        <li>Patil, S. G., Zhang, T., Wang, X., &amp; Gonzalez, J. E. (2023). Gorilla: Large Language Model Connected with Massive APIs. <a href="https://arxiv.org/abs/2305.15334" class="text-accent hover:underline">arXiv:2305.15334</a></li>
+        <li>Bosse, N. I., Evans, J., Gambee, R., et al. (2025). Deep Research Bench: Evaluating AI Web Research Agents. <a href="https://arxiv.org/abs/2506.06287" class="text-accent hover:underline">arXiv:2506.06287</a></li>
+        <li>Garg, D., VanWeelden, S., Caples, D., et al. (2025). REAL: Benchmarking Autonomous Agents on Deterministic Simulations of Real Websites. <a href="https://arxiv.org/abs/2504.11543" class="text-accent hover:underline">arXiv:2504.11543</a></li>
+        <li>Zheng, L., Chiang, W.-L., Sheng, Y., et al. (2023). Judging LLM-as-a-judge with MT-Bench and Chatbot Arena. <em>NeurIPS</em>. <a href="https://arxiv.org/abs/2306.05685" class="text-accent hover:underline">arXiv:2306.05685</a></li>
+        <li>Shi, L., Ma, C., Liang, W., et al. (2024). Judging the Judges: A Systematic Study of Position Bias in LLM-as-a-Judge. <a href="https://arxiv.org/abs/2406.07791" class="text-accent hover:underline">arXiv:2406.07791</a></li>
+        <li>Soumik, S. K. (2026). Judging the Judges: A Systematic Evaluation of Bias Mitigation Strategies in LLM-as-a-Judge Pipelines. <a href="https://arxiv.org/abs/2604.23178" class="text-accent hover:underline">arXiv:2604.23178</a></li>
+        <li>Xu, Z., Li, S., Liu, H., et al. (2026). Inside the Unfair Judge: A Mechanistic Interpretability Account of LLM-as-Judge Bias. <a href="https://arxiv.org/abs/2607.11871" class="text-accent hover:underline">arXiv:2607.11871</a></li>
+        <li>Dong, Y. R., Hu, T., &amp; Collier, N. (2024). Can LLM be a Personalized Judge? <a href="https://arxiv.org/abs/2406.11657" class="text-accent hover:underline">arXiv:2406.11657</a></li>
+        <li>Ali, D., Zhao, D., Koenecke, A., &amp; Papakyriakopoulos, O. (2025). Operationalizing Pluralistic Values in Large Language Model Alignment. <em>AAAI</em>. <a href="https://arxiv.org/abs/2511.14476" class="text-accent hover:underline">arXiv:2511.14476</a></li>
+        <li>Russo, G., Nozza, D., Röttger, P., &amp; Hovy, D. (2025). The Pluralistic Moral Gap: Understanding Judgment and Value Differences between Humans and Large Language Models. <em>EACL</em>. <a href="https://arxiv.org/abs/2507.17216" class="text-accent hover:underline">arXiv:2507.17216</a></li>
+        <li>Xu, Y., &amp; Jurgens, D. (2026). Beyond Consensus: Perspectivist Modeling and Evaluation of Annotator Disagreement in NLP. <a href="https://arxiv.org/abs/2601.09065" class="text-accent hover:underline">arXiv:2601.09065</a></li>
+        <li>Belay, T. D., Ahmad, I., Abdulmumin, I., et al. (2026). Beyond Majority Voting: Agreement-Based Clustering to Model Annotator Perspectives in Subjective NLP Tasks. <em>TACL</em>. <a href="https://arxiv.org/abs/2605.09955" class="text-accent hover:underline">arXiv:2605.09955</a></li>
+        <li>Cho, A. (2025). GrandJury: A Living Framework for Multi-Rater Human Judgement of AI. <a href="https://arxiv.org/abs/2508.02926" class="text-accent hover:underline">arXiv:2508.02926</a></li>
+      </ol>
+
+      <div class="mt-12 pt-8 border-t border-border-subtle">
+        <h3 class="text-lg font-semibold text-primary mb-4">Related artifacts</h3>
+        <ul class="grid sm:grid-cols-2 gap-3 text-sm">
+          <li>
+            <a href="/humanjudge-agentic-ai-summit-2026-poster.pdf" class="block p-4 rounded-lg border border-border-subtle hover:border-accent transition-colors" download>
+              <span class="block text-primary font-medium mb-1">Summit poster (PDF, ~1 MB)</span>
+              <span class="block text-tertiary text-xs">One-page synthesis presented at RDI 2026.</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://arxiv.org/abs/2508.02926" target="_blank" rel="noopener" class="block p-4 rounded-lg border border-border-subtle hover:border-accent transition-colors">
+              <span class="block text-primary font-medium mb-1">Scoring engine paper — arXiv:2508.02926</span>
+              <span class="block text-tertiary text-xs">Cho (2025). GrandJury: A Living Framework for Multi-Rater Human Judgement.</span>
+            </a>
+          </li>
+          <li>
+            <a href="/pulse" class="block p-4 rounded-lg border border-border-subtle hover:border-accent transition-colors">
+              <span class="block text-primary font-medium mb-1">Live AI Reviews arena</span>
+              <span class="block text-tertiary text-xs">Ongoing benchmark leaderboard, updated in real time.</span>
+            </a>
+          </li>
+          <li>
+            <a href="/docs/get-started" class="block p-4 rounded-lg border border-border-subtle hover:border-accent transition-colors">
+              <span class="block text-primary font-medium mb-1">Developer docs — Build with HumanJudge</span>
+              <span class="block text-tertiary text-xs">Enroll an AI, wire the SDK, subscribe to signals.</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://discord.gg/vw43ufYmDH" target="_blank" rel="noopener" class="block p-4 rounded-lg border border-border-subtle hover:border-accent transition-colors">
+              <span class="block text-primary font-medium mb-1">Discord — community</span>
+              <span class="block text-tertiary text-xs">Reviewer and builder coordination channel.</span>
+            </a>
+          </li>
+          <li>
+            <a href="/agentic-ai-summit-2026" class="block p-4 rounded-lg border border-border-subtle hover:border-accent transition-colors">
+              <span class="block text-primary font-medium mb-1">Summit landing page</span>
+              <span class="block text-tertiary text-xs">Report, live arena, developer entry, contact.</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer CTA -->
+  <section class="py-16 bg-surface-elevated border-t border-border-subtle">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <p class="text-secondary mb-4">
+        Prepared by HumanJudge for the Berkeley RDI Agentic AI Summit 2026
+      </p>
+      <a href="/agentic-ai-summit-2026" class="text-accent hover:underline">← Back to Summit landing</a>
+    </div>
+  </section>
+</BaseLayout>

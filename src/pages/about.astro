@@ -1,0 +1,491 @@
+---
+export const prerender = true;
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TrustLoopEcosystem from '../components/TrustLoopEcosystem.astro';
+---
+
+<BaseLayout
+  title="About HumanJudge | Defining the Standard for Human-AI Trust"
+  description="AI is everywhere, but trust is still missing. HumanJudge is building public infrastructure where every AI judgment is recorded, attributed, and rewarded. Founded by Arthur Cho."
+  currentPath="/about"
+>
+  <!-- Canonical URL -->
+  <link slot="head" rel="canonical" href="https://humanjudge.com/about" />
+
+  <!-- Organization + Person Schema for SEO -->
+  <script type="application/ld+json" slot="head">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "HumanJudge",
+    "url": "https://humanjudge.com",
+    "logo": "https://humanjudge.com/logo.png",
+    "description": "Public platform for AI evaluation where every judgment is recorded, attributed, and rewarded.",
+    "founder": {
+      "@type": "Person",
+      "name": "Arthur Cho",
+      "jobTitle": "Founder",
+      "url": "https://arthurcho.notion.site/",
+      "sameAs": [
+        "https://www.linkedin.com/in/ai-ml-product-arthur-cho/",
+        "https://arxiv.org/abs/2508.02926"
+      ],
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "University of Michigan"
+      }
+    },
+    "sameAs": [
+      "https://arxiv.org/abs/2508.02926"
+    ]
+  }
+  </script>
+
+  <!-- Navigation Dots -->
+  <nav class="fixed right-6 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col gap-3" id="scroll-nav">
+    <button data-section="0" class="scroll-dot w-3 h-3 rounded-full bg-secondary/30 hover:bg-accent/50 transition-colors" aria-label="Hero"></button>
+    <button data-section="1" class="scroll-dot w-3 h-3 rounded-full bg-secondary/30 hover:bg-accent/50 transition-colors" aria-label="Setup"></button>
+    <button data-section="2" class="scroll-dot w-3 h-3 rounded-full bg-secondary/30 hover:bg-accent/50 transition-colors" aria-label="Problem 1"></button>
+    <button data-section="3" class="scroll-dot w-3 h-3 rounded-full bg-secondary/30 hover:bg-accent/50 transition-colors" aria-label="Problem 2"></button>
+    <button data-section="4" class="scroll-dot w-3 h-3 rounded-full bg-secondary/30 hover:bg-accent/50 transition-colors" aria-label="Problem 3"></button>
+    <button data-section="5" class="scroll-dot w-3 h-3 rounded-full bg-secondary/30 hover:bg-accent/50 transition-colors" aria-label="Insight"></button>
+    <button data-section="6" class="scroll-dot w-3 h-3 rounded-full bg-secondary/30 hover:bg-accent/50 transition-colors" aria-label="How It Works"></button>
+    <button data-section="7" class="scroll-dot w-3 h-3 rounded-full bg-secondary/30 hover:bg-accent/50 transition-colors" aria-label="Our Approach"></button>
+    <button data-section="8" class="scroll-dot w-3 h-3 rounded-full bg-secondary/30 hover:bg-accent/50 transition-colors" aria-label="Values"></button>
+    <button data-section="9" class="scroll-dot w-3 h-3 rounded-full bg-secondary/30 hover:bg-accent/50 transition-colors" aria-label="Origin"></button>
+    <button data-section="10" class="scroll-dot w-3 h-3 rounded-full bg-secondary/30 hover:bg-accent/50 transition-colors" aria-label="Founder"></button>
+    <button data-section="11" class="scroll-dot w-3 h-3 rounded-full bg-secondary/30 hover:bg-accent/50 transition-colors" aria-label="Contact"></button>
+  </nav>
+
+  <!-- Scroll Container -->
+  <div class="scroll-container" id="scroll-container">
+
+    <!-- Section 1: Hero -->
+    <section class="scroll-section flex items-center justify-center" id="section-0">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-primary mb-6 animate-fade-up">
+          Defining the standard for human-AI trust.
+        </h1>
+        <p class="text-xl text-secondary max-w-2xl mx-auto animate-fade-up animation-delay-200">
+          We help people define what trustworthy AI looks like — publicly, transparently, together.
+        </p>
+        <div class="mt-12 animate-bounce">
+          <svg class="w-6 h-6 mx-auto text-secondary/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Setup - The Context -->
+    <section class="scroll-section flex items-center justify-center bg-surface-elevated" id="section-1">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal-section">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-primary mb-8 reveal-item">
+          AI is everywhere.
+        </h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent mb-12 reveal-item reveal-delay-1">
+          Trust is missing.
+        </h2>
+        <p class="text-xl sm:text-2xl text-secondary reveal-item reveal-delay-2">
+          Who decides if AI gets it right?
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 3: Problem - 95% Stat -->
+    <section class="scroll-section flex items-center justify-center" id="section-2">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal-section">
+        <div class="mb-8">
+          <span class="text-8xl sm:text-9xl font-bold text-accent counter" data-target="95">0</span>
+          <span class="text-6xl sm:text-7xl font-bold text-accent">%</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-primary mb-6 reveal-item">
+          of gen-AI pilots yield no business impact.
+        </h2>
+        <p class="text-lg text-secondary reveal-item reveal-delay-1">
+          Not because the AI is bad — but because <span class="text-primary font-medium">trust is hard to build and easy to break</span>.
+        </p>
+        <p class="mt-6 text-sm text-secondary/60 reveal-item reveal-delay-2">
+          <a href="https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/" target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-colors">
+            Source: MIT Report, August 2025 →
+          </a>
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 4: Problem - Lawsuits -->
+    <section class="scroll-section flex items-center justify-center bg-surface-elevated" id="section-3">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal-section">
+        <div class="text-7xl mb-8 reveal-item">⚖️</div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-primary mb-6 reveal-item reveal-delay-1">
+          "May be wrong" isn't accountability.
+        </h2>
+        <p class="text-lg text-secondary reveal-item reveal-delay-2">
+          Companies ship AI with disclaimers instead of responsibility — until <span class="text-primary font-medium">lawsuits force settlements</span>.
+        </p>
+        <p class="mt-6 text-sm text-secondary/60 reveal-item reveal-delay-3">
+          <a href="https://www.cnn.com/2026/01/07/business/character-ai-google-settle-teen-suicide-lawsuit" target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-colors">
+            Source: Character.AI + Google settlement, January 2026 →
+          </a>
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 5: Problem - No Standard -->
+    <section class="scroll-section flex items-center justify-center" id="section-4">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal-section">
+        <div class="mb-8">
+          <span class="text-8xl sm:text-9xl font-bold text-accent counter" data-target="0">0</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-primary mb-6 reveal-item">
+          public standards for "trustworthy AI."
+        </h2>
+        <p class="text-lg text-secondary reveal-item reveal-delay-1">
+          The <a href="https://artificialintelligenceact.eu/implementation-timeline/" target="_blank" rel="noopener noreferrer" class="text-accent hover:text-accent/80 transition-colors">EU AI Act</a> is coming. Safety researchers are <a href="https://fortune.com/2025/06/03/openai-deepmind-anthropic-loosing-engineers-ai-talent-war/" target="_blank" rel="noopener noreferrer" class="text-accent hover:text-accent/80 transition-colors">leaving big labs</a>. Everyone talks about "responsible AI" —
+        </p>
+        <p class="text-xl text-primary font-medium mt-4 reveal-item reveal-delay-2">
+          but there's still no public standard for what "trustworthy" actually means.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 6: Insight - The Key Realization -->
+    <section class="scroll-section flex items-center justify-center bg-surface-elevated" id="section-5">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal-section">
+        <div class="text-6xl mb-8 reveal-item">💡</div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-primary mb-6 reveal-item reveal-delay-1">
+          There's no absolute ground truth for AI output.
+        </h2>
+        <p class="text-xl sm:text-2xl text-accent font-medium reveal-item reveal-delay-2">
+          Truth is plural and context-dependent.
+        </p>
+        <p class="text-lg text-secondary mt-8 reveal-item reveal-delay-3">
+          The answer isn't better benchmarks — it's an evolving process of <span class="text-primary font-medium">collecting and attributing human judgments</span>.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 7 (NEW): How It Works — TrustLoop chart -->
+    <section class="scroll-section flex items-center justify-center" id="section-6">
+      <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 reveal-section">
+        <TrustLoopEcosystem />
+      </div>
+    </section>
+
+    <!-- Section 8: Our Approach -->
+    <section class="scroll-section flex items-center justify-center" id="section-7">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 reveal-section">
+        <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-8 reveal-item">
+          Public judgments.<br/>Real attribution.<br/>Evolving standards.
+        </h2>
+        <div class="space-y-6 text-lg text-secondary">
+          <p class="reveal-item reveal-delay-1">
+            We're building a public platform where anyone can judge AI and have that judgment recorded, credited, and rewarded.
+          </p>
+          <p class="reveal-item reveal-delay-2">
+            Every evaluation is attributed to a real person. Every judgment is timestamped and auditable. Standards evolve with emerging consensus — not static leaderboards, but living records of human judgment.
+          </p>
+          <p class="text-primary font-medium reveal-item reveal-delay-3">
+            HumanJudge is setting the standard for human-AI accountability.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 8: Values -->
+    <section class="scroll-section flex items-center justify-center bg-surface-elevated" id="section-8">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 reveal-section">
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary mb-6 sm:mb-10 reveal-item">
+          What we stand for
+        </h2>
+        <div class="space-y-4 sm:space-y-8">
+          <div class="border-l-2 border-accent pl-4 sm:pl-6 reveal-item reveal-delay-1 reveal-left">
+            <h3 class="text-lg sm:text-xl font-semibold text-primary mb-1 sm:mb-2">Transparency</h3>
+            <p class="text-sm sm:text-base text-secondary">All judgments are public — linked to a real person, timestamped, and auditable.</p>
+          </div>
+          <div class="border-l-2 border-accent pl-4 sm:pl-6 reveal-item reveal-delay-2 reveal-left">
+            <h3 class="text-lg sm:text-xl font-semibold text-primary mb-1 sm:mb-2">Author's Rights</h3>
+            <p class="text-sm sm:text-base text-secondary">Evaluators own their work. Your judgments stay attributed to you.</p>
+          </div>
+          <div class="border-l-2 border-accent pl-4 sm:pl-6 reveal-item reveal-delay-3 reveal-left">
+            <h3 class="text-lg sm:text-xl font-semibold text-primary mb-1 sm:mb-2">Beyond "One Right Answer"</h3>
+            <p class="text-sm sm:text-base text-secondary">Reality is context-dependent. We use time-decayed aggregation — evolving consensus, not fixed scores.</p>
+          </div>
+          <div class="border-l-2 border-accent pl-4 sm:pl-6 reveal-item reveal-delay-4 reveal-left">
+            <h3 class="text-lg sm:text-xl font-semibold text-primary mb-1 sm:mb-2">Long-term over hype</h3>
+            <p class="text-sm sm:text-base text-secondary">We build evaluation infrastructure that lasts.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 9: Origin Story -->
+    <section class="scroll-section flex items-center justify-center" id="section-9">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 reveal-section">
+        <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-8 reveal-item">
+          Why we built this
+        </h2>
+        <div class="space-y-6 text-lg text-secondary">
+          <p class="reveal-item reveal-delay-1">
+            After nearly a decade building production AI solutions across travel tech, financial services, and healthcare — we kept watching the same pattern: trust is hard to build, and it keeps breaking.
+          </p>
+          <p class="reveal-item reveal-delay-2">
+            Benchmarks didn't help because they measure generic capabilities, not specific use cases. One skeptical user during a Product Hunt launch or enterprise pilot could shape the entire narrative.
+          </p>
+          <p class="reveal-item reveal-delay-3">
+            That insight led to the <a href="https://arxiv.org/abs/2508.02926" target="_blank" rel="noopener noreferrer" class="text-accent hover:text-accent/80 transition-colors">GrandJury research paper</a>: time-decayed aggregation, complete traceability, and dynamic rubrics that evolve with emerging consensus.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 10: About Founder -->
+    <section class="scroll-section flex items-center justify-center bg-surface-elevated" id="section-10">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 reveal-section">
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+          <div class="flex-shrink-0 reveal-item">
+            <div class="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mb-4">
+              <span class="text-2xl font-bold text-accent">AC</span>
+            </div>
+            <h2 class="text-2xl font-bold text-primary">Arthur Cho</h2>
+            <p class="text-accent font-medium mb-4">Founder</p>
+            <div class="flex gap-3">
+              <a href="https://www.linkedin.com/in/ai-ml-product-arthur-cho/" target="_blank" rel="noopener noreferrer" class="text-secondary hover:text-accent transition-colors">
+                LinkedIn
+              </a>
+              <span class="text-secondary/30">·</span>
+              <a href="https://arthurcho.notion.site/" target="_blank" rel="noopener noreferrer" class="text-secondary hover:text-accent transition-colors">
+                Portfolio
+              </a>
+            </div>
+          </div>
+          <div class="flex-1 space-y-4 text-secondary">
+            <p class="reveal-item reveal-delay-1">
+              Arthur has spent nearly a decade at the intersection of AI products and the humans who use them. He's shipped production AI solutions at scale across travel tech, financial services, healthcare, and legal applications.
+            </p>
+            <p class="reveal-item reveal-delay-2">
+              Frustrated that AI trust came down to brand reputation rather than evidence, he published the <a href="https://arxiv.org/abs/2508.02926" target="_blank" rel="noopener noreferrer" class="text-accent hover:text-accent/80 transition-colors">GrandJury research paper</a> proposing a new framework for AI evaluation.
+            </p>
+            <p class="reveal-item reveal-delay-3">
+              Arthur holds a Master of Applied Data Science from the University of Michigan.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 11: CTA + Footer -->
+    <section class="scroll-section flex flex-col items-center justify-center" id="section-11">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal-section flex-1 flex flex-col justify-center">
+        <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-6 reveal-item">
+          Questions? Let's talk.
+        </h2>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center reveal-item reveal-delay-1">
+          <a
+            href="https://calendly.com/humanjudge/new-meeting"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center justify-center px-8 py-4 bg-accent text-accent-on font-semibold rounded-lg hover:bg-accent/90 transition-colors"
+          >
+            Book a Free Call
+            <span class="ml-2">→</span>
+          </a>
+          <a
+            href="/for-developers"
+            class="inline-flex items-center justify-center px-8 py-4 border border-border-emphasis text-primary font-semibold rounded-lg hover:bg-surface-elevated transition-colors"
+          >
+            For Developers
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Mini Footer -->
+      <div class="w-full border-t border-border-subtle py-6 mt-auto">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-secondary">
+          <p>© <span id="about-copyright-year"></span> HumanJudge. All rights reserved.</p>
+          <div class="flex gap-6">
+            <a href="/privacy" class="hover:text-primary transition-colors">Privacy</a>
+            <a href="/terms" class="hover:text-primary transition-colors">Terms</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <style>
+    /* Scroll snap container */
+    .scroll-container {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      overscroll-behavior: contain;
+    }
+
+    /* Each section snaps to viewport */
+    .scroll-section {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+
+    /* Active dot indicator */
+    .scroll-dot.active {
+      background-color: var(--color-accent);
+      transform: scale(1.3);
+    }
+
+    /* Base fade up animation for hero */
+    .animate-fade-up {
+      animation: fadeUp 0.8s ease-out forwards;
+      opacity: 0;
+    }
+
+    .animation-delay-200 {
+      animation-delay: 0.2s;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Reveal animations for scroll sections */
+    .reveal-item {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .reveal-item.reveal-left {
+      transform: translateX(-30px);
+    }
+
+    .reveal-section.revealed .reveal-item {
+      opacity: 1;
+      transform: translateY(0) translateX(0);
+    }
+
+    /* Staggered delays */
+    .reveal-delay-1 { transition-delay: 0.15s; }
+    .reveal-delay-2 { transition-delay: 0.3s; }
+    .reveal-delay-3 { transition-delay: 0.45s; }
+    .reveal-delay-4 { transition-delay: 0.6s; }
+
+    /* Counter animation */
+    .counter {
+      display: inline-block;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Hide scrollbar but keep functionality */
+    .scroll-container::-webkit-scrollbar {
+      width: 0;
+      background: transparent;
+    }
+
+    .scroll-container {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('scroll-container');
+      const dots = document.querySelectorAll('.scroll-dot');
+      const sections = document.querySelectorAll('.scroll-section');
+      const revealSections = document.querySelectorAll('.reveal-section');
+
+      // Counter animation function
+      const animateCounter = (element: Element) => {
+        const target = parseInt(element.getAttribute('data-target') || '0');
+        const duration = 1500; // ms
+        const startTime = performance.now();
+
+        const updateCounter = (currentTime: number) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+
+          // Easing function (ease-out)
+          const easeOut = 1 - Math.pow(1 - progress, 3);
+          const current = Math.round(target * easeOut);
+
+          element.textContent = current.toString();
+
+          if (progress < 1) {
+            requestAnimationFrame(updateCounter);
+          }
+        };
+
+        requestAnimationFrame(updateCounter);
+      };
+
+      // Intersection Observer for reveal animations
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+
+            // Trigger counter animation if this section has counters
+            const counters = entry.target.querySelectorAll('.counter');
+            counters.forEach(counter => {
+              // Only animate if not already animated
+              if (!counter.classList.contains('animated')) {
+                counter.classList.add('animated');
+                animateCounter(counter);
+              }
+            });
+          }
+        });
+      }, {
+        threshold: 0.3,
+        root: container
+      });
+
+      revealSections.forEach(section => {
+        revealObserver.observe(section);
+      });
+
+      // Update active dot on scroll
+      const updateActiveDot = () => {
+        const scrollTop = container?.scrollTop || 0;
+        const sectionHeight = window.innerHeight;
+        const currentSection = Math.round(scrollTop / sectionHeight);
+
+        dots.forEach((dot, index) => {
+          dot.classList.toggle('active', index === currentSection);
+        });
+      };
+
+      // Click dot to scroll to section
+      dots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+          const sectionIndex = parseInt(dot.getAttribute('data-section') || '0');
+          const targetSection = document.getElementById(`section-${sectionIndex}`);
+          targetSection?.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+
+      // Listen for scroll
+      container?.addEventListener('scroll', updateActiveDot);
+
+      // Initialize
+      updateActiveDot();
+
+      // Set copyright year
+      const copyrightYear = document.getElementById('about-copyright-year');
+      if (copyrightYear) {
+        copyrightYear.textContent = new Date().getFullYear().toString();
+      }
+    });
+  </script>
+</BaseLayout>

@@ -1,0 +1,1142 @@
+---
+/**
+ * Trust Loop Ecosystem - 3-branch diagram
+ * Center: Human-AI Trust hub
+ * Left wing: Dev tools → AI Developer → Works With
+ * Right wing: Reports → The Public → Insights
+ * Bottom: Browser/Platform → Community → Output
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props;
+---
+
+<div class={`trust-loop-ecosystem ${className}`}>
+  <!-- Header with fade-in -->
+  <div class="text-center mb-12 header-animate">
+    <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-3">How It Works</h2>
+  </div>
+
+  <!-- Butterfly Diagram -->
+  <div class="butterfly-container">
+
+    <!-- LEFT WING (HORIZONTAL): Works With + AI Developer ← Dev tools (tools closest to center) -->
+    <div class="wing left-wing left-wing-horizontal">
+      <!-- Layer 1 (left end): AI Developer persona with Works With below -->
+      <div class="wing-col col-2 developer-with-workswith">
+        <div class="node node-stakeholder animate-node delay-3">
+          <div class="node-icon-svg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+            </svg>
+          </div>
+          <span class="node-label">AI Developers</span>
+        </div>
+
+        <!-- Works With card below AI Developer -->
+        <div class="node node-group animate-node delay-4">
+          <span class="group-title">Live Production QA</span>
+          <div class="group-items">
+            <div class="group-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="group-icon">
+                <path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+              <span>Human-in-the-loop</span>
+            </div>
+            <div class="group-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="group-icon">
+                <path d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+              </svg>
+              <span>Platform Integration</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Horizontal fork: persona → tools -->
+      <div class="flow-fork-horizontal">
+        <div class="fork-stem-h"></div>
+        <div class="fork-branches-h">
+          <div class="fork-branch-h"></div>
+          <div class="fork-branch-h"></div>
+        </div>
+      </div>
+
+      <!-- Layer 2 (right, closest to center): Dev tools -->
+      <div class="wing-col col-1">
+        <div class="node animate-node delay-1">
+          <div class="node-icon-svg">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M0 7.334v8h6.666v1.332H12v-1.332h12v-8H0zm6.666 6.664H5.334v-4H3.999v4H1.335V8.667h5.331v5.331zm4 0v1.336H8.001V8.667h5.334v5.332h-2.669v-.001zm12.001 0h-1.33v-4h-1.336v4h-1.335v-4h-1.33v4h-2.671V8.667h8.002v5.331zM10.665 10H12v2.667h-1.335V10z"/>
+            </svg>
+          </div>
+          <span class="node-label">Node.js</span>
+        </div>
+        <div class="node animate-node delay-2">
+          <div class="node-icon-svg">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98l-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95l.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25l-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z"/>
+            </svg>
+          </div>
+          <span class="node-label">Python</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fork from Center to Left wing tools -->
+    <div class="flow-fork-horizontal flow-fork-to-left">
+      <div class="fork-branches-h">
+        <div class="fork-branch-h"></div>
+        <div class="fork-branch-h"></div>
+      </div>
+      <div class="fork-stem-h"></div>
+    </div>
+
+    <!-- CENTER: Human-AI Trust hub -->
+    <div class="waist animate-waist">
+      <div class="center-node trust-signal-node">
+        <span class="signal-title">Human-AI Trust</span>
+      </div>
+
+      <!-- Bottom branch: Browser/Platform → Community → Evaluations -->
+      <div class="community-section">
+        <!-- Forking line: one stem splits into two branches -->
+        <div class="flow-fork">
+          <div class="fork-stem"></div>
+          <div class="fork-branches">
+            <div class="fork-branch fork-left"></div>
+            <div class="fork-branch fork-right"></div>
+          </div>
+        </div>
+
+        <!-- Layer 1 (inner): Tools -->
+        <div class="community-row community-row-1">
+          <div class="node animate-node delay-5">
+            <div class="node-icon-svg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+              </svg>
+            </div>
+            <span class="node-label">Browser Tool</span>
+          </div>
+          <div class="node animate-node delay-6">
+            <div class="node-icon-svg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+              </svg>
+            </div>
+            <span class="node-label">Platform</span>
+          </div>
+        </div>
+
+        <!-- Merging fork: two branches merge into one -->
+        <div class="flow-merge">
+          <div class="merge-branches">
+            <div class="merge-branch merge-left"></div>
+            <div class="merge-branch merge-right"></div>
+          </div>
+          <div class="merge-stem"></div>
+        </div>
+
+        <!-- Layer 2 (middle): Community persona -->
+        <div class="community-row community-row-2">
+          <div class="node node-stakeholder animate-node delay-7">
+            <div class="node-icon-svg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+              </svg>
+            </div>
+            <span class="node-label">AI Reviewers</span>
+          </div>
+        </div>
+
+        <!-- Layer 3 (outer): Evaluations -->
+        <div class="community-row community-row-3">
+          <div class="node node-group animate-node delay-8">
+            <span class="group-title">Monetize Expertise</span>
+            <div class="group-items">
+              <div class="group-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="group-icon">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z" />
+                </svg>
+                <span>Make Judgments</span>
+              </div>
+              <div class="group-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="group-icon">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                </svg>
+                <span>Build Authority</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fork from Center to Right wing tools -->
+    <div class="flow-fork-horizontal flow-fork-to-right">
+      <div class="fork-stem-h"></div>
+      <div class="fork-branches-h">
+        <div class="fork-branch-h"></div>
+        <div class="fork-branch-h"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT WING (HORIZONTAL): Tools → The Public → Insights (rotated left) -->
+    <div class="wing right-wing right-wing-horizontal">
+      <!-- Layer 1 (left, closest to center): Report nodes -->
+      <div class="wing-col col-1">
+        <div class="node animate-node delay-9">
+          <div class="node-icon-svg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            </svg>
+          </div>
+          <span class="node-label">Scorecards</span>
+        </div>
+        <div class="node animate-node delay-10">
+          <div class="node-icon-svg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+            </svg>
+          </div>
+          <span class="node-label">Reports</span>
+        </div>
+      </div>
+
+      <!-- Horizontal merge: tools → persona -->
+      <div class="flow-merge-horizontal">
+        <div class="merge-branches-h">
+          <div class="merge-branch-h"></div>
+          <div class="merge-branch-h"></div>
+        </div>
+        <div class="merge-stem-h"></div>
+      </div>
+
+      <!-- Layer 2 (right end): The Public persona with Insights below -->
+      <div class="wing-col col-2 public-with-insights">
+        <div class="node node-stakeholder animate-node delay-11">
+          <div class="node-icon-svg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+          </div>
+          <span class="node-label">AI Users</span>
+        </div>
+
+        <!-- Insights card below The Public -->
+        <div class="node node-group animate-node delay-12">
+          <span class="group-title">Know What to Trust</span>
+          <div class="group-items">
+            <div class="group-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="group-icon">
+                <path d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z" />
+              </svg>
+              <span>Approval Signals</span>
+            </div>
+            <div class="group-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="group-icon">
+                <path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span>Transparency</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<style>
+  .trust-loop-ecosystem {
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Header animation */
+  .header-animate {
+    opacity: 0;
+    animation: fadeInDown 0.8s ease forwards;
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Butterfly Container - fits within parent max-w-6xl */
+  .butterfly-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    min-height: 280px;
+    padding-bottom: 260px; /* Space for Community section with 3 layers */
+  }
+
+  /* Wings - vertical stack (tools → persona → dashed card) */
+  .wing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    width: 180px;
+  }
+
+  /* Wing rows - horizontal layout within each row */
+  .wing-row {
+    display: flex;
+    gap: 0.4rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Row 1: innermost (closest to center) - tool nodes */
+  .wing-row.row-1 {
+    flex-wrap: wrap;
+  }
+
+  .wing-row.row-1 .node {
+    padding: 0.4rem 0.6rem;
+  }
+
+  .wing-row.row-3 .node-group {
+    width: 100%;
+    max-width: 160px;
+  }
+
+  /* Nodes - Compact but readable */
+  .node {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.6rem;
+    background: var(--bg-surface);
+    border: 2px solid var(--border-subtle);
+    border-radius: 10px;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+
+  /* Hover disabled for testing glow animation
+  .node:hover {
+    border-color: var(--color-accent);
+    background: rgba(99, 102, 241, 0.1);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+  */
+
+  .node-icon-svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: var(--color-accent);
+  }
+
+  .node-icon-svg svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .node-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  /* Stakeholder nodes - minimal style with vertical layout, no border */
+  .node-stakeholder {
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 0.8rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+  }
+
+  .node-stakeholder .node-icon-svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .node-stakeholder .node-label {
+    font-size: 0.7rem;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  /* Grouped nodes - contains sub-items with animated glow */
+  .node-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    padding: 0.5rem 0.6rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.05));
+    border: 1.5px solid rgba(99, 102, 241, 0.5);
+    white-space: normal;
+  }
+
+  /* Combined animation: slide-in first, then continuous glow pulsing */
+  .node.node-group.animate-node {
+    animation: slideInNode 0.5s ease forwards, glowPulse 2.5s ease-in-out 0.6s infinite;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% {
+      box-shadow: 0 0 6px rgba(99, 102, 241, 0.2), 0 0 12px rgba(99, 102, 241, 0.08);
+    }
+    50% {
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.5), 0 0 24px rgba(99, 102, 241, 0.25), 0 0 36px rgba(99, 102, 241, 0.15);
+    }
+  }
+
+  .group-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+    white-space: normal;
+    line-height: 1.3;
+  }
+
+  .group-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .group-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .group-icon {
+    width: 14px;
+    height: 14px;
+    color: var(--color-accent);
+    flex-shrink: 0;
+  }
+
+  /* Benefit tags on nodes */
+  .node.with-benefit {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .node.with-benefit > .node-icon,
+  .node.with-benefit > .node-icon-svg,
+  .node.with-benefit > .node-label {
+    display: inline;
+  }
+
+  .node-stakeholder.with-benefit {
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .node-stakeholder .node-label {
+    font-size: 0.65rem;
+    text-align: center;
+  }
+
+  .node-stakeholder .benefit-tag {
+    font-size: 0.55rem;
+    padding: 0.15rem 0.35rem;
+  }
+
+  .benefit-tag {
+    font-size: 0.65rem;
+    color: var(--color-accent);
+    background: rgba(99, 102, 241, 0.15);
+    padding: 0.2rem 0.5rem;
+    border-radius: 10px;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  /* Entrance animations for nodes */
+  .animate-node {
+    opacity: 0;
+    transform: translateX(-20px);
+    animation: slideInNode 0.5s ease forwards;
+  }
+
+  .right-wing .animate-node {
+    transform: translateX(20px);
+  }
+
+  @keyframes slideInNode {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Staggered animation delays (1-12 used) */
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
+  .delay-5 { animation-delay: 0.5s; }
+  .delay-6 { animation-delay: 0.6s; }
+  .delay-7 { animation-delay: 0.7s; }
+  .delay-8 { animation-delay: 0.9s; }
+  .delay-9 { animation-delay: 1.0s; }
+  .delay-10 { animation-delay: 1.1s; }
+  .delay-11 { animation-delay: 1.2s; }
+  .delay-12 { animation-delay: 1.3s; }
+
+  /* CENTER WAIST - Human-AI Trust is the hub, Community hangs below */
+  .waist {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 0.25rem;
+    width: 120px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Community section positioned below the center line */
+  .community-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: -8px;
+  }
+
+  /* Community rows - mirror wing structure (vertical expansion from center) */
+  .community-row {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: center;
+  }
+
+  /* Row 1: innermost (closest to center) - tool nodes */
+  .community-row-1 {
+    width: 240px;
+  }
+
+  .community-row-1 .node {
+    min-width: 100px;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 0.4rem 0.6rem;
+  }
+
+  /* Row 2: middle - persona node */
+  .community-row-2 {
+    width: auto;
+  }
+
+  .community-row-2 .node-stakeholder {
+    justify-content: center;
+  }
+
+  /* Row 3: outermost - benefit card */
+  .community-row-3 {
+    width: 150px;
+    margin-top: 0.5rem;
+  }
+
+  .community-row-3 .node-group {
+    width: 100%;
+  }
+
+  .animate-waist {
+    opacity: 0;
+    transform: scale(0.8);
+    animation: popInWaist 0.6s ease forwards 0.8s;
+  }
+
+  @keyframes popInWaist {
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Center nodes - base */
+  .center-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  /* Human-AI Trust - THE central hub where horizontal lines connect */
+  .trust-signal-node {
+    padding: 0.6rem 1rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(99, 102, 241, 0.08));
+    border: 2px solid var(--color-accent);
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+  }
+
+  .signal-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  /* Vertical flow line - animated dashes flowing upward */
+  .flow-line-vertical {
+    width: 2px;
+    height: 16px;
+    position: relative;
+    overflow: hidden;
+    margin: 0.2rem 0;
+  }
+
+  .flow-line-vertical::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -100%;
+    width: 100%;
+    height: 200%;
+    background: repeating-linear-gradient(
+      0deg,
+      var(--color-accent) 0,
+      var(--color-accent) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+    animation: dashMoveUp 1s linear infinite;
+  }
+
+  @keyframes dashMoveUp {
+    from { transform: translateY(0); }
+    to { transform: translateY(-8px); }
+  }
+
+  /* Forking line - stem splits into two branches */
+  .flow-fork {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0.2rem 0;
+  }
+
+  .fork-stem {
+    width: 2px;
+    height: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fork-stem::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -100%;
+    width: 100%;
+    height: 200%;
+    background: repeating-linear-gradient(
+      0deg,
+      var(--color-accent) 0,
+      var(--color-accent) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+    animation: dashMoveUp 1s linear infinite;
+  }
+
+  .fork-branches {
+    display: flex;
+    gap: 80px;
+    position: relative;
+  }
+
+  /* Horizontal connector bar */
+  .fork-branches::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-accent);
+  }
+
+  .fork-branch {
+    width: 2px;
+    height: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fork-branch::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -100%;
+    width: 100%;
+    height: 200%;
+    background: repeating-linear-gradient(
+      0deg,
+      var(--color-accent) 0,
+      var(--color-accent) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+    animation: dashMoveUp 1s linear infinite;
+  }
+
+  /* Merging fork - two branches merge into one stem */
+  .flow-merge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0.2rem 0;
+  }
+
+  .merge-branches {
+    display: flex;
+    gap: 80px;
+    position: relative;
+  }
+
+  /* Horizontal connector bar at bottom of branches */
+  .merge-branches::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-accent);
+  }
+
+  .merge-branch {
+    width: 2px;
+    height: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .merge-branch::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -100%;
+    width: 100%;
+    height: 200%;
+    background: repeating-linear-gradient(
+      0deg,
+      var(--color-accent) 0,
+      var(--color-accent) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+    animation: dashMoveUp 1s linear infinite;
+  }
+
+  .merge-stem {
+    width: 2px;
+    height: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .merge-stem::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -100%;
+    width: 100%;
+    height: 200%;
+    background: repeating-linear-gradient(
+      0deg,
+      var(--color-accent) 0,
+      var(--color-accent) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+    animation: dashMoveUp 1s linear infinite;
+  }
+
+  /* Wing merge lines - smaller gap to match wing tool nodes */
+  .flow-merge-wing .merge-branches {
+    gap: 50px;
+  }
+
+  /* Wing fork lines - smaller gap to match wing tool nodes */
+  .flow-fork-wing .fork-branches {
+    gap: 50px;
+  }
+
+  /* LEFT WING HORIZONTAL LAYOUT */
+  .left-wing-horizontal {
+    flex-direction: row !important;
+    align-items: center !important;
+    width: auto !important;
+    gap: 0.25rem;
+  }
+
+  /* Developer with Works With below - stacks vertically */
+  .developer-with-workswith {
+    flex-direction: column !important;
+    align-items: center;
+  }
+
+  .developer-with-workswith .node-group {
+    max-width: 160px;
+  }
+
+  /* Horizontal fork for left wing - stem then branches going right */
+  .flow-fork-horizontal {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0 0.1rem;
+  }
+
+  .fork-stem-h {
+    width: 12px;
+    height: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fork-stem-h::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--color-accent) 0,
+      var(--color-accent) 6px,
+      transparent 6px,
+      transparent 12px
+    );
+    animation: dashMoveRight 1s linear infinite;
+  }
+
+  .fork-branches-h {
+    display: flex;
+    flex-direction: column;
+    gap: 38px; /* Match tool node center-to-center distance */
+    position: relative;
+  }
+
+  /* Vertical connector bar on left side of branches - animated dashes */
+  .fork-branches-h::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: repeating-linear-gradient(
+      180deg,
+      var(--color-accent) 0,
+      var(--color-accent) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+    animation: dashMoveDown 0.5s linear infinite;
+  }
+
+  @keyframes dashMoveDown {
+    from { background-position: 0 0; }
+    to { background-position: 0 8px; }
+  }
+
+  @keyframes dashMoveRight {
+    from { transform: translateX(0); }
+    to { transform: translateX(12px); }
+  }
+
+  /* Fork pointing to the left (connector bar on right side) */
+  .flow-fork-to-left .fork-branches-h::before {
+    left: auto;
+    right: 0;
+  }
+
+  .fork-branch-h {
+    width: 12px;
+    height: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fork-branch-h::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--color-accent) 0,
+      var(--color-accent) 6px,
+      transparent 6px,
+      transparent 12px
+    );
+    animation: dashMoveRight 1s linear infinite;
+  }
+
+  /* Override animation direction for left wing */
+  .left-wing-horizontal .animate-node {
+    transform: translateX(-20px);
+  }
+
+  /* RIGHT WING HORIZONTAL LAYOUT */
+  .right-wing-horizontal {
+    flex-direction: row !important;
+    align-items: center !important;
+    width: auto !important;
+    gap: 0.25rem;
+  }
+
+  /* Wing columns - stack nodes vertically within horizontal wing */
+  .wing-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .wing-col.col-1 .node {
+    padding: 0.4rem 0.6rem;
+  }
+
+  /* Public with Insights below - stacks vertically */
+  .public-with-insights {
+    flex-direction: column !important;
+    align-items: center;
+  }
+
+  .public-with-insights .node-group {
+    max-width: 160px;
+  }
+
+  /* Horizontal merge - two vertical branches merge into horizontal stem */
+  .flow-merge-horizontal {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0 0.1rem;
+  }
+
+  .merge-branches-h {
+    display: flex;
+    flex-direction: column;
+    gap: 38px; /* Match tool node center-to-center distance */
+    position: relative;
+  }
+
+  /* Vertical connector bar on right side of branches - animated dashes */
+  .merge-branches-h::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: repeating-linear-gradient(
+      180deg,
+      var(--color-accent) 0,
+      var(--color-accent) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+    animation: dashMoveDown 0.5s linear infinite;
+  }
+
+  .merge-branch-h {
+    width: 12px;
+    height: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .merge-branch-h::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--color-accent) 0,
+      var(--color-accent) 6px,
+      transparent 6px,
+      transparent 12px
+    );
+    animation: dashMoveRight 1s linear infinite;
+  }
+
+  .merge-stem-h {
+    width: 12px;
+    height: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .merge-stem-h::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--color-accent) 0,
+      var(--color-accent) 6px,
+      transparent 6px,
+      transparent 12px
+    );
+    animation: dashMoveRight 1s linear infinite;
+  }
+
+  /* Override animation direction for right wing */
+  .right-wing-horizontal .animate-node {
+    transform: translateX(20px);
+  }
+
+  /* Animated running dashed lines */
+  .flow-line {
+    width: 16px;
+    height: 2px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    animation: fadeIn 0.3s ease forwards 1s;
+  }
+
+  .flow-line::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--color-accent) 0,
+      var(--color-accent) 8px,
+      transparent 8px,
+      transparent 16px
+    );
+    animation: dashMove 1s linear infinite;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  @keyframes dashMove {
+    from { transform: translateX(0); }
+    to { transform: translateX(16px); }
+  }
+
+  /* Mobile - scale down to fit viewport */
+  @media (max-width: 768px) {
+    .trust-loop-ecosystem {
+      overflow: hidden;
+    }
+
+    .butterfly-container {
+      transform: scale(0.52);
+      transform-origin: top center;
+      margin-bottom: -130px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .butterfly-container {
+      transform: scale(0.4);
+      transform-origin: top center;
+      margin-bottom: -165px;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .butterfly-container {
+      transform: scale(0.33);
+      transform-origin: top center;
+      margin-bottom: -185px;
+    }
+  }
+
+  /* Tablet */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .butterfly-container {
+      gap: 0.5rem;
+    }
+
+    .node {
+      padding: 0.6rem 0.8rem;
+    }
+
+    .node-label {
+      font-size: 0.85rem;
+    }
+
+    .waist {
+      padding: 1rem 1.25rem;
+      margin: 0 0.75rem;
+    }
+  }
+
+  /* Large screens */
+  @media (min-width: 1200px) {
+    .butterfly-container {
+      gap: 0.5rem;
+    }
+
+    .node {
+      padding: 0.6rem 0.9rem;
+    }
+
+    .node-label {
+      font-size: 0.9rem;
+    }
+
+    .waist {
+      padding: 1.25rem 1.5rem;
+      min-width: 160px;
+    }
+  }
+</style>

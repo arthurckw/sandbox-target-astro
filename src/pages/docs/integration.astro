@@ -1,0 +1,551 @@
+---
+export const prerender = true;
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "name": "HumanJudge Integration Guide",
+  "url": "https://humanjudge.com/docs/integration",
+  "description": "Step-by-step guide to integrate HumanJudge with your AI application. Install the Python SDK (pip install grandjury), add the JavaScript SDK to your frontend, configure human evaluation for your AI model.",
+  "publisher": { "@type": "Organization", "name": "HumanJudge", "url": "https://humanjudge.com" }
+};
+---
+
+<BaseLayout
+  title="Integration Guide | pip install grandjury | HumanJudge Docs"
+  description="Step-by-step: install Python SDK (pip install grandjury), add JS SDK to frontend, configure human evaluation. Get verified human feedback on your AI in minutes."
+  currentPath="/docs"
+  jsonLd={jsonLd}
+>
+  <div class="min-h-screen bg-surface">
+    <!-- Docs Header -->
+    <div class="bg-surface-elevated border-b border-border-subtle">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <nav class="text-sm text-secondary mb-4">
+          <a href="/docs" class="hover:text-primary">Docs</a>
+          <span class="mx-2">/</span>
+          <span class="text-primary">Integration Guide</span>
+        </nav>
+        <h1 class="text-4xl font-bold text-primary mb-4">Integration Guide</h1>
+        <p class="text-xl text-secondary max-w-3xl">
+          Add HumanJudge's SDK <code class="text-accent">grandjury-js</code> to your AI application and connect it with Langfuse for human evaluation tracking.
+        </p>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid md:grid-cols-4 gap-8">
+        <!-- Sidebar -->
+        <nav class="md:col-span-1">
+          <div class="sticky top-24 space-y-6">
+            <div>
+              <h3 class="text-sm font-semibold text-secondary uppercase tracking-wider mb-3">On This Page</h3>
+              <ul class="space-y-2 text-sm">
+                <li><a href="#prerequisites" class="text-secondary hover:text-primary">Prerequisites</a></li>
+                <li><a href="#installation" class="text-secondary hover:text-primary">Installation</a></li>
+                <li><a href="#configuration" class="text-secondary hover:text-primary">Configuration</a></li>
+                <li><a href="#langfuse-integration" class="text-secondary hover:text-primary">Langfuse Integration</a></li>
+                <li><a href="#inference-tracking" class="text-secondary hover:text-primary">Inference Tracking</a></li>
+                <li><a href="#api-reference" class="text-secondary hover:text-primary">API Reference</a></li>
+                <li><a href="#examples" class="text-secondary hover:text-primary">Examples</a></li>
+                <li><a href="#troubleshooting" class="text-secondary hover:text-primary">Troubleshooting</a></li>
+              </ul>
+            </div>
+            <div class="pt-4 border-t border-border-subtle">
+              <a href="/docs" class="text-secondary hover:text-primary text-sm">&larr; Back to Docs</a>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Content -->
+        <div class="md:col-span-3 space-y-12">
+          <!-- Prerequisites -->
+          <section id="prerequisites">
+            <h2 class="text-2xl font-bold text-primary mb-6">Prerequisites</h2>
+
+            <div class="bg-accent/10 border border-accent/20 rounded-lg p-4 mb-6">
+              <p class="text-primary">
+                <strong>Langfuse Required:</strong> HumanJudge works as an additional layer on top of Langfuse. You must have Langfuse integrated first.
+              </p>
+            </div>
+
+            <div class="space-y-4">
+              <div class="flex items-start gap-3">
+                <span class="bg-accent/20 text-accent w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                <div>
+                  <h4 class="font-semibold text-primary">Langfuse Account</h4>
+                  <p class="text-secondary text-sm">Set up Langfuse monitoring for your AI app at <a href="https://langfuse.com" target="_blank" class="text-accent hover:text-accent-hover">langfuse.com</a></p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <span class="bg-accent/20 text-accent w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+                <div>
+                  <h4 class="font-semibold text-primary">HumanJudge Account</h4>
+                  <p class="text-secondary text-sm">Sign up at <a href="/auth" class="text-accent hover:text-accent-hover">humanjudge.com</a> to get your Project ID</p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <span class="bg-accent/20 text-accent w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">3</span>
+                <div>
+                  <h4 class="font-semibold text-primary">Web-based AI App</h4>
+                  <p class="text-secondary text-sm">Your app must be accessible via URL in Chrome browser</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Installation -->
+          <section id="installation">
+            <h2 class="text-2xl font-bold text-primary mb-6">Installation</h2>
+
+            <h3 class="text-lg font-semibold text-primary mb-4">Option 1: CDN (Recommended)</h3>
+
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden mb-6">
+              <div class="bg-surface px-4 py-2 border-b border-border-subtle flex justify-between items-center">
+                <span class="text-sm text-secondary">HTML</span>
+              </div>
+              <pre class="p-4 overflow-x-auto"><code class="text-sm text-primary">&lt;script src="https://grandjury.xyz/sdk/grandjury.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  GrandJury.init({'{'}
+    projectId: 'proj_your_project_id'
+  {'}'});
+&lt;/script&gt;</code></pre>
+            </div>
+
+            <h3 class="text-lg font-semibold text-primary mb-4">Option 2: Auto-initialization via Data Attributes</h3>
+
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden mb-6">
+              <div class="bg-surface px-4 py-2 border-b border-border-subtle">
+                <span class="text-sm text-secondary">HTML</span>
+              </div>
+              <pre class="p-4 overflow-x-auto"><code class="text-sm text-primary">&lt;script
+  src="https://grandjury.xyz/sdk/grandjury.min.js"
+  data-grandjury-project-id="proj_your_project_id"
+  data-grandjury-debug="false"&gt;
+&lt;/script&gt;</code></pre>
+            </div>
+
+            <h3 class="text-lg font-semibold text-primary mb-4">Option 3: NPM Package</h3>
+
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden mb-6">
+              <div class="bg-surface px-4 py-2 border-b border-border-subtle">
+                <span class="text-sm text-secondary">Terminal</span>
+              </div>
+              <pre class="p-4 overflow-x-auto"><code class="text-sm text-primary">npm install @humanjudge/grandjury-js</code></pre>
+            </div>
+
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden">
+              <div class="bg-surface px-4 py-2 border-b border-border-subtle">
+                <span class="text-sm text-secondary">JavaScript</span>
+              </div>
+              <pre class="p-4 overflow-x-auto"><code class="text-sm text-primary">import GrandJury from '@humanjudge/grandjury-js';
+
+GrandJury.init({'{'}
+  projectId: process.env.GRANDJURY_PROJECT_ID
+{'}'});</code></pre>
+            </div>
+          </section>
+
+          <!-- Configuration -->
+          <section id="configuration">
+            <h2 class="text-2xl font-bold text-primary mb-6">Configuration</h2>
+
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden mb-6">
+              <div class="bg-surface px-4 py-2 border-b border-border-subtle">
+                <span class="text-sm text-secondary">JavaScript</span>
+              </div>
+              <pre class="p-4 overflow-x-auto"><code class="text-sm text-primary">GrandJury.init({'{'}
+  // Required: Your GrandJury project ID
+  projectId: 'proj_abc123_xyz',
+
+  // Optional: API endpoint (defaults to grandjury.xyz)
+  apiEndpoint: 'https://api.grandjury.xyz',
+
+  // Optional: Session metadata
+  sessionMetadata: {'{'}
+    app_version: '1.0.0',
+    environment: 'production'
+  {'}'},
+
+  // Optional: Auto-start session (default: true)
+  autoStart: true,
+
+  // Optional: Enable debug logging (default: false)
+  enableDebug: false,
+
+  // Optional: Enable session discovery (default: true)
+  enableSessionDiscovery: true
+{'}'});</code></pre>
+            </div>
+
+            <h3 class="text-lg font-semibold text-primary mb-4">Configuration Options</h3>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-border-subtle">
+                    <th class="text-left py-3 px-4 text-primary font-semibold">Option</th>
+                    <th class="text-left py-3 px-4 text-primary font-semibold">Type</th>
+                    <th class="text-left py-3 px-4 text-primary font-semibold">Default</th>
+                    <th class="text-left py-3 px-4 text-primary font-semibold">Description</th>
+                  </tr>
+                </thead>
+                <tbody class="text-secondary">
+                  <tr class="border-b border-border-subtle">
+                    <td class="py-3 px-4"><code class="text-accent">projectId</code></td>
+                    <td class="py-3 px-4">string</td>
+                    <td class="py-3 px-4">required</td>
+                    <td class="py-3 px-4">Your GrandJury project ID (format: proj_xxx)</td>
+                  </tr>
+                  <tr class="border-b border-border-subtle">
+                    <td class="py-3 px-4"><code class="text-accent">apiEndpoint</code></td>
+                    <td class="py-3 px-4">string</td>
+                    <td class="py-3 px-4">api.grandjury.xyz</td>
+                    <td class="py-3 px-4">API endpoint override</td>
+                  </tr>
+                  <tr class="border-b border-border-subtle">
+                    <td class="py-3 px-4"><code class="text-accent">autoStart</code></td>
+                    <td class="py-3 px-4">boolean</td>
+                    <td class="py-3 px-4">true</td>
+                    <td class="py-3 px-4">Auto-start session on init</td>
+                  </tr>
+                  <tr class="border-b border-border-subtle">
+                    <td class="py-3 px-4"><code class="text-accent">enableDebug</code></td>
+                    <td class="py-3 px-4">boolean</td>
+                    <td class="py-3 px-4">false</td>
+                    <td class="py-3 px-4">Enable console debug logging</td>
+                  </tr>
+                  <tr class="border-b border-border-subtle">
+                    <td class="py-3 px-4"><code class="text-accent">enableSessionDiscovery</code></td>
+                    <td class="py-3 px-4">boolean</td>
+                    <td class="py-3 px-4">true</td>
+                    <td class="py-3 px-4">Auto-detect existing session patterns</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Langfuse Integration -->
+          <section id="langfuse-integration">
+            <h2 class="text-2xl font-bold text-primary mb-6">Langfuse Integration</h2>
+
+            <p class="text-secondary mb-6">
+              HumanJudge integrates with Langfuse to sync human evaluation scores alongside your automated metrics.
+            </p>
+
+            <h3 class="text-lg font-semibold text-primary mb-4">Basic Integration</h3>
+
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden mb-6">
+              <div class="bg-surface px-4 py-2 border-b border-border-subtle">
+                <span class="text-sm text-secondary">JavaScript</span>
+              </div>
+              <pre class="p-4 overflow-x-auto"><code class="text-sm text-primary">import {'{'} Langfuse {'}'} from 'langfuse';
+import GrandJury from '@humanjudge/grandjury-js';
+
+// Initialize both services
+await GrandJury.init({'{'} projectId: 'proj_my_app_123' {'}'});
+
+const langfuse = new Langfuse({'{'}
+  publicKey: 'your_public_key',
+  secretKey: 'your_secret_key'
+{'}'});
+
+// Create trace with automatic correlation
+const trace = langfuse.trace({'{'} name: 'user_query' {'}'});
+const enhancedTrace = GrandJury.langfuse.wrapTrace(trace);
+
+// Generate AI response
+const generation = enhancedTrace.generation({'{'}
+  name: 'ai_response',
+  model: 'gpt-4',
+  input: userQuery,
+  output: aiResponse
+{'}'});
+
+// Track generation for evaluation
+GrandJury.langfuse.trackGeneration(generation);</code></pre>
+            </div>
+
+            <h3 class="text-lg font-semibold text-primary mb-4">How It Works</h3>
+
+            <div class="space-y-4 mb-6">
+              <div class="flex items-start gap-3">
+                <span class="text-accent">1.</span>
+                <p class="text-secondary"><code class="text-accent">wrapTrace()</code> adds GrandJury session ID to your Langfuse trace metadata</p>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-accent">2.</span>
+                <p class="text-secondary">When reviewers evaluate via Chrome extension, scores link back to the trace</p>
+              </div>
+              <div class="flex items-start gap-3">
+                <span class="text-accent">3.</span>
+                <p class="text-secondary">Human evaluation scores appear in your Langfuse dashboard</p>
+              </div>
+            </div>
+
+            <div class="bg-accent/10 border border-accent/20 rounded-lg p-4">
+              <p class="text-primary text-sm">
+                <strong>Tip:</strong> Enable <code class="text-accent">enableDebug: true</code> during development to see Langfuse correlation in console logs.
+              </p>
+            </div>
+          </section>
+
+          <!-- Inference Tracking -->
+          <section id="inference-tracking">
+            <h2 class="text-2xl font-bold text-primary mb-6">Inference Tracking</h2>
+
+            <p class="text-secondary mb-6">
+              Generate unique inference IDs for each AI query to enable granular evaluation tracking.
+            </p>
+
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden mb-6">
+              <div class="bg-surface px-4 py-2 border-b border-border-subtle">
+                <span class="text-sm text-secondary">JavaScript</span>
+              </div>
+              <pre class="p-4 overflow-x-auto"><code class="text-sm text-primary">// Generate new inference ID for each user query
+async function handleUserQuery(query) {'{'}
+  // Create inference ID for this interaction
+  const inferenceId = GrandJury.inference({'{'}
+    query_type: 'chat',
+    category: 'recipe_advice'
+  {'}'});
+
+  // Process AI response
+  const response = await callAI(query);
+
+  // inferenceId is automatically available to Chrome extension
+  // for reviewers to evaluate this specific interaction
+  return response;
+{'}'}
+
+// Get current inference ID
+const currentInference = GrandJury.getCurrentInferenceId();</code></pre>
+            </div>
+
+            <p class="text-secondary">
+              Inference IDs follow the format <code class="text-accent">gj_inf_{'{'}timestamp{'}'}_{'{'}randomId{'}'}</code> and are automatically exposed to the Chrome extension for evaluation.
+            </p>
+          </section>
+
+          <!-- API Reference -->
+          <section id="api-reference">
+            <h2 class="text-2xl font-bold text-primary mb-6">API Reference</h2>
+
+            <!-- init -->
+            <div class="mb-8">
+              <h3 class="text-lg font-semibold text-primary mb-2">
+                <code class="text-accent">GrandJury.init(config)</code>
+              </h3>
+              <p class="text-secondary mb-4">Initialize the SDK with your project configuration.</p>
+              <p class="text-secondary text-sm"><strong>Returns:</strong> Promise&lt;void&gt;</p>
+            </div>
+
+            <!-- startSession -->
+            <div class="mb-8">
+              <h3 class="text-lg font-semibold text-primary mb-2">
+                <code class="text-accent">GrandJury.startSession(metadata?)</code>
+              </h3>
+              <p class="text-secondary mb-4">Start a new evaluation session with optional metadata.</p>
+              <p class="text-secondary text-sm"><strong>Returns:</strong> Promise&lt;string&gt; - Session ID</p>
+            </div>
+
+            <!-- stopSession -->
+            <div class="mb-8">
+              <h3 class="text-lg font-semibold text-primary mb-2">
+                <code class="text-accent">GrandJury.stopSession()</code>
+              </h3>
+              <p class="text-secondary mb-4">Stop the current session and clean up resources.</p>
+              <p class="text-secondary text-sm"><strong>Returns:</strong> Promise&lt;void&gt;</p>
+            </div>
+
+            <!-- getSessionId -->
+            <div class="mb-8">
+              <h3 class="text-lg font-semibold text-primary mb-2">
+                <code class="text-accent">GrandJury.getSessionId()</code>
+              </h3>
+              <p class="text-secondary mb-4">Get the current session ID.</p>
+              <p class="text-secondary text-sm"><strong>Returns:</strong> string | null</p>
+            </div>
+
+            <!-- inference -->
+            <div class="mb-8">
+              <h3 class="text-lg font-semibold text-primary mb-2">
+                <code class="text-accent">GrandJury.inference(metadata?)</code>
+              </h3>
+              <p class="text-secondary mb-4">Generate a new inference ID for tracking an AI interaction.</p>
+              <p class="text-secondary text-sm"><strong>Returns:</strong> string - Inference ID</p>
+            </div>
+
+            <!-- track -->
+            <div class="mb-8">
+              <h3 class="text-lg font-semibold text-primary mb-2">
+                <code class="text-accent">GrandJury.track(event, properties?)</code>
+              </h3>
+              <p class="text-secondary mb-4">Track custom analytics events.</p>
+              <p class="text-secondary text-sm"><strong>Returns:</strong> void</p>
+            </div>
+
+            <!-- isReady -->
+            <div class="mb-8">
+              <h3 class="text-lg font-semibold text-primary mb-2">
+                <code class="text-accent">GrandJury.isReady()</code>
+              </h3>
+              <p class="text-secondary mb-4">Check if the SDK is initialized and ready.</p>
+              <p class="text-secondary text-sm"><strong>Returns:</strong> boolean</p>
+            </div>
+
+            <!-- langfuse.wrapTrace -->
+            <div class="mb-8">
+              <h3 class="text-lg font-semibold text-primary mb-2">
+                <code class="text-accent">GrandJury.langfuse.wrapTrace(trace)</code>
+              </h3>
+              <p class="text-secondary mb-4">Wrap a Langfuse trace with GrandJury session correlation.</p>
+              <p class="text-secondary text-sm"><strong>Returns:</strong> Enhanced Langfuse trace</p>
+            </div>
+
+            <!-- langfuse.trackGeneration -->
+            <div>
+              <h3 class="text-lg font-semibold text-primary mb-2">
+                <code class="text-accent">GrandJury.langfuse.trackGeneration(generation)</code>
+              </h3>
+              <p class="text-secondary mb-4">Track a Langfuse generation for evaluation.</p>
+              <p class="text-secondary text-sm"><strong>Returns:</strong> void</p>
+            </div>
+          </section>
+
+          <!-- Examples -->
+          <section id="examples">
+            <h2 class="text-2xl font-bold text-primary mb-6">Examples</h2>
+
+            <h3 class="text-lg font-semibold text-primary mb-4">React Application</h3>
+
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden mb-8">
+              <div class="bg-surface px-4 py-2 border-b border-border-subtle">
+                <span class="text-sm text-secondary">React</span>
+              </div>
+              <pre class="p-4 overflow-x-auto"><code class="text-sm text-primary">import {'{'} useEffect {'}'} from 'react';
+import GrandJury from '@humanjudge/grandjury-js';
+
+function App() {'{'}
+  useEffect(() =&gt; {'{'}
+    GrandJury.init({'{'}
+      projectId: process.env.REACT_APP_GRANDJURY_PROJECT_ID,
+      sessionMetadata: {'{'}
+        framework: 'react',
+        version: '18.2.0'
+      {'}'}
+    {'}'});
+
+    return () =&gt; {'{'}
+      GrandJury.destroy();
+    {'}'};
+  {'}'}, []);
+
+  const handleAIQuery = async (query) =&gt; {'{'}
+    // Create inference for this interaction
+    const inferenceId = GrandJury.inference({'{'}
+      query_type: 'chat'
+    {'}'});
+
+    // Your AI logic here
+    const response = await fetchAIResponse(query);
+    return response;
+  {'}'};
+
+  return &lt;div&gt;Your app content&lt;/div&gt;;
+{'}'}</code></pre>
+            </div>
+
+            <h3 class="text-lg font-semibold text-primary mb-4">Vanilla JavaScript</h3>
+
+            <div class="bg-surface-elevated border border-border-subtle rounded-lg overflow-hidden">
+              <div class="bg-surface px-4 py-2 border-b border-border-subtle">
+                <span class="text-sm text-secondary">HTML</span>
+              </div>
+              <pre class="p-4 overflow-x-auto"><code class="text-sm text-primary">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;script src="https://grandjury.xyz/sdk/grandjury.min.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;script&gt;
+    GrandJury.init({'{'}
+      projectId: 'proj_my_app_123',
+      enableDebug: true
+    {'}'}).then(() =&gt; {'{'}
+      console.log('Session started:', GrandJury.getSessionId());
+
+      // Listen for AI responses and create inference IDs
+      document.getElementById('submit-btn').addEventListener('click', () =&gt; {'{'}
+        const inferenceId = GrandJury.inference();
+        console.log('Inference created:', inferenceId);
+        // Process AI query...
+      {'}'});
+    {'}'});
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+          </section>
+
+          <!-- Troubleshooting -->
+          <section id="troubleshooting">
+            <h2 class="text-2xl font-bold text-primary mb-6">Troubleshooting</h2>
+
+            <div class="space-y-6">
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-6">
+                <h3 class="font-semibold text-primary mb-2">SDK not loading</h3>
+                <div class="bg-surface border border-border-subtle rounded p-4 mb-3">
+                  <code class="text-sm text-primary">if (typeof window.GrandJury === 'undefined') {'{'}
+  console.error('GrandJury SDK failed to load');
+{'}'}</code>
+                </div>
+                <p class="text-secondary text-sm">Check network tab for script loading errors. Ensure CDN URL is correct.</p>
+              </div>
+
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-6">
+                <h3 class="font-semibold text-primary mb-2">Chrome extension not detecting sessions</h3>
+                <p class="text-secondary text-sm mb-2">Ensure these global variables are set after init:</p>
+                <div class="bg-surface border border-border-subtle rounded p-4">
+                  <code class="text-sm text-primary">console.log(window.grandjurySessionId);  // Should have value
+console.log(window.grandjuryConfig);      // Should have config</code>
+                </div>
+              </div>
+
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-6">
+                <h3 class="font-semibold text-primary mb-2">Langfuse scores not syncing</h3>
+                <p class="text-secondary text-sm">
+                  Ensure you're using <code class="text-accent">GrandJury.langfuse.wrapTrace()</code> to add session correlation to your traces.
+                </p>
+              </div>
+
+              <div class="bg-surface-elevated border border-border-subtle rounded-lg p-6">
+                <h3 class="font-semibold text-primary mb-2">Debug mode</h3>
+                <p class="text-secondary text-sm mb-2">Enable debug logging to troubleshoot issues:</p>
+                <div class="bg-surface border border-border-subtle rounded p-4">
+                  <code class="text-sm text-primary">GrandJury.init({'{'}
+  projectId: 'proj_your_id',
+  enableDebug: true
+{'}'});</code>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Support -->
+          <section class="mt-12 pt-8 border-t border-border-subtle">
+            <h2 class="text-xl font-bold text-primary mb-4">Need Help?</h2>
+            <p class="text-secondary">
+              Questions about integration? Email <a href="mailto:support@humanjudge.com" class="text-accent hover:text-accent-hover">support@humanjudge.com</a>
+            </p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

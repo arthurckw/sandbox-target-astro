@@ -1,0 +1,5 @@
+# Redirects for URL migration
+/for-reviewers              /ai-reviews              301
+/for-reviewers/*            /ai-reviews/:splat       301
+/topics                     /ai-reviews              301
+/topics/*                   /ai-reviews/:splat       301
