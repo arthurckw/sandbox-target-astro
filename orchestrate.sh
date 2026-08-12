@@ -19,7 +19,7 @@ cd "$REPO_ROOT" || exit 1
 
 MAX_RETRIES=3
 MAX_TURNS_PER_AGENT=40
-CLAUDE_FLAGS="--output-format text --dangerously-skip-permissions --max-turns $MAX_TURNS_PER_AGENT"
+CLAUDE_FLAGS="--output-format stream-json --input-format text --verbose --dangerously-skip-permissions --max-turns $MAX_TURNS_PER_AGENT"
 
 # --- helpers ------------------------------------------------------------------
 
