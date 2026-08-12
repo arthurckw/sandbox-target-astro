@@ -155,6 +155,19 @@ done
 
 # --- 3. Deployer --------------------------------------------------------------
 
+if [ "${SKIP_DEPLOYER:-0}" = "1" ]; then
+  log ORCH "SKIP_DEPLOYER=1 set — bypassing Deployer. Final state files: PLAN.md, IMPLEMENT.md, QA_REPORT.md"
+  echo ""
+  echo "=========================================="
+  echo "PARTIAL RUN COMPLETE (deployer skipped)"
+  echo "=========================================="
+  echo "--- PLAN.md ---"; cat PLAN.md; echo ""
+  echo "--- IMPLEMENT.md ---"; cat IMPLEMENT.md; echo ""
+  echo "--- QA_REPORT.md ---"; cat QA_REPORT.md
+  echo "=========================================="
+  exit 0
+fi
+
 invoke_agent deployer "PLAN.md:
 $(cat PLAN.md)
 
